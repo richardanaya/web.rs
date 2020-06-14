@@ -1,4 +1,4 @@
-# ramen
+# ramen :ramen:
 
 Load WebAssembly like JavaScript
 
