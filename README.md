@@ -1,8 +1,6 @@
 # ramen
 
-A dead-simple WebAssembly module loader.
-
-Load WebAssembly like JavaScript:
+Load WebAssembly like JavaScript
 
 ```html
 <html>
@@ -16,7 +14,7 @@ Load WebAssembly like JavaScript:
 </html>
 ```
 
-Instantly get access to two functions to dynamically invoke JavaScript:
+Instantly get access to two functions to dynamically invoke JavaScript
 
 ```rust
 let fn_log = register_function("
