@@ -14,7 +14,7 @@ Load WebAssembly like JavaScript
 </html>
 ```
 
-Instantly get access to two functions to dynamically invoke JavaScript
+Instantly get access to functions for invoking JavaScript
 
 ```rust
 let fn_log = register_function("
