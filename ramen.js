@@ -1,7 +1,12 @@
 async function load_and_run_wasm(wasmURL) {
   let context = {
     functions: [],
-    objects: [],
+    objects:  [
+      undefined,
+      null,
+      self,
+      typeof document != "undefined" ? document : null
+    ],
     utf8dec: new TextDecoder("utf-8"),
     utf8enc: new TextEncoder("utf-8"),
     getUtf8FromMemory: function(start, len) {
