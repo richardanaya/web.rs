@@ -1,7 +1,7 @@
 # ramen :ramen:
 <a href="https://docs.rs/ramen"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-`ramen` wants to be technology-agnostic way to call JavaScript from WebAssembly. See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
+`ramen` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly. See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
 
 # How It Works
 
