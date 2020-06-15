@@ -1,12 +1,14 @@
 # ramen :ramen:
 <a href="https://docs.rs/ramen"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-`ramen` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly. See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
+`ramen` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
 
 Works with any WebAssembly programming language out of the box:
-* Rust
+* [Rust](https://docs.rs/ramen/0.0.1/ramen/)
 * [C/C++](ramen.h)
 * AssemblyScript
+
+See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
 
 # How It Works
 
