@@ -15,7 +15,7 @@ Load WebAssembly like JavaScript
 </html>
 ```
 
-Quickly create JavaScript functions and invoke them
+Create JavaScript functions and invoke them
 
 **Rust:**
 ```toml
