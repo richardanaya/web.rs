@@ -18,6 +18,10 @@ Load WebAssembly like JavaScript
 Quickly get access to functions for invoking JavaScript
 
 **Rust:**
+```toml
+[dependencies]
+ramen = "0"
+```
 ```rust
 let fn_log = ramen::register_function(
     "function(context,strPtr,strLen){
