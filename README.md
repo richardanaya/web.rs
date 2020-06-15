@@ -8,7 +8,7 @@ Works with any WebAssembly programming language out of the box:
 * [C/C++](ramen.h)
 * AssemblyScript
 
-See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
+See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html) of it working!
 
 # How It Works
 
