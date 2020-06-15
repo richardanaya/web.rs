@@ -16,6 +16,7 @@ Load WebAssembly like JavaScript
 
 Quickly get access to functions for invoking JavaScript
 
+**Rust:**
 ```rust
 let fn_log = ramen::register_function(
     "function(context,strPtr,strLen){
@@ -29,6 +30,7 @@ let msg = "Hello World!";
 fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 ```
 
+**C/C++:**
 ```c
 JSFunction fnLog = js_register_function(
     "function(context,strPtr,strLen){\
@@ -43,7 +45,7 @@ js_invoke_function(fnLog, msg, 11);
 
 Works with any WebAssembly programming language out of the box:
 * Rust
-* C
+* C/C++
 * AssemblyScript
 
 Lot's of helpers!
