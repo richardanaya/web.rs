@@ -55,7 +55,7 @@ Works with any WebAssembly programming language out of the box:
 
 Lot's of helpers!
 
-In your JS function `context` is passed in to handle most chores for binding and give access to your program.
+In your JS function `context` is passed in to handle most issues you'll encounter
 
 * `context.getUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
 * `context.writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
