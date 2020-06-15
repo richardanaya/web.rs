@@ -50,8 +50,8 @@ Lot's of helpers!
 
 In your JS function `context` is passed in to handle most chores for binding and give access to your program.
 
-* `getUtf8FromMemory` - extract utf-8 text from your program's memory.
-* `storeObject` - store an object in your context for later reference, get a handle you can give to WebASsembly.
-* `getObject` - retreive and object from your context with a handle.
-* `releaseObject` - release a stored object so it's memory can be freed.
-
+* `context.getUtf8FromMemory(start,length)` - extract utf-8 text from your program's memory.
+* `context.storeObject(object)` - store an object in your context for later reference, get a handle you can give to WebASsembly.
+* `context.getObject(handle)` - retreive and object from your context with a handle.
+* `context.releaseObject(handle)` - release a stored object so it's memory can be freed.
+* `context.module` - Get access to your program so you can call methods on it.
