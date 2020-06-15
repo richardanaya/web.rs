@@ -3,6 +3,11 @@
 
 `ramen` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly. See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
 
+Works with any WebAssembly programming language out of the box:
+* Rust
+* [C/C++](ramen.h)
+* AssemblyScript
+
 # How It Works
 
 Load WebAssembly like JavaScript. 
@@ -54,13 +59,6 @@ char *msg = "Hello World!";
 
 js_invoke_function_2(fnLog, msg, 11);
 ```
-
-Works with any WebAssembly programming language out of the box:
-* Rust
-* [C/C++](ramen.h)
-* AssemblyScript
-
-Lot's of helpers!
 
 In your JS function `context` is passed in to handle most issues you'll encounter
 
