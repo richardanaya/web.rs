@@ -50,7 +50,7 @@ js_invoke_function_2(fnLog, msg, 11);
 
 Works with any WebAssembly programming language out of the box:
 * Rust
-* C/C++
+* [C/C++](ramen.h)
 * AssemblyScript
 
 Lot's of helpers!
