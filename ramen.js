@@ -1,6 +1,7 @@
 async function load_and_run_wasm(wasmURL) {
   let context = {
     functions: [],
+    free_locations: [],
     objects:  [
       undefined,
       null,
@@ -22,6 +23,9 @@ async function load_and_run_wasm(wasmURL) {
     },
     storeObject: function(obj) {
       let handle = this.objects.length;
+      if(this.free_locations.length>0){
+        handle = this.free_locations.pop();
+      }
       this.objects.push(obj);
       return handle;
     },
@@ -30,6 +34,7 @@ async function load_and_run_wasm(wasmURL) {
     },
     releaseObject: function(handle) {
       this.objects[handle] = null;
+      this.free_locations.push(handle);
     }
   };
   let response = await fetch(wasmURL);
