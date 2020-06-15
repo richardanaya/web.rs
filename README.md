@@ -56,6 +56,8 @@ Works with any WebAssembly programming language out of the box:
 * [C/C++](ramen.h)
 * AssemblyScript
 
+See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
+
 Lot's of helpers!
 
 In your JS function `context` is passed in to handle most issues you'll encounter
