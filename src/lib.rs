@@ -1,9 +1,10 @@
+#![no_std]
 
-
-pub const NULL:usize = 0;
-pub const UNDEFINED:usize = 1;
-pub const SELF:usize = 2;
-pub const DOCUMENT:usize = 3;
+pub const JS_NULL: usize = 0;
+pub const JS_UNDEFINED: usize = 1;
+pub const JS_SELF: usize = 2;
+pub const JS_WINDOW: usize = 2;
+pub const JS_DOCUMENT: usize = 3;
 
 extern "C" {
     fn js_register_function(start: usize, len: usize) -> usize;
@@ -27,12 +28,10 @@ pub struct JSInvoker {
 }
 
 impl JSInvoker {
-    pub fn invoke_0<R>(&self) -> R
-    where
-        R: From<f64>,
-    {
+    pub fn invoke_0<R>(&self) -> f64
+where {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 0.0,
                 0.0,
@@ -44,17 +43,16 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_1<A, R>(&self, a: A) -> R
+    pub fn invoke_1<A>(&self, a: A) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 0.0,
@@ -66,18 +64,17 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_2<A, B, R>(&self, a: A, b: B) -> R
+    pub fn invoke_2<A, B>(&self, a: A, b: B) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -89,19 +86,18 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_3<A, B, C, R>(&self, a: A, b: B, c: C) -> R
+    pub fn invoke_3<A, B, C>(&self, a: A, b: B, c: C) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -113,20 +109,19 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_4<A, B, C, D, R>(&self, a: A, b: B, c: C, d: D) -> R
+    pub fn invoke_4<A, B, C, D>(&self, a: A, b: B, c: C, d: D) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
         D: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -138,13 +133,12 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_5<A, B, C, D, E, R>(&self, a: A, b: B, c: C, d: D, e: E) -> R
+    pub fn invoke_5<A, B, C, D, E>(&self, a: A, b: B, c: C, d: D, e: E) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
@@ -152,7 +146,7 @@ impl JSInvoker {
         E: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -164,13 +158,12 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_6<A, B, C, D, E, F, R>(&self, a: A, b: B, c: C, d: D, e: E, f: F) -> R
+    pub fn invoke_6<A, B, C, D, E, F>(&self, a: A, b: B, c: C, d: D, e: E, f: F) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
@@ -179,7 +172,7 @@ impl JSInvoker {
         F: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -191,13 +184,12 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_7<A, B, C, D, E, F, G, R>(&self, a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> R
+    pub fn invoke_7<A, B, C, D, E, F, G>(&self, a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
@@ -207,7 +199,7 @@ impl JSInvoker {
         G: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -219,11 +211,11 @@ impl JSInvoker {
                 0.0,
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_8<A, B, C, D, E, F, G, H, R>(
+    pub fn invoke_8<A, B, C, D, E, F, G, H>(
         &self,
         a: A,
         b: B,
@@ -233,9 +225,8 @@ impl JSInvoker {
         f: F,
         g: G,
         h: H,
-    ) -> R
+    ) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
@@ -246,7 +237,7 @@ impl JSInvoker {
         H: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -258,11 +249,11 @@ impl JSInvoker {
                 h.into(),
                 0.0,
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_9<A, B, C, D, E, F, G, H, I, R>(
+    pub fn invoke_9<A, B, C, D, E, F, G, H, I>(
         &self,
         a: A,
         b: B,
@@ -273,9 +264,8 @@ impl JSInvoker {
         g: G,
         h: H,
         i: I,
-    ) -> R
+    ) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
@@ -287,7 +277,7 @@ impl JSInvoker {
         I: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -299,11 +289,11 @@ impl JSInvoker {
                 h.into(),
                 i.into(),
                 0.0,
-            ))
+            )
         }
     }
 
-    pub fn invoke_10<A, B, C, D, E, F, G, H, I, J, R>(
+    pub fn invoke_10<A, B, C, D, E, F, G, H, I, J>(
         &self,
         a: A,
         b: B,
@@ -315,9 +305,8 @@ impl JSInvoker {
         h: H,
         i: I,
         j: J,
-    ) -> R
+    ) -> f64
     where
-        R: From<f64>,
         A: Into<f64>,
         B: Into<f64>,
         C: Into<f64>,
@@ -330,7 +319,7 @@ impl JSInvoker {
         J: Into<f64>,
     {
         unsafe {
-            R::from(js_invoke_function(
+            js_invoke_function(
                 self.fn_handle,
                 a.into(),
                 b.into(),
@@ -342,7 +331,7 @@ impl JSInvoker {
                 h.into(),
                 i.into(),
                 j.into(),
-            ))
+            )
         }
     }
 }
