@@ -1,7 +1,11 @@
 # ramen :ramen:
 <a href="https://docs.rs/ramen"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-Load WebAssembly like JavaScript
+`ramen` wants to be technology-agnostic way to call JavaScript from WebAssembly. See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
+
+# How It Works
+
+Load WebAssembly like JavaScript. 
 
 ```html
 <html>
@@ -55,8 +59,6 @@ Works with any WebAssembly programming language out of the box:
 * Rust
 * [C/C++](ramen.h)
 * AssemblyScript
-
-See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html)!
 
 Lot's of helpers!
 
