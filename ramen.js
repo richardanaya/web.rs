@@ -14,6 +14,12 @@ async function load_and_run_wasm(wasmURL) {
       let text = this.utf8dec.decode(memory.subarray(start, start + len));
       return text;
     },
+    writeUtf8ToMemory: function(start, str) {
+      let bytes = utf8enc.encode(str);
+      let len = bytes.length;
+      const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
+      memory.set(bytes, start);
+    },
     storeObject: function(obj) {
       let handle = this.objects.length;
       this.objects.push(obj);
