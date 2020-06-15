@@ -45,6 +45,7 @@ JSFunction fnLog = js_register_function(
 );
 
 char *msg = "Hello World!";
+
 js_invoke_function_2(fnLog, msg, 11);
 ```
 
