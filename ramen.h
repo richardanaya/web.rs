@@ -4,8 +4,9 @@
 
 #ifndef RAMEN_H
 typedef double JSValue;
-extern int js_register_function(char*,usize len);
-extern JSValue js_register_function(int,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue);
+typedef int JSFunction;
+extern JSFunction js_register_function(char*,uint len);
+extern JSValue js_invoke_function(JSFunction,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue);
 
 JSValue const JS_NULL = 0.0;
 JSValue const JS_UNDEFINED = 1.0;
