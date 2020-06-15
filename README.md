@@ -3,7 +3,7 @@
 
 `ramen` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
 
-Works with any WebAssembly programming language out of the box:
+Use any WebAssembly programming language out of the box:
 * [Rust](https://docs.rs/ramen/0.0.1/ramen/)
 * [C/C++](ramen.h)
 * AssemblyScript
