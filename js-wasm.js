@@ -10,6 +10,22 @@ async function load_and_run_wasm(wasmURL) {
     ],
     utf8dec: new TextDecoder("utf-8"),
     utf8enc: new TextEncoder("utf-8"),
+    getCStringFromMemory: function(start){
+      const data = new Uint8Array(this.module.instance.exports.memory.buffer);
+      const str = [];
+      let i = start;
+      while (data[i] !== 0) {
+          str.push(data[i]);
+          i++;
+      }
+      return this.utf8dec.decode(new Uint8Array(str));
+    },
+    writeCStringToMemory(str, start) {
+      let bytes = this.utf8enc.encode(str + String.fromCharCode(0));
+      let len = bytes.length;
+      const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
+      memory.set(bytes, start);
+    },
     getUtf8FromMemory: function(start, len) {
       let memory = new Uint8Array(this.module.instance.exports.memory.buffer);
       let text = this.utf8dec.decode(memory.subarray(start, start + len));
