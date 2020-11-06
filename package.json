@@ -1,0 +1,26 @@
+{
+  "name": "js-wasm",
+  "version": "0.2.1",
+  "description": "Call JavaScript from WebAssembly ",
+  "main": "js-wasm.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/richardanaya/js-wasm.git"
+  },
+  "keywords": [
+    "wasm",
+    "js"
+  ],
+  "author": "Richard Anaya",
+  "license": "MIT OR Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/richardanaya/js-wasm/issues"
+  },
+  "homepage": "https://github.com/richardanaya/js-wasm#readme"
+}
