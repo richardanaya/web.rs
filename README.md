@@ -60,7 +60,7 @@ In your JS function `context` is passed in to handle most issues you'll encounte
 
 * `context.readUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
 * `context.writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
-* `context.getCStringFromMemory(start,length)` - Extract C string text from your program's memory.
+* `context.readCStringFromMemory(start,length)` - Extract C string text from your program's memory.
 * `context.writeCStringToMemory(start,str)` - Write C string to a memory location you are sure it should go.
 * `context.storeObject(object)` - Store an object in your context for later reference, get a handle you can give to WebAssembly.
 * `context.getObject(handle)` - Retreive and object from your context with a handle.
