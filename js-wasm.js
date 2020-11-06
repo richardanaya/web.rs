@@ -2,7 +2,7 @@ async function load_and_run_wasm(wasmURL) {
   let context = {
     functions: [],
     free_locations: [],
-    objects:  [
+    objects: [
       undefined,
       null,
       self,
@@ -10,13 +10,13 @@ async function load_and_run_wasm(wasmURL) {
     ],
     utf8dec: new TextDecoder("utf-8"),
     utf8enc: new TextEncoder("utf-8"),
-    getCStringFromMemory: function(start){
+    getCStringFromMemory: function (start) {
       const data = new Uint8Array(this.module.instance.exports.memory.buffer);
       const str = [];
       let i = start;
       while (data[i] !== 0) {
-          str.push(data[i]);
-          i++;
+        str.push(data[i]);
+        i++;
       }
       return this.utf8dec.decode(new Uint8Array(str));
     },
@@ -26,29 +26,29 @@ async function load_and_run_wasm(wasmURL) {
       const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
       memory.set(bytes, start);
     },
-    getUtf8FromMemory: function(start, len) {
+    getUtf8FromMemory: function (start, len) {
       let memory = new Uint8Array(this.module.instance.exports.memory.buffer);
       let text = this.utf8dec.decode(memory.subarray(start, start + len));
       return text;
     },
-    writeUtf8ToMemory: function(start, str) {
+    writeUtf8ToMemory: function (start, str) {
       let bytes = utf8enc.encode(str);
       let len = bytes.length;
       const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
       memory.set(bytes, start);
     },
-    storeObject: function(obj) {
+    storeObject: function (obj) {
       let handle = this.objects.length;
-      if(this.free_locations.length>0){
+      if (this.free_locations.length > 0) {
         handle = this.free_locations.pop();
       }
       this.objects.push(obj);
       return handle;
     },
-    getObject: function(handle) {
+    getObject: function (handle) {
       return this.objects[handle];
     },
-    releaseObject: function(handle) {
+    releaseObject: function (handle) {
       this.objects[handle] = null;
       this.free_locations.push(handle);
     }
@@ -83,11 +83,11 @@ async function load_and_run_wasm(wasmURL) {
   let num = module.instance.exports.main();
 }
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
   let wasmScripts = document.querySelectorAll("script[type='application/wasm']");
-  for(let i = 0;i<wasmScripts.length;i++){
+  for (let i = 0; i < wasmScripts.length; i++) {
     let src = wasmScripts[i].src;
-    if(src){
+    if (src) {
       load_and_run_wasm(src);
     } else {
       console.error("Script tag must have 'src' property.");
