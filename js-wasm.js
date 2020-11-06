@@ -31,6 +31,13 @@ async function load_and_run_wasm(wasmURL) {
       let text = this.utf8dec.decode(memory.subarray(start, start + len));
       return text;
     },
+    readUint8ArrayFromMemory(start) {
+      const data32 = new Uint32Array(this.module.instance.exports.memory.buffer);
+      const ptr = data32[start / 4];
+      const length = data32[ptr / 4];
+      let b = mem.slice(ptr + 4, ptr + 4 + length);
+      return new Uint8Array(b);
+    },
     writeUtf8ToMemory: function (start, str) {
       let bytes = utf8enc.encode(str);
       let len = bytes.length;

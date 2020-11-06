@@ -56,13 +56,14 @@ JSFunction fnLog = js_register_function(
 js_invoke_function_2(fnLog, "Hello World!");
 ```
 
-In your JS function `context` is passed in to handle most issues you'll encounter
+In your JS function context `this` several functions handle most issues you'll encounter
 
-* `context.readUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
-* `context.writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
-* `context.readCStringFromMemory(start,length)` - Extract C string text from your program's memory.
-* `context.writeCStringToMemory(start,str)` - Write C string to a memory location you are sure it should go.
-* `context.storeObject(object)` - Store an object in your context for later reference, get a handle you can give to WebAssembly.
-* `context.getObject(handle)` - Retreive and object from your context with a handle.
-* `context.releaseObject(handle)` - Release a stored object so it's memory can be freed.
-* `context.module` - Get access to your program so you can call methods on it.
+* `readUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
+* `writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
+* `readCStringFromMemory(start,length)` - Extract C string text from your program's memory.
+* `writeCStringToMemory(start,str)` - Write C string to a memory location you are sure it should go.
+* `readUint8ArrayFromMemory` - Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory.
+* `storeObject(object)` - Store an object in your context for later reference, get a handle you can give to WebAssembly.
+* `getObject(handle)` - Retreive and object from your context with a handle.
+* `releaseObject(handle)` - Release a stored object so it's memory can be freed.
+* `module` - Get access to your program so you can call methods on it.
