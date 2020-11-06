@@ -2,7 +2,7 @@
 #define export __attribute__((visibility("default")))
 #endif
 
-#ifndef RAMEN_H
+#ifndef JS_H
 typedef double JSValue;
 typedef int JSFunction;
 extern JSFunction js_register_function(char*,uint len);

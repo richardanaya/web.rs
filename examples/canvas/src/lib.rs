@@ -1,6 +1,6 @@
 #[no_mangle]
 pub fn main() {
-    let fn_get_2d_context = ramen::register_function(
+    let fn_get_2d_context = js::register_function(
         r#"
             (context, selectorStart, selectorEnd) => {
                 let selector = context.getUtf8FromMemory(selectorStart,selectorEnd);
@@ -8,7 +8,7 @@ pub fn main() {
                 return context.storeObject(obj.getContext("2d"));
             }"#,
     );
-    let fn_set_color = ramen::register_function(
+    let fn_set_color = js::register_function(
         r#"
             (context, ctxHandle, colorStart, colorEnd) => {
                 let color = context.getUtf8FromMemory(colorStart, colorEnd);
@@ -16,7 +16,7 @@ pub fn main() {
                 ctx.fillStyle = color;
             }"#,
     );
-    let fn_fill_rect = ramen::register_function(
+    let fn_fill_rect = js::register_function(
         r#"
             (context, ctxHandle, x, y, width, height) => {
                 let ctx = context.getObject(ctxHandle);
