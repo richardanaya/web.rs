@@ -58,13 +58,14 @@ async function load_and_run_wasm(wasmURL) {
   let module = await WebAssembly.instantiate(bytes, {
     env: {
       js_register_function(start, len) {
-        let functionBody = context.getUtf8FromMemory(start, len);
+        let functionBody = context.readUtf8FromMemory(start, len);
         let id = context.functions.length;
-        context.functions.push(eval("(" + functionBody + ")").bind(context));
+        context.functions.push(eval("(" + functionBody + ")"));
         return id;
       },
       js_invoke_function(funcHandle, a, b, c, d, e, f, g, h, i, j) {
-        return context.functions[funcHandle](
+        return context.functions[funcHandle].call(
+          context,
           a,
           b,
           c,

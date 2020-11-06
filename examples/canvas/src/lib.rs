@@ -2,23 +2,23 @@
 pub fn main() {
     let fn_get_2d_context = js::register_function(
         r#"
-            (selectorStart, selectorEnd) => {
-                let selector = this.getUtf8FromMemory(selectorStart,selectorEnd);
+            function(selectorStart, selectorEnd){
+                let selector = this.readUtf8FromMemory(selectorStart,selectorEnd);
                 let obj = document.querySelector(selector);
                 return context.storeObject(obj.getContext("2d"));
             }"#,
     );
     let fn_set_color = js::register_function(
         r#"
-            (ctxHandle, colorStart, colorEnd) => {
-                let color = this.getUtf8FromMemory(colorStart, colorEnd);
+            function(ctxHandle, colorStart, colorEnd){
+                let color = this.readUtf8FromMemory(colorStart, colorEnd);
                 let ctx = this.getObject(ctxHandle);
                 ctx.fillStyle = color;
             }"#,
     );
     let fn_fill_rect = js::register_function(
         r#"
-            (ctxHandle, x, y, width, height) => {
+            function(ctxHandle, x, y, width, height){
                 let ctx = this.getObject(ctxHandle);
                 ctx.fillRect(x, y, width, height);
             }"#,

@@ -2,7 +2,7 @@
 pub fn main() {
     let fn_log = js::register_function(
         "function(strPtr,strLen){
-            console.log(this.getUtf8FromMemory(strPtr,strLen)); 
+            console.log(this.readUtf8FromMemory(strPtr,strLen)); 
         }",
     );
     let msg = "Hello World!";

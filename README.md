@@ -36,7 +36,7 @@ js = "0.2"
 ```rust
 let fn_log = js::register_function(
     "function(strPtr,strLen){
-        console.log(this.getUtf8FromMemory(strPtr,strLen)); 
+        console.log(this.readUtf8FromMemory(strPtr,strLen)); 
     }",
 );
 
@@ -60,7 +60,7 @@ js_invoke_function_2(fnLog, "Hello World!");
 
 In your JS function `context` is passed in to handle most issues you'll encounter
 
-* `context.getUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
+* `context.readUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
 * `context.writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
 * `context.getCStringFromMemory(start,length)` - Extract C string text from your program's memory.
 * `context.writeCStringToMemory(start,str)` - Write C string to a memory location you are sure it should go.
