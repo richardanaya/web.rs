@@ -2,9 +2,9 @@
 
 pub const JS_NULL: usize = 0;
 pub const JS_UNDEFINED: usize = 1;
-pub const JS_SELF: usize = 2;
-pub const JS_WINDOW: usize = 2;
-pub const JS_DOCUMENT: usize = 3;
+pub const DOM_SELF: usize = 2;
+pub const DOM_WINDOW: usize = 2;
+pub const DOM_DOCUMENT: usize = 3;
 
 extern "C" {
     fn js_register_function(start: usize, len: usize) -> usize;
