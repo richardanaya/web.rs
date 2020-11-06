@@ -5,6 +5,7 @@ pub const JS_UNDEFINED: usize = 1;
 pub const DOM_SELF: usize = 2;
 pub const DOM_WINDOW: usize = 2;
 pub const DOM_DOCUMENT: usize = 3;
+pub const DOM_BODY: usize = 3;
 
 extern "C" {
     fn js_register_function(start: usize, len: usize) -> usize;
@@ -28,7 +29,7 @@ pub struct JSInvoker {
 }
 
 impl JSInvoker {
-    pub fn invoke_0<R>(&self) -> f64
+    pub fn invoke_0(&self) -> f64
 where {
         unsafe {
             js_invoke_function(

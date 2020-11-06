@@ -1,6 +1,6 @@
 [package]
 name = "js"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "Call JavaScript from WebAssembly"

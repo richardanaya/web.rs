@@ -6,7 +6,8 @@ async function load_and_run_wasm(wasmURL) {
       undefined,
       null,
       self,
-      typeof document != "undefined" ? document : null
+      typeof document != "undefined" ? document : null,
+      typeof document != "undefined" ? document.body : null
     ],
     utf8dec: new TextDecoder("utf-8"),
     utf8enc: new TextEncoder("utf-8"),
