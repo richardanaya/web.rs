@@ -1,14 +1,14 @@
-# ramen :ramen:
-<a href="https://docs.rs/ramen"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
+# js-rs
+<a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-`ramen` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
+`js` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
 
 Use any WebAssembly programming language out of the box:
-* [Rust](https://docs.rs/ramen/0.0.1/ramen/)
-* [C/C++](ramen.h)
+* [Rust](https://docs.rs/js/0.0.1/js/)
+* [C/C++](js.h)
 * AssemblyScript
 
-See a [demo](https://richardanaya.github.io/ramen/examples/canvas/index.html) of it working!
+See a [demo](https://richardanaya.github.io/js-rs/examples/canvas/index.html) of it working!
 
 # How It Works
 
@@ -17,7 +17,7 @@ Load WebAssembly like JavaScript.
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/richardanaya/ramen/ramen.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/richardanaya/js-rs/js.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>
@@ -31,10 +31,10 @@ Create JavaScript functions and invoke them
 **Rust:**
 ```toml
 [dependencies]
-ramen = "0"
+js = "0"
 ```
 ```rust
-let fn_log = ramen::register_function(
+let fn_log = js::register_function(
     "function(context,strPtr,strLen){
         let str = context.getUtf8FromMemory(strPtr,strLen);
         console.log(str); 
@@ -48,7 +48,7 @@ fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 
 **C/C++:**
 ```c
- #include "ramen.h"
+ #include "js.h"
  
 JSFunction fnLog = js_register_function(
     "function(context,strPtr,strLen){\
