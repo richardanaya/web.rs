@@ -4,7 +4,7 @@
 `js` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
 
 Use any WebAssembly programming language out of the box:
-* [Rust](https://docs.rs/js/0.0.1/js/)
+* [Rust](https://docs.rs/js/latest/js/)
 * [C/C++](js.h)
 * AssemblyScript
 
