@@ -17,7 +17,7 @@ Load WebAssembly like JavaScript.
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/richardanaya/js-wasm/js.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/richardanaya/js-wasm/js-wasm.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>
