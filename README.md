@@ -1,4 +1,4 @@
-# js-rs
+# js-wasm
 <a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
 `js` wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
@@ -8,7 +8,7 @@ Use any WebAssembly programming language out of the box:
 * [C/C++](js.h)
 * AssemblyScript
 
-See a [demo](https://richardanaya.github.io/js-rs/examples/canvas/index.html) of it working!
+See a [demo](https://richardanaya.github.io/js-wasm/examples/canvas/index.html) of it working!
 
 # How It Works
 
@@ -17,7 +17,7 @@ Load WebAssembly like JavaScript.
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/richardanaya/js-rs/js.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/richardanaya/js-wasm/js.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>

@@ -1,12 +1,12 @@
 [package]
 name = "js"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "Call Javascript from WebAssembly"
 license = "MIT OR Apache-2.0"
 categories = ["wasm", "no-std"]
-repository = "https://github.com/richardanaya/js_ffi"
+repository = "https://github.com/richardanaya/js-wasm"
 readme="README.md"
 
 
