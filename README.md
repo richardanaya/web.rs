@@ -37,8 +37,7 @@ js = "0.2"
 let fn_log = js::register_function(
     "function(strPtr,strLen){
         console.log(this.readUtf8FromMemory(strPtr,strLen)); 
-    }",
-);
+    }");
 
 let msg = "Hello World!";
 
@@ -52,8 +51,7 @@ fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 JSFunction fnLog = js_register_function(
     "function(context,cstrPtr){\
         console.log(thi.getCStringFromMemory(cstrPtr));\
-    }",
-);
+    }");
 
 js_invoke_function_2(fnLog, "Hello World!");
 ```
