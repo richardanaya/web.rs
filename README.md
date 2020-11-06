@@ -56,7 +56,7 @@ JSFunction fnLog = js_register_function(
 js_invoke_function_2(fnLog, "Hello World!");
 ```
 
-In your JS function context `this` several functions handle most issues you'll encounter
+In your JS function context `this` contains several functions handle most issues you'll encounter
 
 * `readUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
 * `writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
