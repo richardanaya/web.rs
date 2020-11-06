@@ -1,11 +1,11 @@
 #![no_std]
 
-pub const JS_NULL: usize = 0;
-pub const JS_UNDEFINED: usize = 1;
-pub const DOM_SELF: usize = 2;
-pub const DOM_WINDOW: usize = 2;
-pub const DOM_DOCUMENT: usize = 3;
-pub const DOM_BODY: usize = 3;
+pub const JS_NULL: u32 = 0;
+pub const JS_UNDEFINED: u32 = 1;
+pub const DOM_SELF: u32 = 2;
+pub const DOM_WINDOW: u32 = 2;
+pub const DOM_DOCUMENT: u32 = 3;
+pub const DOM_BODY: u32 = 4;
 
 extern "C" {
     fn js_register_function(start: usize, len: usize) -> usize;
