@@ -35,9 +35,8 @@ js = "0"
 ```
 ```rust
 let fn_log = js::register_function(
-    "function(context,strPtr,strLen){
-        let str = context.getUtf8FromMemory(strPtr,strLen);
-        console.log(str); 
+    "function(strPtr,strLen){
+        console.log(this.getUtf8FromMemory(strPtr,strLen)); 
     }",
 );
 
@@ -48,12 +47,11 @@ fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 
 **C/C++:**
 ```c
- #include "js.h"
+ #include "js-wasm.h"
  
 JSFunction fnLog = js_register_function(
     "function(context,strPtr,strLen){\
-        let str = context.getUtf8FromMemory(strPtr,strLen);\
-        console.log(str);\
+        console.log(thi.getUtf8FromMemory(strPtr,strLen));\
     }",
 );
 

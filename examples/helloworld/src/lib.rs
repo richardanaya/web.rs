@@ -1,9 +1,8 @@
 #[no_mangle]
 pub fn main() {
     let fn_log = js::register_function(
-        "function(context,strPtr,strLen){
-            let str = context.getUtf8FromMemory(strPtr,strLen);
-            console.log(str); 
+        "function(strPtr,strLen){
+            console.log(this.getUtf8FromMemory(strPtr,strLen)); 
         }",
     );
     let msg = "Hello World!";

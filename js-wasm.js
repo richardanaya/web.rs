@@ -44,12 +44,11 @@ async function load_and_run_wasm(wasmURL) {
       js_register_function(start, len) {
         let functionBody = context.getUtf8FromMemory(start, len);
         let id = context.functions.length;
-        context.functions.push(eval("(" + functionBody + ")"));
+        context.functions.push(eval("(" + functionBody + ")").bind(context));
         return id;
       },
       js_invoke_function(funcHandle, a, b, c, d, e, f, g, h, i, j) {
         return context.functions[funcHandle](
-          context,
           a,
           b,
           c,
