@@ -1,6 +1,6 @@
 [package]
-name = "ramen"
-version = "0.0.1"
+name = "js"
+version = "0.1.1"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "Call Javascript from WebAssembly"
