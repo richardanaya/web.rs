@@ -31,7 +31,7 @@ Create JavaScript functions and invoke them
 **Rust:**
 ```toml
 [dependencies]
-js = "0.3"
+js = "0.2"
 ```
 ```rust
 let fn_log = js::register_function(
