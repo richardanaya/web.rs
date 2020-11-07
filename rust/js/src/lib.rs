@@ -24,11 +24,11 @@ extern "C" {
     ) -> f64;
 }
 
-pub struct JSInvoker {
+pub struct JSFunction {
     fn_handle: usize,
 }
 
-impl JSInvoker {
+impl JSFunction {
     pub fn invoke_0(&self) -> f64
 where {
         unsafe {
@@ -337,11 +337,11 @@ where {
     }
 }
 
-pub fn register_function(code: &str) -> JSInvoker {
+pub fn register_function(code: &str) -> JSFunction {
     let start = code.as_ptr();
     let len = code.len();
     unsafe {
-        JSInvoker {
+        JSFunction {
             fn_handle: js_register_function(start as usize, len),
         }
     }
