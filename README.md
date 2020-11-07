@@ -99,13 +99,13 @@ A number of libraries exist to help save you time from writing your own bindings
 | ------------- | ------------- | ------------- |
 | [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  simple logging  |
 | [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  timers, animation loops |
-| [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  random numbers  |
+| [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_random) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  random numbers  |
 
 **UI:** 
 
 | Name          | Documentation | Description   |
 | ------------- | ------------- | ------------- |
-| [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/lit-html) | <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  a prototype of using [lit-html](https://lit-html.polymer-project.org/) HTML rendering  |
+| [`lit-html-rs`](https://github.com/richardanaya/js-wasm/tree/master/rust/lit-html) | <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  a prototype of using [lit-html](https://lit-html.polymer-project.org/) HTML rendering  |
 
 
 <p align="center">
