@@ -1,7 +1,7 @@
 # js-wasm
 <a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-JavaScript from WebAssembly should be a joy to use together. 
+*JavaScript from WebAssembly should be a joy to use together.*
 
 This project aims to provide a simple, easy to learn, technology-agnostic way bridge the two worlds.
 
