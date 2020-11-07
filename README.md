@@ -72,11 +72,38 @@ In your JS function context `this` contains several functions handle most issues
 * `releaseObject(handle)` - Release a stored object so it's memory can be freed.
 * `module` - Get access to your program so you can call methods on it.
 
+```html
+<html>
+    <head>
+        <script src="unpkg.com/js-wasm/js-wasm.js"></script>
+        <script type="application/wasm" src="helloworld.wasm"></script>
+    </head>
+    <body>
+        ...
+    </body>
+</html>
+```
+
+<p align="center">
+  <img width="460" height="300" src="images/undraw_elements_cipa.png">
+</p>
+
+# Don't Recreate the Wheel
+
+A number of libraries exist to help save you time from writing your own bindings. 
+
+
+Browser Functionality Libraries:
+* [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) - simple logging 
+* [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) - timers, animation loops
+* [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_random) - random numbers
+
+UI 
+* [`lit-html-rs`](https://github.com/richardanaya/lit-html-rs/) - a prototype of using lit-html HTML rendering
 
 <p align="center">
   <img width="460" height="300" src="images/undraw_true_love_cy8x.png">
 </p>
-
 
 # License
 
