@@ -93,12 +93,12 @@ In your JS function context `this` contains several functions handle most issues
 A number of libraries exist to help save you time from writing your own bindings. 
 
 
-Browser Functionality Libraries:
+**Browser Functionality Libraries:**
 * [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) - simple logging 
 * [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) - timers, animation loops
 * [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_random) - random numbers
 
-UI 
+**UI:** 
 * [`lit-html-rs`](https://github.com/richardanaya/lit-html-rs/) - a prototype of using lit-html HTML rendering
 
 <p align="center">
