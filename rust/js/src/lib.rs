@@ -8,7 +8,7 @@ pub const DOM_DOCUMENT: u32 = 3;
 pub const DOM_BODY: u32 = 4;
 
 extern "C" {
-    fn js_register_function(start: usize, len: usize) -> usize;
+    fn js_register_function(start: usize, len: usize) -> f64;
     fn js_invoke_function(
         fn_handle: usize,
         a: f64,
@@ -26,6 +26,18 @@ extern "C" {
 
 pub struct JSFunction {
     fn_handle: usize,
+}
+
+impl From<usize> for JSFunction {
+    fn from(f: usize) -> Self {
+        JSFunction {fn_handle:f}
+    }
+}
+
+impl From<f64> for JSFunction {
+    fn from(f: f64) -> Self {
+        JSFunction {fn_handle:f as usize}
+    }
 }
 
 impl JSFunction {

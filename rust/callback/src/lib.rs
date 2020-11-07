@@ -29,7 +29,7 @@ pub enum CallbackHandler {
     ),
 }
 
-type CallbackHandle = u32;
+type CallbackHandle = usize;
 
 pub struct CallbackManager {
     cur_id: CallbackHandle,
@@ -72,66 +72,66 @@ pub fn remove_callback(id: CallbackHandle) {
     }
 }
 
-fn create_callback(cb: CallbackHandler) -> f64 {
+fn create_callback(cb: CallbackHandler) -> usize {
     let mut h = get_callbacks().lock();
     h.cur_id += 1;
     let id = h.cur_id;
     h.keys.push(id);
     h.handlers.push(Arc::new(Mutex::new(cb)));
-    return id as f64;
+    return id;
 }
 
-pub fn create_callback_0(cb: impl FnMut() -> () + Send + 'static) -> f64 {
+pub fn create_callback_0(cb: impl FnMut() -> () + Send + 'static) -> usize {
     create_callback(CallbackHandler::Callback0(Box::new(cb)))
 }
 
-pub fn create_callback_1(cb: impl FnMut(f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_1(cb: impl FnMut(f64) -> () + Send + 'static) -> usize {
     create_callback(CallbackHandler::Callback1(Box::new(cb)))
 }
 
-pub fn create_callback_2(cb: impl FnMut(f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_2(cb: impl FnMut(f64, f64) -> () + Send + 'static) -> usize {
     create_callback(CallbackHandler::Callback2(Box::new(cb)))
 }
 
-pub fn create_callback_3(cb: impl FnMut(f64, f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_3(cb: impl FnMut(f64, f64, f64) -> () + Send + 'static) -> usize {
     create_callback(CallbackHandler::Callback3(Box::new(cb)))
 }
 
-pub fn create_callback_4(cb: impl FnMut(f64, f64, f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_4(cb: impl FnMut(f64, f64, f64, f64) -> () + Send + 'static) -> usize {
     create_callback(CallbackHandler::Callback4(Box::new(cb)))
 }
 
-pub fn create_callback_5(cb: impl FnMut(f64, f64, f64, f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_5(cb: impl FnMut(f64, f64, f64, f64, f64) -> () + Send + 'static) -> usize {
     create_callback(CallbackHandler::Callback5(Box::new(cb)))
 }
 
 pub fn create_callback_6(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> f64 {
+) -> usize {
     create_callback(CallbackHandler::Callback6(Box::new(cb)))
 }
 
 pub fn create_callback_7(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> f64 {
+) -> usize {
     create_callback(CallbackHandler::Callback7(Box::new(cb)))
 }
 
 pub fn create_callback_8(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> f64 {
+) -> usize {
     create_callback(CallbackHandler::Callback8(Box::new(cb)))
 }
 
 pub fn create_callback_9(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> f64 {
+) -> usize {
     create_callback(CallbackHandler::Callback9(Box::new(cb)))
 }
 
 pub fn create_callback_10(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> f64 {
+) -> usize {
     create_callback(CallbackHandler::Callback10(Box::new(cb)))
 }
 

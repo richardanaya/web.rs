@@ -2,17 +2,18 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use core::future::Future;
-use js_ffi::*;
+use js::*;
+use callback::*;
 
-pub type Handle = JSValue;
+pub type Handle = f64;
 
 pub struct Timer {
-    fn_set_timeout: JSInvoker,
-    fn_set_interval: JSInvoker,
-    fn_request_animation_frame: JSInvoker,
-    fn_request_animation_loop: JSInvoker,
-    fn_clear_timeout: JSInvoker,
-    fn_clear_interval: JSInvoker,
+    fn_set_timeout: JSFunction,
+    fn_set_interval: JSFunction,
+    fn_request_animation_frame: JSFunction,
+    fn_request_animation_loop: JSFunction,
+    fn_clear_timeout: JSFunction,
+    fn_clear_interval: JSFunction,
 }
 
 impl Default for Timer {
@@ -50,7 +51,7 @@ impl Timer {
     ) -> (Handle, JSFunction) {
         let cb = create_callback_0(callback);
         let handle = self.fn_set_timeout.invoke_2(cb, milliseconds);
-        (handle, cb)
+        (handle, JSFunction(cb))
     }
 
     pub fn sleep(&self, milliseconds: u32) -> impl Future {
