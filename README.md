@@ -1,7 +1,7 @@
 # js-wasm
 <a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-This project wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
+JavaScript from WebAssembly should be a joy to use together. This project aims to provide a simple, easy to learn, technology-agnostic way bridge the two worlds.
 
 <p align="center">
   <img width="460" height="300" src="images/undraw_good_team_m7uu.png">
@@ -94,14 +94,16 @@ A number of libraries exist to help save you time from writing your own bindings
 
 
 **Browser Functionality Libraries:**
-| Name | Documentation | Description |
+
+| Name          | Documentation | Description   |
 | ------------- | ------------- | ------------- |
 | [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  simple logging  |
 | [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  timers, animation loops |
 | [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  random numbers  |
 
 **UI:** 
-| Name | Documentation | Description |
+
+| Name          | Documentation | Description   |
 | ------------- | ------------- | ------------- |
 | [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/lit-html) | <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  a prototype of using [lit-html](https://lit-html.polymer-project.org/) HTML rendering  |
 
