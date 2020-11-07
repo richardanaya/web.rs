@@ -30,13 +30,15 @@ pub struct JSFunction {
 
 impl From<usize> for JSFunction {
     fn from(f: usize) -> Self {
-        JSFunction {fn_handle:f}
+        JSFunction { fn_handle: f }
     }
 }
 
 impl From<f64> for JSFunction {
     fn from(f: f64) -> Self {
-        JSFunction {fn_handle:f as usize}
+        JSFunction {
+            fn_handle: f as usize,
+        }
     }
 }
 
