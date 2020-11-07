@@ -348,7 +348,7 @@ pub fn register_function(code: &str) -> JSFunction {
     let len = code.len();
     unsafe {
         JSFunction {
-            fn_handle: js_register_function(start as f64, len),
+            fn_handle: js_register_function(start as usize as f64, len as f64),
         }
     }
 }
