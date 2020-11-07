@@ -94,9 +94,10 @@ A number of libraries exist to help save you time from writing your own bindings
 
 
 **Browser Functionality Libraries:**
-* [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) - simple logging 
-* [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) - timers, animation loops
-* [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_random) - random numbers
+* [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) - 
+<a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> simple logging 
+* [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) - <a href="https://docs.rs/web_timer><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> timers, animation loops
+* [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_random) - <a href="https://docs.rs/web_random"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> random numbers
 
 **UI:** 
 * [`lit-html-rs`](https://github.com/richardanaya/lit-html-rs/) - a prototype of using lit-html HTML rendering
