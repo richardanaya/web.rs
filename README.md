@@ -108,6 +108,10 @@ A number of libraries exist to help save you time from writing your own bindings
 | [`lit-html-rs`](https://github.com/richardanaya/js-wasm/tree/master/rust/lit-html) | <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  a prototype of using [lit-html](https://lit-html.polymer-project.org/) HTML rendering  |
 
 
+# Who is making this?
+
+My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm technologist, philosopher, and cook from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world!
+
 <p align="center">
   <img width="460" height="300" src="images/undraw_true_love_cy8x.png">
 </p>
