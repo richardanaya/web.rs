@@ -4,7 +4,7 @@ use rand::rngs::StdRng;
 use rand::Rng;
 use rand::SeedableRng;
 
-pub struct Random {
+struct Random {
     rng: StdRng,
 }
 
@@ -60,4 +60,8 @@ impl Random {
     {
         self.rng.gen::<T>()
     }
+}
+
+pub fn random() -> f64{
+    globals::get::<Random>().gen()
 }

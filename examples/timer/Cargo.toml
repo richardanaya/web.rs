@@ -10,6 +10,7 @@ edition = "2018"
 js = {path="../../rust/js"}
 web_timer = {path="../../rust/web_timer"}
 web_console = {path="../../rust/web_console"}
+web_random = {path="../../rust/web_random"}
 
 [lib]
 crate-type =["cdylib"]

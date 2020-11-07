@@ -12,6 +12,7 @@ readme = "README.md"
 
 [dependencies]
 js = "0.2"
+globals="1"
 
 [dependencies.rand]
 version = "0.7.3"
