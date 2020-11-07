@@ -8,7 +8,7 @@ pub const DOM_DOCUMENT: u32 = 3;
 pub const DOM_BODY: u32 = 4;
 
 extern "C" {
-    fn js_register_function(start: usize, len: usize) -> f64;
+    fn js_register_function(start: usize, len: usize) -> usize;
     fn js_invoke_function(
         fn_handle: usize,
         a: f64,
