@@ -3,6 +3,10 @@
 
 This project wants to be a simple, easy to learn, technology-agnostic way to call JavaScript from WebAssembly.
 
+<p align="center">
+  <img width="460" height="300" src="images/undraw_good_team_m7uu.png">
+</p>
+
 Use any WebAssembly programming language out of the box:
 * [Rust](https://docs.rs/js/latest/js/)
 * [C/C++](js-wasm.h)
@@ -67,6 +71,12 @@ In your JS function context `this` contains several functions handle most issues
 * `getObject(handle)` - Retreive and object from your context with a handle.
 * `releaseObject(handle)` - Release a stored object so it's memory can be freed.
 * `module` - Get access to your program so you can call methods on it.
+
+
+<p align="center">
+  <img width="460" height="300" src="images/undraw_true_love_cy8x.png">
+</p>
+
 
 # License
 
