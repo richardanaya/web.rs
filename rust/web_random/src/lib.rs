@@ -1,5 +1,5 @@
 #![no_std]
-use js_ffi::*;
+use js::*;
 use rand::rngs::StdRng;
 use rand::Rng;
 use rand::SeedableRng;
@@ -10,7 +10,11 @@ pub struct Random {
 
 impl Default for Random {
     fn default() -> Self {
-        let random = js!(Math.random);
+        let random = register_function(
+            "function(){
+            return Math.random();
+        }",
+        );
         let rng: StdRng = SeedableRng::from_seed([
             (255.0 * random.invoke_0()) as u8,
             (255.0 * random.invoke_0()) as u8,
