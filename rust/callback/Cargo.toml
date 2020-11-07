@@ -6,7 +6,7 @@ edition = "2018"
 description = "A library for handling callbacks in WebAssembly"
 license = "MIT OR Apache-2.0"
 categories = ["wasm", "no-std"]
-repository = "https://github.com/richardanaya/callback"
+repository = "https://github.com/richardanaya/js-wasm"
 readme = "README.md"
 
 [dependencies]
