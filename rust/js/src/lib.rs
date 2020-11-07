@@ -1,16 +1,16 @@
 #![no_std]
 
-pub const JS_NULL: u32 = 0;
-pub const JS_UNDEFINED: u32 = 1;
-pub const DOM_SELF: u32 = 2;
-pub const DOM_WINDOW: u32 = 2;
-pub const DOM_DOCUMENT: u32 = 3;
-pub const DOM_BODY: u32 = 4;
+pub const JS_NULL: f64 = 0.0;
+pub const JS_UNDEFINED: f64 = 1.0;
+pub const DOM_SELF: f64 = 2.0;
+pub const DOM_WINDOW: f64 = 2.0;
+pub const DOM_DOCUMENT: f64 = 3.0;
+pub const DOM_BODY: f64 = 4.0;
 
 extern "C" {
-    fn js_register_function(start: usize, len: usize) -> usize;
+    fn js_register_function(start: f64, len: f64) -> f64;
     fn js_invoke_function(
-        fn_handle: usize,
+        fn_handle: f64,
         a: f64,
         b: f64,
         c: f64,
@@ -25,20 +25,12 @@ extern "C" {
 }
 
 pub struct JSFunction {
-    fn_handle: usize,
-}
-
-impl From<usize> for JSFunction {
-    fn from(f: usize) -> Self {
-        JSFunction { fn_handle: f }
-    }
+    fn_handle: f64,
 }
 
 impl From<f64> for JSFunction {
     fn from(f: f64) -> Self {
-        JSFunction {
-            fn_handle: f as usize,
-        }
+        JSFunction { fn_handle: f }
     }
 }
 
@@ -356,7 +348,7 @@ pub fn register_function(code: &str) -> JSFunction {
     let len = code.len();
     unsafe {
         JSFunction {
-            fn_handle: js_register_function(start as usize, len),
+            fn_handle: js_register_function(start as f64, len),
         }
     }
 }

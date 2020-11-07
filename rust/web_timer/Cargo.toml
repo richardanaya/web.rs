@@ -12,4 +12,4 @@ readme = "README.md"
 
 [dependencies]
 js = "0.2.5"
-callback= "0.4.0"
+callback= "0.4.2"
