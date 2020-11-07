@@ -13,4 +13,5 @@ JSValue const JS_UNDEFINED = 1.0;
 JSValue const DOM_SELF = 2.0;
 JSValue const DOM_WINDOW = 2.0;
 JSValue const DOM_DOCUMENT = 3.0;
+JSValue const DOM_BODY = 4.0;
 #endif
