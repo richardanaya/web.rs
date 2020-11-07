@@ -765,3 +765,35 @@ impl CallbackFuture10 {
 pub fn create_callback_future_10() -> (impl Future, f64) {
     CallbackFuture10::new()
 }
+
+#[no_mangle]
+fn handle_callback(
+    id: f64,
+    a1: f64,
+    a2: f64,
+    a3: f64,
+    a4: f64,
+    a5: f64,
+    a6: f64,
+    a7: f64,
+    a8: f64,
+    a9: f64,
+    a10: f64,
+) -> () {
+    let h = get_callback(id);
+    let handler_ref = h.unwrap().clone();
+    let mut handler = handler_ref.lock();
+    match &mut *handler {
+        CallbackHandler::Callback0(c) => c(),
+        CallbackHandler::Callback1(c) => c(a1),
+        CallbackHandler::Callback2(c) => c(a1, a2),
+        CallbackHandler::Callback3(c) => c(a1, a2, a3),
+        CallbackHandler::Callback4(c) => c(a1, a2, a3, a4),
+        CallbackHandler::Callback5(c) => c(a1, a2, a3, a4, a5),
+        CallbackHandler::Callback6(c) => c(a1, a2, a3, a4, a5, a6),
+        CallbackHandler::Callback7(c) => c(a1, a2, a3, a4, a5, a6, a7),
+        CallbackHandler::Callback8(c) => c(a1, a2, a3, a4, a5, a6, a7, a8),
+        CallbackHandler::Callback9(c) => c(a1, a2, a3, a4, a5, a6, a7, a8, a9),
+        CallbackHandler::Callback10(c) => c(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10),
+    }
+}

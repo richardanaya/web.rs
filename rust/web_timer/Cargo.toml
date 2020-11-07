@@ -11,5 +11,5 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-js = "0.2.5"
-callback= "0.4.2"
+js = "0.2.6"
+callback= "0.4.3"

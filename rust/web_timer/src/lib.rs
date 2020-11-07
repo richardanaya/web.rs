@@ -19,7 +19,9 @@ pub struct Timer {
 impl Default for Timer {
     fn default() -> Self {
         Timer {
-            fn_set_timeout: register_function(r#"window.setTimeout"#),
+            fn_set_timeout: register_function("function(){
+                window.setTimeout();
+            }"),
             fn_set_interval: register_function(r#"window.setInterval"#),
             fn_request_animation_frame: register_function(r#"window.requestAnimationFrame"#),
             fn_request_animation_loop: register_function(
@@ -27,7 +29,7 @@ impl Default for Timer {
                 (cb)=>{
                     let time = Date.now();
                     function run(){
-                        let new_time = Date.now();
+                        let new_time = Dateusize.now();
                         let delta = new_time-time;
                         time = new_time;
                         window.requestAnimationFrame(run);
