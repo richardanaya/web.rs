@@ -11,6 +11,14 @@ async function load_and_run_wasm(wasmURL) {
     ],
     utf8dec: new TextDecoder("utf-8"),
     utf8enc: new TextEncoder("utf-8"),
+    createCallback: function(cb){
+      let fnHandleCallback = this.module.instance.exports.handle_callback;
+      return function(){
+        let args = arguments;
+        args.unshift(cb);
+        fnHandleCallback.appy(null,args);
+      }
+    },
     readCStringFromMemory: function (start) {
       const data = new Uint8Array(this.module.instance.exports.memory.buffer);
       const str = [];

@@ -13,3 +13,4 @@ readme = "README.md"
 [dependencies]
 js = "0.2"
 callback= "0.5"
+globals="1"

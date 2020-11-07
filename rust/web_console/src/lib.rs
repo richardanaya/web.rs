@@ -1,24 +1,48 @@
 #![no_std]
-use js_ffi::*;
+use js::*;
 
 struct Console {
-    fn_log: JSInvoker,
-    fn_clear: JSInvoker,
-    fn_error: JSInvoker,
-    fn_warning: JSInvoker,
-    fn_time: JSInvoker,
-    fn_time_end: JSInvoker,
+    fn_log: JSFunction,
+    fn_clear: JSFunction,
+    fn_error: JSFunction,
+    fn_warning: JSFunction,
+    fn_time: JSFunction,
+    fn_time_end: JSFunction,
 }
 
 impl Default for Console {
     fn default() -> Self {
         Console {
-            fn_log: js!(console.log),
-            fn_clear: js!(console.clear),
-            fn_error: js!(console.error),
-            fn_warning: js!(console.warn),
-            fn_time: js!(console.time),
-            fn_time_end: js!(console.timeEnd),
+            fn_log: register_function(
+                "function(strPtr,strLen){
+                console.log(this.readUtf8FromMemory(strPtr,strLen)); 
+            }",
+            ),
+            fn_clear: register_function(
+                "function(strPtr,strLen){
+                console.clear(); 
+            }",
+            ),
+            fn_error: register_function(
+                "function(strPtr,strLen){
+                console.error(this.readUtf8FromMemory(strPtr,strLen)); 
+            }",
+            ),
+            fn_warning: register_function(
+                "function(strPtr,strLen){
+                console.warn(this.readUtf8FromMemory(strPtr,strLen)); 
+            }",
+            ),
+            fn_time: register_function(
+                "function(strPtr,strLen){
+                console.time(this.readUtf8FromMemory(strPtr,strLen)); 
+            }",
+            ),
+            fn_time_end: register_function(
+                "function(strPtr,strLen){
+                console.timeEnd(this.readUtf8FromMemory(strPtr,strLen)); 
+            }",
+            ),
         }
     }
 }
@@ -29,22 +53,25 @@ impl Console {
     }
 
     fn log(&self, msg: &str) {
-        self.fn_log.invoke_1(msg);
+        self.fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
     }
 
     fn warning(&self, msg: &str) {
-        self.fn_warning.invoke_1(msg);
+        self.fn_warning
+            .invoke_2(msg.as_ptr() as u32, msg.len() as u32);
     }
 
     fn error(&self, msg: &str) {
-        self.fn_error.invoke_1(msg);
+        self.fn_error
+            .invoke_2(msg.as_ptr() as u32, msg.len() as u32);
     }
 
     fn time(&self, label: Option<&str>) {
         if label.is_none() {
             self.fn_time.invoke_0();
         } else {
-            self.fn_time.invoke_1(label.unwrap());
+            let msg = label.unwrap();
+            self.fn_time.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
         }
     }
 
@@ -52,7 +79,9 @@ impl Console {
         if label.is_none() {
             self.fn_time_end.invoke_0();
         } else {
-            self.fn_time_end.invoke_1(label.unwrap());
+            let msg = label.unwrap();
+            self.fn_time_end
+                .invoke_2(msg.as_ptr() as u32, msg.len() as u32);
         }
     }
 }
