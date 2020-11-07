@@ -14,9 +14,8 @@ async function load_and_run_wasm(wasmURL) {
     createCallback: function(cb){
       let fnHandleCallback = this.module.instance.exports.handle_callback;
       return function(){
-        let args = arguments;
-        args.unshift(cb);
-        fnHandleCallback.appy(null,args);
+        const args = arguments;
+        fnHandleCallback(cb,args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9]);
       }
     },
     readCStringFromMemory: function (start) {
