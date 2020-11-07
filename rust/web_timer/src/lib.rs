@@ -51,7 +51,7 @@ impl Timer {
     ) -> (Handle, JSFunction) {
         let cb = create_callback_0(callback);
         let handle = self.fn_set_timeout.invoke_2(cb, milliseconds);
-        (handle, JSFunction(cb))
+        (handle, cb.into())
     }
 
     pub fn sleep(&self, milliseconds: u32) -> impl Future {
@@ -67,22 +67,22 @@ impl Timer {
     ) -> (Handle, JSFunction) {
         let cb = create_callback_0(callback);
         let handle = self.fn_set_interval.invoke_2(cb, milliseconds);
-        (handle, cb)
+        (handle, cb.into())
     }
 
     pub fn request_animation_frame(&self, callback: Box<dyn FnMut() -> () + Send>) -> JSFunction {
         let cb = create_callback_0(callback);
         self.fn_request_animation_frame.invoke_1(cb);
-        cb
+        cb.into()
     }
 
     pub fn request_animation_loop(
         &self,
-        callback: Box<dyn FnMut(JSValue) -> () + Send>,
+        callback: Box<dyn FnMut(f64) -> () + Send>,
     ) -> JSFunction {
         let cb = create_callback_1(callback);
         self.fn_request_animation_loop.invoke_1(cb);
-        cb
+        cb.into()
     }
 
     pub fn clear_timeout(&self, handle: Handle) {
