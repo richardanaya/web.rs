@@ -1,6 +1,6 @@
 [package]
 name = "callback"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "A library for handling callbacks in WebAssembly"

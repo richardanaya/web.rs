@@ -29,7 +29,7 @@ pub enum CallbackHandler {
     ),
 }
 
-type CallbackHandle = usize;
+type CallbackHandle = f64;
 
 pub struct CallbackManager {
     cur_id: CallbackHandle,
@@ -40,7 +40,7 @@ pub struct CallbackManager {
 lazy_static! {
     static ref INSTANCE: Mutex<CallbackManager> = {
         Mutex::new(CallbackManager {
-            cur_id: 0,
+            cur_id: 0.0,
             keys: Vec::new(),
             handlers: Vec::new(),
         })
@@ -72,66 +72,66 @@ pub fn remove_callback(id: CallbackHandle) {
     }
 }
 
-fn create_callback(cb: CallbackHandler) -> usize {
+fn create_callback(cb: CallbackHandler) -> f64 {
     let mut h = get_callbacks().lock();
-    h.cur_id += 1;
+    h.cur_id += 1.0;
     let id = h.cur_id;
     h.keys.push(id);
     h.handlers.push(Arc::new(Mutex::new(cb)));
     return id;
 }
 
-pub fn create_callback_0(cb: impl FnMut() -> () + Send + 'static) -> usize {
+pub fn create_callback_0(cb: impl FnMut() -> () + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback0(Box::new(cb)))
 }
 
-pub fn create_callback_1(cb: impl FnMut(f64) -> () + Send + 'static) -> usize {
+pub fn create_callback_1(cb: impl FnMut(f64) -> () + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback1(Box::new(cb)))
 }
 
-pub fn create_callback_2(cb: impl FnMut(f64, f64) -> () + Send + 'static) -> usize {
+pub fn create_callback_2(cb: impl FnMut(f64, f64) -> () + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback2(Box::new(cb)))
 }
 
-pub fn create_callback_3(cb: impl FnMut(f64, f64, f64) -> () + Send + 'static) -> usize {
+pub fn create_callback_3(cb: impl FnMut(f64, f64, f64) -> () + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback3(Box::new(cb)))
 }
 
-pub fn create_callback_4(cb: impl FnMut(f64, f64, f64, f64) -> () + Send + 'static) -> usize {
+pub fn create_callback_4(cb: impl FnMut(f64, f64, f64, f64) -> () + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback4(Box::new(cb)))
 }
 
-pub fn create_callback_5(cb: impl FnMut(f64, f64, f64, f64, f64) -> () + Send + 'static) -> usize {
+pub fn create_callback_5(cb: impl FnMut(f64, f64, f64, f64, f64) -> () + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback5(Box::new(cb)))
 }
 
 pub fn create_callback_6(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> usize {
+) -> f64 {
     create_callback(CallbackHandler::Callback6(Box::new(cb)))
 }
 
 pub fn create_callback_7(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> usize {
+) -> f64 {
     create_callback(CallbackHandler::Callback7(Box::new(cb)))
 }
 
 pub fn create_callback_8(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> usize {
+) -> f64 {
     create_callback(CallbackHandler::Callback8(Box::new(cb)))
 }
 
 pub fn create_callback_9(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> usize {
+) -> f64 {
     create_callback(CallbackHandler::Callback9(Box::new(cb)))
 }
 
 pub fn create_callback_10(
     cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> usize {
+) -> f64 {
     create_callback(CallbackHandler::Callback10(Box::new(cb)))
 }
 
@@ -206,7 +206,7 @@ impl Future for CallbackFuture0 {
 }
 
 impl CallbackFuture0 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState0 {
             completed: false,
             waker: None,
@@ -227,7 +227,7 @@ impl CallbackFuture0 {
     }
 }
 
-pub fn create_callback_future_0() -> (impl Future, usize) {
+pub fn create_callback_future_0() -> (impl Future, f64) {
     CallbackFuture0::new()
 }
 
@@ -256,7 +256,7 @@ impl Future for CallbackFuture1 {
 }
 
 impl CallbackFuture1 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState1 {
             completed: false,
             waker: None,
@@ -277,7 +277,7 @@ impl CallbackFuture1 {
     }
 }
 
-pub fn create_callback_future_1() -> (impl Future, usize) {
+pub fn create_callback_future_1() -> (impl Future, f64) {
     CallbackFuture1::new()
 }
 
@@ -306,7 +306,7 @@ impl Future for CallbackFuture2 {
 }
 
 impl CallbackFuture2 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState2 {
             completed: false,
             waker: None,
@@ -329,7 +329,7 @@ impl CallbackFuture2 {
     }
 }
 
-pub fn create_callback_future_2() -> (impl Future, usize) {
+pub fn create_callback_future_2() -> (impl Future, f64) {
     CallbackFuture2::new()
 }
 
@@ -358,7 +358,7 @@ impl Future for CallbackFuture3 {
 }
 
 impl CallbackFuture3 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState3 {
             completed: false,
             waker: None,
@@ -381,7 +381,7 @@ impl CallbackFuture3 {
     }
 }
 
-pub fn create_callback_future_3() -> (impl Future, usize) {
+pub fn create_callback_future_3() -> (impl Future, f64) {
     CallbackFuture3::new()
 }
 
@@ -410,7 +410,7 @@ impl Future for CallbackFuture4 {
 }
 
 impl CallbackFuture4 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState4 {
             completed: false,
             waker: None,
@@ -433,7 +433,7 @@ impl CallbackFuture4 {
     }
 }
 
-pub fn create_callback_future_4() -> (impl Future, usize) {
+pub fn create_callback_future_4() -> (impl Future, f64) {
     CallbackFuture4::new()
 }
 
@@ -462,7 +462,7 @@ impl Future for CallbackFuture5 {
 }
 
 impl CallbackFuture5 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState5 {
             completed: false,
             waker: None,
@@ -485,7 +485,7 @@ impl CallbackFuture5 {
     }
 }
 
-pub fn create_callback_future_5() -> (impl Future, usize) {
+pub fn create_callback_future_5() -> (impl Future, f64) {
     CallbackFuture5::new()
 }
 
@@ -514,7 +514,7 @@ impl Future for CallbackFuture6 {
 }
 
 impl CallbackFuture6 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState6 {
             completed: false,
             waker: None,
@@ -537,7 +537,7 @@ impl CallbackFuture6 {
     }
 }
 
-pub fn create_callback_future_6() -> (impl Future, usize) {
+pub fn create_callback_future_6() -> (impl Future, f64) {
     CallbackFuture6::new()
 }
 
@@ -566,7 +566,7 @@ impl Future for CallbackFuture7 {
 }
 
 impl CallbackFuture7 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState7 {
             completed: false,
             waker: None,
@@ -589,7 +589,7 @@ impl CallbackFuture7 {
     }
 }
 
-pub fn create_callback_future_7() -> (impl Future, usize) {
+pub fn create_callback_future_7() -> (impl Future, f64) {
     CallbackFuture7::new()
 }
 
@@ -618,7 +618,7 @@ impl Future for CallbackFuture8 {
 }
 
 impl CallbackFuture8 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState8 {
             completed: false,
             waker: None,
@@ -641,7 +641,7 @@ impl CallbackFuture8 {
     }
 }
 
-pub fn create_callback_future_8() -> (impl Future, usize) {
+pub fn create_callback_future_8() -> (impl Future, f64) {
     CallbackFuture8::new()
 }
 
@@ -670,7 +670,7 @@ impl Future for CallbackFuture9 {
 }
 
 impl CallbackFuture9 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState9 {
             completed: false,
             waker: None,
@@ -701,7 +701,7 @@ impl CallbackFuture9 {
     }
 }
 
-pub fn create_callback_future_9() -> (impl Future, usize) {
+pub fn create_callback_future_9() -> (impl Future, f64) {
     CallbackFuture9::new()
 }
 
@@ -730,7 +730,7 @@ impl Future for CallbackFuture10 {
 }
 
 impl CallbackFuture10 {
-    fn new() -> (Self, usize) {
+    fn new() -> (Self, f64) {
         let shared_state = Arc::new(Mutex::new(SharedState10 {
             completed: false,
             waker: None,
@@ -762,6 +762,6 @@ impl CallbackFuture10 {
     }
 }
 
-pub fn create_callback_future_10() -> (impl Future, usize) {
+pub fn create_callback_future_10() -> (impl Future, f64) {
     CallbackFuture10::new()
 }
