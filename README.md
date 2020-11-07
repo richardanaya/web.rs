@@ -94,13 +94,17 @@ A number of libraries exist to help save you time from writing your own bindings
 
 
 **Browser Functionality Libraries:**
-* [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) - 
-<a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> simple logging 
-* [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) - <a href="https://docs.rs/web_timer"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> timers, animation loops
-* [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_random) - <a href="https://docs.rs/web_random"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> random numbers
+| Name | Documentation | Description |
+| ------------- | ------------- | ------------- |
+| [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  simple logging  |
+| [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_timer) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  timers, animation loops |
+| [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/rust/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  random numbers  |
 
 **UI:** 
-* [`lit-html-rs`](https://github.com/richardanaya/lit-html-rs/) - <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a> a prototype of using lit-html HTML rendering
+| Name | Documentation | Description |
+| ------------- | ------------- | ------------- |
+| [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/rust/lit-html) | <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  a prototype of using [lit-html](https://lit-html.polymer-project.org/) HTML rendering  |
+
 
 <p align="center">
   <img width="460" height="300" src="images/undraw_true_love_cy8x.png">
