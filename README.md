@@ -17,7 +17,7 @@ Load WebAssembly like JavaScript.
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/richardanaya/js-wasm/js-wasm.js"></script>
+        <script src="unpkg.com/js-wasm/js-wasm.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>
@@ -50,7 +50,7 @@ fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
  
 JSFunction fnLog = js_register_function(
     "function(context,cstrPtr){\
-        console.log(thi.getCStringFromMemory(cstrPtr));\
+        console.log(this.getCStringFromMemory(cstrPtr));\
     }");
 
 js_invoke_function_2(fnLog, "Hello World!");
@@ -67,3 +67,20 @@ In your JS function context `this` contains several functions handle most issues
 * `getObject(handle)` - Retreive and object from your context with a handle.
 * `releaseObject(handle)` - Release a stored object so it's memory can be freed.
 * `module` - Get access to your program so you can call methods on it.
+
+# License
+
+This project is licensed under either of
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
+   http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or
+   http://opensource.org/licenses/MIT)
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in `js` by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
