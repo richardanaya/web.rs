@@ -50,7 +50,7 @@ fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 
 **C/C++:**
 ```c
- #include "js-wasm.h"
+#include "js-wasm.h"
  
 JSFunction fnLog = js_register_function(
     "function(context,cstrPtr){\
