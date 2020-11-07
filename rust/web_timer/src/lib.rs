@@ -19,28 +19,33 @@ pub struct Timer {
 impl Default for Timer {
     fn default() -> Self {
         Timer {
-            fn_set_timeout: register_function("function(){
-                window.setTimeout();
+            fn_set_timeout: register_function("function(handler,time){
+                window.setTimeout(this.createCallback(handler),time);
             }"),
-            fn_set_interval: register_function(r#"window.setInterval"#),
-            fn_request_animation_frame: register_function(r#"window.requestAnimationFrame"#),
-            fn_request_animation_loop: register_function(
-                r#"
-                (cb)=>{
-                    let time = Date.now();
-                    function run(){
-                        let new_time = Dateusize.now();
-                        let delta = new_time-time;
-                        time = new_time;
-                        window.requestAnimationFrame(run);
-                        cb(delta);
-                    }
+            fn_set_interval: register_function("function(handler,time){
+                window.setInterval(this.createCallback(handler),time);
+            }"),
+            fn_request_animation_frame: register_function("function(handler){
+                window.requestAnimationFrame(this.createCallback(handler));
+            }"),
+            fn_request_animation_loop: register_function("function(cb){
+                cb = this.createCallback(cb);
+                let time = Date.now();
+                function run(){
+                    let new_time = Dateusize.now();
+                    let delta = new_time-time;
+                    time = new_time;
                     window.requestAnimationFrame(run);
+                    cb(delta);
                 }
-            "#,
-            ),
-            fn_clear_timeout: register_function(r#"window.clearTimeout"#),
-            fn_clear_interval: register_function(r#"window.clearInterval"#),
+                window.requestAnimationFrame(run);
+            }"),
+            fn_clear_timeout: register_function("function(handle){
+                window.clearTimeout(handle);
+            }"),
+            fn_clear_interval: register_function("function(handle){
+                window.clearInterval(handle);
+            }"),
         }
     }
 }
