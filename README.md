@@ -6,7 +6,7 @@
 This project aims to provide a simple, easy to learn, technology-agnostic way bridge the two worlds.
 
 <p align="center">
-  <img width="460" height="300" src="images/undraw_good_team_m7uu.png">
+  <img src="images/undraw_good_team_m7uu.png">
 </p>
 
 Use any WebAssembly programming language out of the box:
@@ -89,7 +89,7 @@ In your JS function context `this` contains several functions handle most issues
 ```
 
 <p align="center">
-  <img width="460" height="300" src="images/undraw_design_team_af2y.png">
+  <img src="images/undraw_design_team_af2y.png">
 </p>
 
 # Don't Recreate the Wheel
@@ -117,7 +117,7 @@ A number of libraries exist to help save you time from writing your own bindings
 My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm a technologist from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world! 
 
 <p align="center">
-  <img width="460" height="300" src="images/undraw_elements_cipa.png">
+  <img src="images/undraw_elements_cipa.png">
 </p>
 
 # License
