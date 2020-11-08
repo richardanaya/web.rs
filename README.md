@@ -23,7 +23,7 @@ Load WebAssembly like JavaScript.
 ```html
 <html>
     <head>
-        <script src="unpkg.com/js-wasm/js-wasm.js"></script>
+        <script src="https://unpkg.com/js-wasm/js-wasm.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>
