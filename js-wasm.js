@@ -118,3 +118,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });
+
+if (window.WasmScript) {
+  window.WasmScript["js-wasm"] = function (e) {
+    return {
+      ...e,
+      ...JsWasm.createEnvironment()
+    }
+  }
+}
