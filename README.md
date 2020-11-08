@@ -1,7 +1,9 @@
 # js-wasm
 <a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-JavaScript from WebAssembly should be a joy to use together. This project aims to provide a simple, easy to learn, technology-agnostic way bridge the two worlds.
+*JavaScript and WebAssembly should be a joy to use together.*
+
+This project aims to provide a simple, easy to learn, technology-agnostic way bridge the two worlds.
 
 <p align="center">
   <img width="460" height="300" src="images/undraw_good_team_m7uu.png">
@@ -14,14 +16,14 @@ Use any WebAssembly programming language out of the box:
 
 See a [demo](https://richardanaya.github.io/js-wasm/examples/canvas/index.html) of it working!
 
-# How It Works
+# How It Works?
 
 Load WebAssembly like JavaScript. 
 
 ```html
 <html>
     <head>
-        <script src="unpkg.com/js-wasm/js-wasm.js"></script>
+        <script src="https://unpkg.com/js-wasm/js-wasm.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>
@@ -62,15 +64,17 @@ js_invoke_function_2(fnLog, "Hello World!");
 
 In your JS function context `this` contains several functions handle most issues you'll encounter
 
-* `readUtf8FromMemory(start,length)` - Extract utf-8 text from your program's memory.
-* `writeUtf8ToMemory(start,str)` - Write utf-8 to a memory location you are sure it should go.
-* `readCStringFromMemory(start,length)` - Extract C string text from your program's memory.
-* `writeCStringToMemory(start,str)` - Write C string to a memory location you are sure it should go.
-* `readUint8ArrayFromMemory(start)` - Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory.
-* `storeObject(object)` - Store an object in your context for later reference, get a handle you can give to WebAssembly.
-* `getObject(handle)` - Retreive and object from your context with a handle.
-* `releaseObject(handle)` - Release a stored object so it's memory can be freed.
-* `module` - Get access to your program so you can call methods on it.
+| Name          | Description   |
+| ------------- | ------------- |
+| `readUtf8FromMemory(start,length)` | Extract utf-8 text from your program's memory. |
+| `writeUtf8ToMemory(start,str)` | Write utf-8 to a memory location you are sure it should go. |
+| `readCStringFromMemory(start,length)` | Extract C string text from your program's memory. |
+| `writeCStringToMemory(start,str)` | Write C string to a memory location you are sure it should go. |
+| `readUint8ArrayFromMemory(start)` | Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory. |
+| `storeObject(object)` | Store an object in your context for later reference, get a handle you can give to WebAssembly. |
+| `getObject(handle)` | Retreive and object from your context with a handle. |
+| `releaseObject(handle)` | Release a stored object so it's memory can be freed. |
+| `module` | Get access to your program so you can call methods on it. |
 
 ```html
 <html>
@@ -110,7 +114,7 @@ A number of libraries exist to help save you time from writing your own bindings
 
 # Who is making this?
 
-My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm technologist, philosopher, and cook from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world!
+My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm a technologist from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world! 
 
 <p align="center">
   <img width="460" height="300" src="images/undraw_true_love_cy8x.png">
