@@ -114,7 +114,7 @@ A number of libraries exist to help save you time from writing your own bindings
 
 # Who is making this?
 
-My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm technologist from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world!
+My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm a technologist from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world! 
 
 <p align="center">
   <img width="460" height="300" src="images/undraw_true_love_cy8x.png">
