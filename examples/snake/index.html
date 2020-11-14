@@ -7,17 +7,30 @@
             html {
                 background: black;
             }
-            canvas {
+            .game {
                 position: absolute;
                 left: 50%;
                 top: 50%;
                 margin-left: -250px;
                 margin-top: -250px;
-                border: solid 2px white;
+                text-align: center;
+            }
+
+            canvas {
+                border: solid 2px white;   
+            }
+
+            a {
+                display: block;
+                color: white;
+                font-family: arial;
             }
         </style>
     </head>
     <body>
+        <div class="game">
         <canvas id="screen" width=500 height=500></canvas>
+        <a href="https://github.com/richardanaya/js-wasm/tree/master/examples/snake">source</a>
+    </div>
     </body>
 </html>
