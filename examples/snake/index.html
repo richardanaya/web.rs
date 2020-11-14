@@ -3,6 +3,19 @@
         <link rel="shortcut icon" href="#" />
         <script src="../../js-wasm.js"></script>
         <script type="application/wasm" src="example.wasm"></script>
+        <style>
+            html {
+                background: black;
+            }
+            canvas {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin-left: -250px;
+                margin-top: -250px;
+                border: solid 2px white;
+            }
+        </style>
     </head>
     <body>
         <canvas id="screen" width=500 height=500></canvas>
