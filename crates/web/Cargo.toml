@@ -12,7 +12,7 @@ readme = "README.md"
 
 [dependencies]
 web_common={path="../../crates/web_common",version="0"}
-web_dom={path="../../crates/web_dom",version="0"}
+web-dom={path="../../crates/web_dom",version="0"}
 web_console={path="../../crates/web_console",version="0"}
 web_random={path="../../crates/web_random",version="0"}
 web_timer={path="../../crates/web_timer",version="0"}
