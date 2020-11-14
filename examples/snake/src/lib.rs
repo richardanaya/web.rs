@@ -4,10 +4,13 @@ use web::*;
 struct Game {
     time: u32,
     ctx: CanvasContext,
+    canvas_width: u32,
+    canvas_height: u32,
     width: u32,
     height: u32,
     direction: Direction,
     world: World,
+    head: Entity,
 }
 
 enum Direction {
@@ -21,9 +24,11 @@ enum Direction {
 struct SnakeHead;
 struct SnakeBody;
 struct Food;
-struct Position(f64, f64);
+struct Position(u32, u32);
 struct Color(String);
-struct Size(f64);
+
+const MAP_WIDTH: u32 = 10;
+const MAP_HEIGHT: u32 = 10;
 
 fn game() -> MutexGuard<'static, Game> {
     lazy_static::lazy_static! {
@@ -36,21 +41,24 @@ fn game() -> MutexGuard<'static, Game> {
 
             // create snake
             let mut world = World::new();
-            world.spawn(
-                (SnakeHead,Color("green".to_string()),Position(0.0,0.0),Size(10.0))
+            let head = world.spawn(
+                (SnakeHead,Color(GREEN.to_string()),Position(MAP_WIDTH/2,MAP_HEIGHT/2))
             );
 
             // create initial food
             world.spawn(
-                (Food,Color("red".to_string()),Position(50.0,50.0),Size(10.0))
+                (Food,Color(RED.to_string()),Position((random()*MAP_WIDTH as f64) as u32,(random()*MAP_HEIGHT as f64) as u32))
             );
 
             Mutex::new(Game {
                 time: 0,
                 ctx,
-                width: width as u32,
-                height: height as u32,
+                canvas_width: width as u32,
+                canvas_height:height as u32,
+                width: MAP_WIDTH,
+                height: MAP_HEIGHT,
                 direction: Direction::Down,
+                head,
                 world,
             })
         };
@@ -58,21 +66,48 @@ fn game() -> MutexGuard<'static, Game> {
     SINGLETON.lock()
 }
 
-fn move_snake(game: &Game) {
-    for (_id, (_, pos)) in &mut game.world.query::<(&SnakeHead, &mut Position)>() {
+fn move_snake_system(game: &mut Game) {
+    let last_pos = {
+        let mut pos = game.world.get_mut::<Position>(game.head).unwrap();
+        let p = Position(pos.0, pos.1);
         match game.direction {
-            Direction::Up => pos.1 -= 10.0,
-            Direction::Right => pos.0 += 10.0,
-            Direction::Down => pos.1 += 10.0,
-            Direction::Left => pos.0 -= 10.0,
+            Direction::Up => pos.1 -= 1,
+            Direction::Right => pos.0 += 1,
+            Direction::Down => pos.1 += 1,
+            Direction::Left => pos.0 -= 1,
         }
-    }
+        p
+    };
+    game.world
+        .spawn((SnakeBody, Color("light green".to_string()), last_pos));
 }
 
 fn render_system(game: &Game) {
-    for (_id, (pos, color, size)) in &mut game.world.query::<(&Position, &Color, &Size)>() {
+    for (_id, (pos, color)) in &mut game.world.query::<(&Position, &Color)>() {
         game.ctx.set_fill_color(&color.0);
-        game.ctx.fill_rect(pos.0, pos.1, size.0, size.0);
+        game.ctx.fill_rect(
+            pos.0 * (game.canvas_width / MAP_WIDTH),
+            pos.1 * (game.canvas_height / MAP_HEIGHT),
+            game.canvas_width / MAP_WIDTH,
+            game.canvas_height / MAP_HEIGHT,
+        );
+    }
+}
+
+fn eat_system(game: &mut Game) {
+    let (head_x, head_y) = {
+        let p = game.world.get::<Position>(game.head).unwrap();
+        (p.0, p.1)
+    };
+    let mut food_to_remove = None;
+    for (id, (_, pos)) in &mut game.world.query::<(&Food, &Position)>() {
+        if pos.0 == head_x && pos.1 == head_y {
+            food_to_remove = Some(id);
+            break;
+        }
+    }
+    if let Some(id) = food_to_remove {
+        game.world.despawn(id).unwrap();
     }
 }
 
@@ -89,6 +124,7 @@ pub fn main() {
             65 => game.direction = Direction::Left,
             _ => (),
         };
+        game.time += 1000;
     });
 
     game().ctx.set_fill_color("red");
@@ -98,7 +134,8 @@ pub fn main() {
         game.time += delta as u32;
         if game.time > 1000 {
             game.time %= 1000;
-            move_snake(&game)
+            move_snake_system(&mut game);
+            eat_system(&mut game);
         }
         render_system(&game)
     });

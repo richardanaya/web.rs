@@ -8,10 +8,10 @@ edition = "2018"
 
 [dependencies]
 web = {path="../../crates/web"}
-hecs = "0"
+hecs = "0.3.1"
 
 [dependencies.lazy_static]
-version = "1"
+version = "1.4.0"
 default-features = false
 features = ["spin_no_std"]
 
