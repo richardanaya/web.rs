@@ -2,13 +2,13 @@
 use js::*;
 
 pub fn random() -> f64 {
-    static FN: once_cell::sync::OnceCell<JSFunction> = once_cell::sync::OnceCell::new();
-    FN.get_or_init(|| {
+    lazy_static::lazy_static! {
+        static ref FN: JSFunction= {
         register_function(
             "function(){
                     return Math.random();
                 }",
         )
-    })
-    .invoke_0()
+    };};
+    FN.invoke_0()
 }

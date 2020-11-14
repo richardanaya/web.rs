@@ -14,6 +14,7 @@ readme = "README.md"
 js = {path="../js",version="0.2"}
 spin = "0.7.0"
 
-[dependencies.once_cell]
-version = "1.5.2"
-features = []
+[dependencies.lazy_static]
+version = "1"
+default-features = false
+features = ["spin_no_std"]
