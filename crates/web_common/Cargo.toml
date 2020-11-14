@@ -1,6 +1,6 @@
 [package]
 name = "web_common"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -14,6 +14,7 @@ readme = "README.md"
 js = {path="../js",version="0.2"}
 spin = "0.7.0"
 
-[dependencies.once_cell]
-version = "1.5.2"
-features = []
+[dependencies.lazy_static]
+version = "1"
+default-features = false
+features = ["spin_no_std"]

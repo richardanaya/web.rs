@@ -32,16 +32,16 @@ impl CanvasContext {
 
 impl Canvas2dApi for CanvasContext {
     fn set_fill_color(&self, color: &str) {
-        static FN: once_cell::sync::OnceCell<JSFunction> = once_cell::sync::OnceCell::new();
-        FN.get_or_init(|| {
+        lazy_static::lazy_static! {
+            static ref FN: JSFunction= {
             register_function(
                 "function(ctx,strPtr,strLen){
                                 ctx = this.getObject(ctx);
                                 ctx.fillStyle = this.readUtf8FromMemory(strPtr,strLen);
                         }",
             )
-        })
-        .invoke_3(self.handle, color.as_ptr() as u32, color.len() as u32);
+        };};
+        FN.invoke_3(self.handle, color.as_ptr() as u32, color.len() as u32);
     }
 
     fn fill_rect(
@@ -51,15 +51,15 @@ impl Canvas2dApi for CanvasContext {
         w: impl Into<f64>,
         h: impl Into<f64>,
     ) {
-        static FN: once_cell::sync::OnceCell<JSFunction> = once_cell::sync::OnceCell::new();
-        FN.get_or_init(|| {
+        lazy_static::lazy_static! {
+            static ref FN: JSFunction= {
             register_function(
                 "function(ctx,x,y,w,h){
                                 ctx = this.getObject(ctx);
                                 ctx.fillRect(x,y,w,h);
                         }",
             )
-        })
-        .invoke_5(self.handle, x, y, w, h);
+        };};
+        FN.invoke_5(self.handle, x, y, w, h);
     }
 }
