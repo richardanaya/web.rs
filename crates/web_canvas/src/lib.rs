@@ -14,17 +14,17 @@ impl CanvasContext {
     pub fn from_canvas_element(el: impl Into<f64>) -> CanvasContext {
         CanvasContext {
             handle: {
-                static FN: once_cell::sync::OnceCell<JSFunction> = once_cell::sync::OnceCell::new();
-                FN.get_or_init(|| {
+                lazy_static::lazy_static! {
+                    static ref FN: JSFunction= {
                     register_function(
-                        r#"function(el){   
+                        r#"function(el){
                             el = this.getObject(el);
                             let ctx = el.getContext("2d");
                             return this.storeObject(ctx);
                         }"#,
                     )
-                })
-                .invoke_1(el.into())
+                };};
+                FN.invoke_1(el.into())
             },
         }
     }
