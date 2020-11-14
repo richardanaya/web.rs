@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 web = {path="../../crates/web"}
+hecs = "0"
 
 [dependencies.lazy_static]
 version = "1"
