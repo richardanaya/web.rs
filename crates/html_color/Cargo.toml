@@ -1,8 +1,12 @@
 [package]
 name = "html_color"
 version = "0.0.0"
-authors = ["Richard <Richard>"]
+authors = ["Richard Anaya"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A library of web colors"
+repository = "https://github.com/richardanaya/js-wasm"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
