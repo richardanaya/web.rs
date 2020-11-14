@@ -1,6 +1,6 @@
 [package]
 name = "web_canvas"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
