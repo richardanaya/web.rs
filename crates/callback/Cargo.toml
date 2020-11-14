@@ -1,6 +1,6 @@
 [package]
 name = "callback"
-version = "0.5.1"
+version = "0.5.2"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "A library for handling callbacks in WebAssembly"
@@ -12,6 +12,7 @@ readme = "README.md"
 [dependencies]
 spin = "0.7.0"
 
-[dependencies.once_cell]
-version = "1.5.2"
-features = []
+[dependencies.lazy_static]
+version = "1"
+default-features = false
+features = ["spin_no_std"]

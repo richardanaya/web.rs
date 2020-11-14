@@ -9,6 +9,12 @@ edition = "2018"
 [dependencies]
 web = {path="../../crates/web"}
 
+[dependencies.lazy_static]
+version = "1"
+default-features = false
+features = ["spin_no_std"]
+
+
 [lib]
 crate-type =["cdylib"]
 

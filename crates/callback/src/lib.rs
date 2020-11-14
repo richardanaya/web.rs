@@ -8,8 +8,7 @@ use core::{
     pin::Pin,
     task::{Context, Poll, Waker},
 };
-use spin::Mutex;
-use once_cell::sync::OnceCell;
+use spin::{Mutex,MutexGuard};
 
 
 pub enum CallbackHandler {
@@ -37,19 +36,21 @@ pub struct CallbackManager {
 }
 
 
-fn get_callbacks() -> &'static Mutex<CallbackManager> {
-    static INSTANCE: OnceCell<Mutex<CallbackManager>> = OnceCell::new();
-    INSTANCE.get_or_init(||{
-        Mutex::new(CallbackManager {
-            cur_id: 0.0,
-            keys: Vec::new(),
-            handlers: Vec::new(),
-        })
-    })
+fn get_callbacks() -> MutexGuard<'static, CallbackManager>{
+    lazy_static::lazy_static! {
+        static ref SINGLETON: Mutex<CallbackManager> = {
+            Mutex::new(CallbackManager {
+                cur_id: 0.0,
+                keys: Vec::new(),
+                handlers: Vec::new(),
+            })
+        };
+    };
+    SINGLETON.lock()
 }
 
 pub fn get_callback(id: CallbackHandle) -> Option<Arc<Mutex<CallbackHandler>>> {
-    let cbs = get_callbacks().lock();
+    let cbs = get_callbacks();
     let index = cbs.keys.iter().position(|&r| r == id);
     if let Some(i) = index {
         let handler_ref = cbs.handlers.get(i).unwrap().clone();
@@ -61,7 +62,7 @@ pub fn get_callback(id: CallbackHandle) -> Option<Arc<Mutex<CallbackHandler>>> {
 }
 
 pub fn remove_callback(id: CallbackHandle) {
-    let mut cbs = get_callbacks().lock();
+    let mut cbs = get_callbacks();
     let index = cbs.keys.iter().position(|&r| r == id);
     if let Some(i) = index {
         cbs.keys.remove(i);
@@ -70,7 +71,7 @@ pub fn remove_callback(id: CallbackHandle) {
 }
 
 fn create_callback(cb: CallbackHandler) -> f64 {
-    let mut h = get_callbacks().lock();
+    let mut h = get_callbacks();
     h.cur_id += 1.0;
     let id = h.cur_id;
     h.keys.push(id);

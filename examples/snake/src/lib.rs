@@ -15,9 +15,8 @@ enum Direction {
 }
 
 fn game() -> MutexGuard<'static, Game> {
-    static SINGLETON: OnceCell<Mutex<Game>> = OnceCell::new();
-    SINGLETON
-        .get_or_init(|| {
+    lazy_static::lazy_static! {
+        static ref SINGLETON: Mutex<Game> = {
             let screen = get_element_by_id("screen");
             let width: f64 = get_property(&screen, "width");
             let height: f64 = get_property(&screen, "height");
@@ -28,8 +27,9 @@ fn game() -> MutexGuard<'static, Game> {
                 height: height as u32,
                 direction: Direction::Down,
             })
-        })
-        .lock()
+        };
+    }
+    SINGLETON.lock()
 }
 
 #[no_mangle]
