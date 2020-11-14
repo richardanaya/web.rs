@@ -17,6 +17,7 @@ enum Direction {
     Down,
 }
 
+// ECS components
 struct SnakeHead;
 struct SnakeBody;
 struct Food;
@@ -27,17 +28,23 @@ struct Size(f64);
 fn game() -> MutexGuard<'static, Game> {
     lazy_static::lazy_static! {
         static ref SINGLETON: Mutex<Game> = {
+            // create graphics context
             let screen = get_element_by_id("screen");
             let width: f64 = get_property(&screen, "width");
             let height: f64 = get_property(&screen, "height");
             let ctx = CanvasContext::from_canvas_element(&screen);
+
+            // create snake
             let mut world = World::new();
             world.spawn(
                 (SnakeHead,Color("green".to_string()),Position(0.0,0.0),Size(10.0))
             );
+
+            // create initial food
             world.spawn(
                 (Food,Color("red".to_string()),Position(50.0,50.0),Size(10.0))
             );
+
             Mutex::new(Game {
                 time: 0,
                 ctx,
@@ -53,7 +60,12 @@ fn game() -> MutexGuard<'static, Game> {
 
 fn move_snake(game: &Game) {
     for (_id, (_, pos)) in &mut game.world.query::<(&SnakeHead, &mut Position)>() {
-        pos.0 += 10.0;
+        match game.direction {
+            Direction::Up => pos.1 -= 10.0,
+            Direction::Right => pos.0 += 10.0,
+            Direction::Down => pos.1 += 10.0,
+            Direction::Left => pos.0 -= 10.0,
+        }
     }
 }
 
@@ -70,7 +82,6 @@ pub fn main() {
         let key_down_event = KeyDownEvent::from_event(event);
         let key_code = key_down_event.key_code();
         let mut game = game();
-        log(&format!("{}", key_code));
         match key_code {
             87 => game.direction = Direction::Up,
             68 => game.direction = Direction::Right,
