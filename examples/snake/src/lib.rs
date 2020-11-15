@@ -33,33 +33,39 @@ const MAP_HEIGHT: i32 = 30;
 const ITERATION_TIME: i32 = 100;
 
 impl Game {
+    fn new() -> Game {
+        // create graphics context
+        let screen = get_element_by_id("screen");
+        let width: f64 = get_property(&screen, "width");
+        let height: f64 = get_property(&screen, "height");
+        let ctx = CanvasContext::from_canvas_element(&screen);
+        // create snake
+        let mut world = World::new();
+        let head = world.spawn((
+            SnakeHead(1),
+            Color(GREEN.to_string()),
+            Position(MAP_WIDTH / 2, MAP_HEIGHT / 2),
+        ));
+        let mut g = Game {
+            time: 0,
+            ctx,
+            canvas_width: width as i32,
+            canvas_height: height as i32,
+            width: MAP_WIDTH,
+            height: MAP_HEIGHT,
+            direction: Direction::Down,
+            head,
+            world,
+            made_move: false,
+        };
+        g.reset();
+        g
+    }
+
     fn instance() -> MutexGuard<'static, Game> {
         lazy_static::lazy_static! {
             static ref SINGLETON: Mutex<Game> = {
-                // create graphics context
-                let screen = get_element_by_id("screen");
-                let width: f64 = get_property(&screen, "width");
-                let height: f64 = get_property(&screen, "height");
-                let ctx = CanvasContext::from_canvas_element(&screen);
-                // create snake
-                let mut world = World::new();
-                let head = world.spawn(
-                    (SnakeHead(1),Color(GREEN.to_string()),Position(MAP_WIDTH/2,MAP_HEIGHT/2))
-                );
-                let mut g = Game {
-                    time: 0,
-                    ctx,
-                    canvas_width: width as i32,
-                    canvas_height:height as i32,
-                    width: MAP_WIDTH,
-                    height: MAP_HEIGHT,
-                    direction: Direction::Down,
-                    head,
-                    world,
-                    made_move: false,
-                };
-                g.reset();
-                Mutex::new(g)
+                Mutex::new(Game::new())
             };
         }
         SINGLETON.lock()
@@ -232,10 +238,8 @@ pub fn main() {
         Game::instance().key_down(key_code);
     });
 
-    request_animation_loop(|delta| {
-        match Game::instance().run(delta) {
-            Err(e) => error(&e.to_string()),
-            _ => (),
-        }
+    request_animation_loop(|delta| match Game::instance().run(delta) {
+        Err(e) => error(&e.to_string()),
+        _ => (),
     });
 }
