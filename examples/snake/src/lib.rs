@@ -71,6 +71,19 @@ impl Game {
         SINGLETON.lock()
     }
 
+    fn start() {
+        add_event_listener(DOM_BODY, "keydown", |event| {
+            let key_down_event = KeyDownEvent::from_event(event);
+            let key_code = key_down_event.key_code();
+            Game::instance().key_down(key_code);
+        });
+
+        request_animation_loop(|delta| match Game::instance().run(delta) {
+            Err(e) => error(&e.to_string()),
+            _ => (),
+        });
+    }
+
     fn reset(&mut self) {
         self.ctx
             .clear_rect(0, 0, self.canvas_width, self.canvas_height);
@@ -232,14 +245,5 @@ impl Game {
 
 #[no_mangle]
 pub fn main() {
-    add_event_listener(DOM_BODY, "keydown", |event| {
-        let key_down_event = KeyDownEvent::from_event(event);
-        let key_code = key_down_event.key_code();
-        Game::instance().key_down(key_code);
-    });
-
-    request_animation_loop(|delta| match Game::instance().run(delta) {
-        Err(e) => error(&e.to_string()),
-        _ => (),
-    });
+    Game::start();
 }
