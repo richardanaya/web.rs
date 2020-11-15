@@ -1,4 +1,7 @@
 #![no_std]
+extern crate alloc;
+use alloc::vec::Vec;
+pub use cstring::cstr_to_string;
 
 pub const JS_NULL: f64 = 0.0;
 pub const JS_UNDEFINED: f64 = 1.0;
@@ -25,6 +28,7 @@ extern "C" {
     ) -> f64;
 }
 
+#[derive(Copy,Clone)]
 pub struct JSFunction {
     fn_handle: f64,
 }
@@ -32,6 +36,18 @@ pub struct JSFunction {
 impl From<f64> for JSFunction {
     fn from(f: f64) -> Self {
         JSFunction { fn_handle: f }
+    }
+}
+
+impl Into<f64> for JSFunction {
+    fn into(self) -> f64 {
+        self.fn_handle
+    }
+}
+
+impl Into<f64> for &JSFunction {
+    fn into(self) -> f64 {
+        self.fn_handle
     }
 }
 
@@ -376,11 +392,18 @@ impl From<f64> for JSObject {
     }
 }
 
-
 impl Drop for JSObject {
     fn drop(&mut self) {
         unsafe {
             js_release(self.handle);
         }
     }
+}
+
+#[no_mangle]
+fn malloc(size: i32) -> *mut u8 {
+    let mut buf = Vec::with_capacity(size as usize);
+    let ptr = buf.as_mut_ptr();
+    core::mem::forget(buf);
+    ptr
 }

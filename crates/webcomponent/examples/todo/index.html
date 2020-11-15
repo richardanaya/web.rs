@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>Todo</title>
+<!-- a polyfill for web components on some browsers -->
+<script src="https://unpkg.com/@webcomponents/webcomponentsjs@latest/webcomponents-loader.js"></script>
+<!-- for running your js_ffi library -->
+<script src="https://cdn.jsdelivr.net/gh/richardanaya/js_ffi@latest/js_ffi.js"></script>
+<!-- get things started -->
+<script>js_ffi.run("example.wasm");</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+</head>
+<body>
+    <div class="container is-fluid">
+<todo-list>
+    <todo-item done="yes">Write Rust</todo-item>
+    <todo-item done="no">Read that book</todo-item>
+    <todo-item done="no">Hang picture</todo-item>
+</todo-list>
+</div>
+</body>
+</html>

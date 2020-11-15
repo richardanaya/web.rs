@@ -152,15 +152,17 @@ window.JsWasm = {
         }
         return this.utf8dec.decode(new Uint8Array(str));
       },
-      writeCStringToMemory(str, start) {
-        let bytes = this.utf8enc.encode(str + String.fromCharCode(0));
-        let len = bytes.length;
+      writeCStringToMemory(str) {
+        const bytes = this.utf8enc.encode(str + String.fromCharCode(0));
+        const len = bytes.length;
+        const start = this.module.instance.exports.malloc(len);
         const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
         memory.set(bytes, start);
+        return start;
       },
       readUtf8FromMemory: function (start, len) {
-        let memory = new Uint8Array(this.module.instance.exports.memory.buffer);
-        let text = this.utf8dec.decode(memory.subarray(start, start + len));
+        const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
+        const text = this.utf8dec.decode(memory.subarray(start, start + len));
         return text;
       },
       readUint8ArrayFromMemory(start) {
@@ -170,14 +172,16 @@ window.JsWasm = {
         let b = mem.slice(ptr + 4, ptr + 4 + length);
         return new Uint8Array(b);
       },
-      writeUtf8ToMemory: function (start, str) {
-        let bytes = utf8enc.encode(str);
-        let len = bytes.length;
+      writeUtf8ToMemory: function (str) {
+        const bytes = utf8enc.encode(str);
+        const len = bytes.length;
+        const start = this.module.instance.exports.malloc(len);
         const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
         memory.set(bytes, start);
+        return start;
       },
       storeObject: function (obj) {
-        let index = this.objects.insert(obj);
+        const index = this.objects.insert(obj);
         return index.toNum();
       },
       getObject: function (handle) {
