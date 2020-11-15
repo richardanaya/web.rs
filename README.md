@@ -68,9 +68,9 @@ In your JS function context `this` contains several functions handle most issues
 | Name          | Description   |
 | ------------- | ------------- |
 | `readUtf8FromMemory(start,length)` | Extract utf-8 text from your program's memory. |
-| `writeUtf8ToMemory(start,str)` | Write utf-8 to a memory location you are sure it should go. |
+| `writeUtf8ToMemory(str)` | Write utf-8 to a memory location you are sure it should go. |
 | `readCStringFromMemory(start,length)` | Extract C string text from your program's memory. |
-| `writeCStringToMemory(start,str)` | Write C string to a memory location you are sure it should go. |
+| `writeCStringToMemory(str)` | Write C string to a memory location you are sure it should go. |
 | `readUint8ArrayFromMemory(start)` | Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory. |
 | `storeObject(object)` | Store an object in your context for later reference, get a handle you can give to WebAssembly. |
 | `getObject(handle)` | Retreive and object from your context with a handle. |
