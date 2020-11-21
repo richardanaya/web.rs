@@ -45,7 +45,7 @@ All our `index.html` does is quickly tell WebAssembly to start like any old web 
 Now you can create JavaScript binding functions to invoke using [`js-wasm`](https://github.com/richardanaya/js-wasm/) as normal.
 
 ```rust
-pub fn read_file(msg: &str) {
+pub fn read_file(msg: &str) -> String {
     lazy_static::lazy_static! {
         static ref FN: JSFunction= {
         register_function(
@@ -56,7 +56,7 @@ pub fn read_file(msg: &str) {
             }",
         )
     };};
-    cstr_to_string(FN.invoke_2(msg.as_ptr() as u32, msg.len() as u32) as i32);
+    cstr_to_string(FN.invoke_2(msg.as_ptr() as u32, msg.len() as u32) as i32)
 }
 
 #[no_mangle]
