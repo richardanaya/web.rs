@@ -42,7 +42,7 @@ All our `index.html` does is quickly tell WebAssembly to start like any old web 
 
 ## Getting what you need
 
-Now you can create functions to invoke using `js-wasm` as normal!
+Now you can create JavaScript binding functions to invoke using `js-wasm` as normal.
 
 ```rust
 pub fn read_file(msg: &str) {
