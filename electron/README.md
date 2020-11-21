@@ -40,6 +40,8 @@ All our `index.html` does is quickly tell WebAssembly to start like any old web 
 </html>
 ```
 
+## Getting what you need
+
 Now you can create functions to invoke using `js-wasm` as normal!
 
 ```rust
