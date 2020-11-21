@@ -16,3 +16,26 @@ git clone git@github.com:richardanaya/js-wasm.git
 cd js-wasm/electron
 make run
 ```
+
+Let's take a look at the various files:
+
+| File | Description |
+|------|-------------|
+| `index.js` | Electron wants a javascript file to tell it where to start, this is just basic setup you can tweak. |
+| `index.html` | This is the index file  tht get's loaded by `index.js` to be the first thing you see. Consider this just like any old web page. |
+
+All our `index.html` does is quickly tell WebAssembly to start like any old web application
+
+```html
+<html>
+    <head>
+        <title>My App!</title>
+        <link rel="shortcut icon" href="#" />
+        <script src="js-wasm.js"></script>
+        <script type="application/wasm" src="app.wasm"></script>
+    </head>
+    <body>
+        <canvas id="screen" width=500 height=500></canvas>
+    </body>
+</html>
+```
