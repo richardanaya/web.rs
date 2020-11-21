@@ -1,4 +1,4 @@
-# Electron apps with `js-wasm`
+# Electron + WebAssembly = :heart:
 
 <p align="center">
   <img height="300" src="../images/undraw_web_developer_p3e5.png">
