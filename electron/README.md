@@ -21,7 +21,7 @@ Let's take a look at the various files:
 
 | File | Description |
 |------|-------------|
-| `index.js` | Electron wants a javascript file to tell it where to start, this is just basic setup you can tweak. |
+| `index.js` | Electron wants a javascript file to tell it where to start, this is just basic setup you can tweak like starting width/height and does your app have a menubar. |
 | `index.html` | This is the index file  tht get's loaded by `index.js` to be the first thing you see. Consider this just like any old web page. |
 
 All our `index.html` does is quickly tell WebAssembly to start like any old web application
