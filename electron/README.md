@@ -56,7 +56,7 @@ pub fn read_file(msg: &str) {
             }",
         )
     };};
-    FN.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+    cstr_to_string(FN.invoke_2(msg.as_ptr() as u32, msg.len() as u32) as i32);
 }
 
 #[no_mangle]
