@@ -39,3 +39,28 @@ All our `index.html` does is quickly tell WebAssembly to start like any old web 
     </body>
 </html>
 ```
+
+Now you can create functions to invoke using `js-wasm` as normal!
+
+```rust
+pub fn read_file(msg: &str) {
+    lazy_static::lazy_static! {
+        static ref FN: JSFunction= {
+        register_function(
+            "function(pathPtr,pathLen){
+                const fs = require('fs');
+                const data String(fs.readFileSync(this.readUtf8FromMemory(pathPtr,pathLen)));
+                return this.writeCStringToMemory(data);
+            }",
+        )
+    };};
+    FN.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+}
+
+#[no_mangle]
+pub fn main() {
+    let fileContent = read_file("foo.txt");
+    ...
+}
+```
+
