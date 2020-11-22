@@ -5,13 +5,11 @@ use crate::alloc::borrow::ToOwned;
 use alloc::string::String;
 use core::convert::TryInto;
 
-pub type CString = i32;
-
-pub fn from_str(s: &str) -> CString {
-    cstr_core::CString::new(s).unwrap().into_raw() as i32
+pub fn from_str(s: &str) -> usize {
+    cstr_core::CString::new(s).unwrap().into_raw() as usize
 }
 
-pub fn try_into_string(start: impl TryInto<CString>) -> Result<String, &'static str> {
+pub fn try_into_string(start: impl TryInto<i32>) -> Result<String, &'static str> {
     if let Ok(pos) = start.try_into() {
         let s: &cstr_core::CStr =
             unsafe { cstr_core::CStr::from_ptr(pos as *const cstr_core::c_char) };
