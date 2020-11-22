@@ -1,0 +1,16 @@
+[package]
+name = "cstring"
+version = "0.1.0"
+authors = ["Richard Anaya"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A super simple cstring library for WebAssembly"
+categories = ["wasm", "no-std"]
+
+[dependencies]
+cty = "0.2.1"
+memchr = { version = "2.3.4", default-features = false }	
+
+[features]
+default = ["alloc"]
+alloc = []
