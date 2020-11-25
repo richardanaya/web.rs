@@ -1,0 +1,15 @@
+[package]
+name = "cargo-webassembly"
+version = "0.0.0"
+authors = ["Richard Anaya"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A cargo utility for working on WebAssembly"
+repository = "https://github.com/richardanaya/js-wasm"
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+url="*"
+url_open="*"
