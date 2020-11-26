@@ -87,6 +87,7 @@ fn build_project_in_dir(dir: &PathBuf) {
         .arg("wasm32-unknown-unknown")
         .arg("--release");
     echo_hello.output().expect("could not compile");
+    std::fs::copy(dir.join(format!("target/wasm32-unknown-unknown/release/{}.wasm",name)),dir.join(format!("dist/{}.wasm",name))).expect("could not copy");
     println!(
         "    {} webassembly target",
         "Finished".green().bold()
