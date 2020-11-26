@@ -4,11 +4,11 @@ extern crate clap;
 use clap::App;
 extern crate url;
 extern crate url_open;
+use colored::*;
 use std::env;
+use std::fs::create_dir;
 use std::path::PathBuf;
 use url::Url;
-use colored::*;
-use std::fs::create_dir;
 
 fn main() {
     let yaml = load_yaml!("cli.yaml");
@@ -40,15 +40,57 @@ fn create_project_in_dir(dir: &PathBuf) {
     }
     create_dir(dir.join("src")).unwrap();
     create_dir(dir.join("dist")).unwrap();
-    std::fs::write(dir.join("Cargo.toml"), include_str!("template/Cargo.toml").replace("PROJECT",name)).expect("Failed to write");
-    std::fs::write(dir.join("src/lib.rs"), include_str!("template/lib.rs").replace("PROJECT",name)).expect("Failed to write");
-    std::fs::write(dir.join("dist/index.html"), include_str!("template/index.html").replace("PROJECT",name)).expect("Failed to write");
-    std::fs::write(dir.join("dist/js-wasm.js"), include_str!("../../../js-wasm.js").replace("PROJECT",name)).expect("Failed to write");
-    println!("   {} webassembly `{}` package", "Created".green().bold(),name);
+    std::fs::write(
+        dir.join("Cargo.toml"),
+        include_str!("template/Cargo.toml").replace("PROJECT", name),
+    )
+    .expect("Failed to write");
+    std::fs::write(
+        dir.join("src/lib.rs"),
+        include_str!("template/lib.rs").replace("PROJECT", name),
+    )
+    .expect("Failed to write");
+    std::fs::write(
+        dir.join("dist/index.html"),
+        include_str!("template/index.html").replace("PROJECT", name),
+    )
+    .expect("Failed to write");
+    std::fs::write(
+        dir.join("dist/js-wasm.js"),
+        include_str!("../../../js-wasm.js").replace("PROJECT", name),
+    )
+    .expect("Failed to write");
+    println!(
+        "   {} webassembly `{}` package",
+        "Created".green().bold(),
+        name
+    );
 }
 
 fn build_project_in_dir(dir: &PathBuf) {
-    println!("creating project in {:?}", dir)
+    if !dir.join("Cargo.toml").exists() {
+        println!("must execute this command in project root");
+        return;
+    }
+
+    let name = dir.file_name().unwrap().to_str().unwrap();
+    println!(
+        "   {} webassembly `{}` package",
+        "Compiling".green().bold(),
+        name
+    );
+    use std::process::Command;
+    let mut echo_hello = Command::new("cargo");
+    echo_hello
+        .arg("build")
+        .arg("--target")
+        .arg("wasm32-unknown-unknown")
+        .arg("--release");
+    echo_hello.output().expect("could not compile");
+    println!(
+        "    {} webassembly target",
+        "Finished".green().bold()
+    );
 }
 
 fn start_server(dir: &PathBuf) {
