@@ -1,0 +1,18 @@
+[package]
+name = "PROJECT"
+version = "0.0.0"
+authors = [""]
+edition = "2018"
+description = ""
+categories = ["wasm"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+web = "0"
+
+[lib]
+crate-type =["cdylib"]
+
+[profile.release]
+lto = true
