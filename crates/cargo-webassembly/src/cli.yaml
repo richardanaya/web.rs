@@ -8,15 +8,18 @@ args:
         multiple: true
         help: Sets the level of verbosity
 subcommands:
-    - new:
-        about: creates new WebAssembly project
-        args: 
-           - INPUT:
-                help: Sets the name of the project directory to use
-                required: true
-    - init:
-        about: creates new WebAssembly project in current directory
-    - build:
-        about: controls testing features
-    - run:
-        about: controls testing features
+    - webassembly:
+        about: A collection of subcommands for working with WebAssembly
+        subcommands:
+            - new:
+                about: creates new WebAssembly project
+                args: 
+                - INPUT:
+                        help: Sets the name of the project directory to use
+                        required: true
+            - init:
+                about: creates new WebAssembly project in current directory
+            - build:
+                about: controls testing features
+            - run:
+                about: controls testing features
