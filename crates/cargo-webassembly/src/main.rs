@@ -42,7 +42,7 @@ fn create_project_in_dir(dir: &PathBuf) {
     create_dir(dir.join("dist")).unwrap();
     std::fs::write(
         dir.join("Cargo.toml"),
-        include_str!("template/Cargo.toml").replace("PROJECT", name),
+        include_str!("template/Project.toml").replace("PROJECT", name),
     )
     .expect("Failed to write");
     std::fs::write(
