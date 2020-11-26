@@ -16,20 +16,22 @@ fn main() {
 
     let mut dir = env::current_dir().unwrap();
 
-    if let Some(matches) = matches.subcommand_matches("new") {
-        dir = dir.join(matches.value_of("INPUT").unwrap());
-        create_project_in_dir(&dir)
-    } else if let Some(_) = matches.subcommand_matches("init") {
-        create_project_in_dir(&dir)
-    } else if let Some(_) = matches.subcommand_matches("build") {
-        build_project_in_dir(&dir)
-    } else if let Some(_) = matches.subcommand_matches("run") {
-        build_project_in_dir(&dir);
-        let server_dir = dir.join("dist");
-        start_server(&server_dir);
-        Url::parse("https://github.com/richardanaya/js-wasm")
-            .unwrap()
-            .open();
+    if let Some(matches) = matches.subcommand_matches("webassembly") {
+        if let Some(matches) = matches.subcommand_matches("new") {
+            dir = dir.join(matches.value_of("INPUT").unwrap());
+            create_project_in_dir(&dir)
+        } else if let Some(_) = matches.subcommand_matches("init") {
+            create_project_in_dir(&dir)
+        } else if let Some(_) = matches.subcommand_matches("build") {
+            build_project_in_dir(&dir)
+        } else if let Some(_) = matches.subcommand_matches("run") {
+            build_project_in_dir(&dir);
+            let server_dir = dir.join("dist");
+            start_server(&server_dir);
+            Url::parse("https://github.com/richardanaya/js-wasm")
+                .unwrap()
+                .open();
+        }
     }
 }
 
