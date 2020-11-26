@@ -57,7 +57,7 @@ fn create_project_in_dir(dir: &PathBuf) {
     .expect("Failed to write");
     std::fs::write(
         dir.join("dist/js-wasm.js"),
-        include_str!("../../../js-wasm.js").replace("PROJECT", name),
+        include_str!("template/js-wasm.js").replace("PROJECT", name),
     )
     .expect("Failed to write");
     println!(
