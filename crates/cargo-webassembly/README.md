@@ -46,6 +46,14 @@ cargo webassembly build
 
 This command will just compile your WebAssembly and place everything you need for your web app in the `dist` folder.
 
+# Next steps
+
+Check out more ways to interact with the browser using the [`web`](https://docs.rs/web/) package!
+
+Here's some cool examples:
+
+* [snake](https://wasm.js.org/examples/snake/)
+
 # License
 
 This project is licensed under either of
