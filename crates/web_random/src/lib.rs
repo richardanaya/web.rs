@@ -2,13 +2,8 @@
 use js::*;
 
 pub fn random() -> f64 {
-    lazy_static::lazy_static! {
-        static ref FN: JSFunction= {
-        register_function(
-            "function(){
-                    return Math.random();
-                }",
-        )
-    };};
-    FN.invoke_0()
+    js!("function(){
+        return Math.random();
+    }")
+    .invoke_0()
 }
