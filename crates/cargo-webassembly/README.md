@@ -1,6 +1,6 @@
 # cargo-webassembly 
 
-This cargo extension is for developing front end applications in WebAssembly.
+This cargo extension is for developing front end applications in WebAssembly. Use it's subcommands to generate Rust projects ready to develop WebAssembly immediately, and use the tool to run a local dev server to see it while you work.
 
 This project is currently **beta**, but totally functional! Next steps include:
 
