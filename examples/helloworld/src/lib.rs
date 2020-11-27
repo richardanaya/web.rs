@@ -1,4 +1,4 @@
-use web::*;
+use js::*;
 
 #[no_mangle]
 pub fn main() {
