@@ -7,16 +7,11 @@ pub trait GetProperty {
 
 impl GetProperty for f64 {
     fn get_property(el: impl Into<f64>, id: &str) -> Self {
-        lazy_static::lazy_static! {
-            static ref FN: JSFunction= {
-            register_function(
-                "function(el,strPtr,strLen){
-                        el = this.getObject(el);
-                        return el[this.readUtf8FromMemory(strPtr,strLen)];
-                }",
-            )
-        };};
-        FN.invoke_3(el.into(), id.as_ptr() as u32, id.len() as u32)
+        js!("function(el,strPtr,strLen){
+            el = this.getObject(el);
+            return el[this.readUtf8FromMemory(strPtr,strLen)];
+        }")
+        .invoke_3(el.into(), id.as_ptr() as u32, id.len() as u32)
     }
 }
 
