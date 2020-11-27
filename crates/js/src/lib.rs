@@ -1,9 +1,9 @@
 #![no_std]
 extern crate alloc;
 use alloc::vec::Vec;
+pub use callback::*;
 pub use cstring::cstr_to_string;
 pub use lazy_static::lazy_static;
-
 
 pub const JS_NULL: f64 = 0.0;
 pub const JS_UNDEFINED: f64 = 1.0;
