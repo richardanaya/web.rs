@@ -42,7 +42,7 @@ async fn main() -> tide::Result<()> {
             create_project_in_dir(&dir)
         } else if let Some(_) = matches.subcommand_matches("build") {
             build_project_in_dir(&dir)
-        } else if let Some(_) = matches.subcommand_matches("run") {
+        } else if let Some(matches) = matches.subcommand_matches("run") {
             build_project_in_dir(&dir);
             let name = dir.file_name().unwrap().to_str().unwrap();
             let server_dir = dir.join("dist");
