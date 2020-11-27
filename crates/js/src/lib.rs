@@ -28,7 +28,7 @@ extern "C" {
     ) -> f64;
 }
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct JSFunction {
     fn_handle: f64,
 }
@@ -387,8 +387,8 @@ impl Into<f64> for &JSObject {
 }
 
 impl From<f64> for JSObject {
-    fn from(n:f64) -> Self {
-        JSObject { handle: n}
+    fn from(n: f64) -> Self {
+        JSObject { handle: n }
     }
 }
 
@@ -406,4 +406,19 @@ fn malloc(size: i32) -> *mut u8 {
     let ptr = buf.as_mut_ptr();
     core::mem::forget(buf);
     ptr
+}
+
+#[macro_export]
+macro_rules! js {
+    ($e:expr) => {{
+        lazy_static::lazy_static! {
+        static ref FN: js::JSFunction= {
+            js::register_function(
+                "function(handler,time){
+                        window.setTimeout(this.createCallback(handler),time);
+                    }",
+            )
+        };};
+        &FN
+    }};
 }
