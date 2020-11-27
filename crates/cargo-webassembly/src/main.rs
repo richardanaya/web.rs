@@ -29,7 +29,8 @@ pub fn from_extension(extension: impl AsRef<str>) -> Option<tide::http::mime::Mi
 #[async_std::main]
 async fn main() -> tide::Result<()> {
     let yaml = load_yaml!("cli.yaml");
-    let matches = App::from_yaml(yaml).get_matches();
+    let mut app = App::from_yaml(yaml);
+    let matches = app.clone().get_matches();
 
     let mut dir = env::current_dir().unwrap();
 
@@ -96,6 +97,8 @@ async fn main() -> tide::Result<()> {
                 addr
             );
             app.listen(addr).await?;
+        } else {
+            app.print_long_help().unwrap();
         }
     }
     Ok(())
