@@ -5,15 +5,12 @@ class Index {
   }
 
   toNum() {
-    return (
-      ((this.generation & 0xffffffff) << 32) |
-      (this.index & 0xffffffff)
-    );
+    return ((this.generation & 0xffffffff) << 32) | (this.index & 0xffffffff);
   }
 }
 
-Index.fromNum = function(n) {
-  let i = ((n& 0xffffffff00000000) >> 32) & 0xffffffff;
+Index.fromNum = function (n) {
+  let i = ((n & 0xffffffff00000000) >> 32) & 0xffffffff;
   let g = n & 0xffffffff;
   return new Index(Number(g), Number(i));
 };
@@ -114,9 +111,7 @@ class GenerationalArena {
   }
 }
 
-
 window.JsWasm = {
-  
   createEnvironment() {
     let arena = new GenerationalArena();
     arena.insert(undefined);
@@ -129,8 +124,8 @@ window.JsWasm = {
       objects: arena,
       utf8dec: new TextDecoder("utf-8"),
       utf8enc: new TextEncoder("utf-8"),
-      toCallbackArg: function(arg){
-        if(typeof arg === "object"){
+      toCallbackArg: function (arg) {
+        if (typeof arg === "object") {
           return context.storeObject(arg);
         }
         return arg;
@@ -139,8 +134,20 @@ window.JsWasm = {
         let fnHandleCallback = this.module.instance.exports.handle_callback;
         return function () {
           const arg = arguments;
-          fnHandleCallback(cb,context.toCallbackArg(arg[0]),context.toCallbackArg(arg[1]),context.toCallbackArg(arg[2]),context.toCallbackArg(arg[3]),context.toCallbackArg(arg[4]),context.toCallbackArg(arg[5]),context.toCallbackArg(arg[6]),context.toCallbackArg(arg[7]),context.toCallbackArg(arg[8]),context.toCallbackArg(arg[9]));
-        }
+          fnHandleCallback(
+            cb,
+            context.toCallbackArg(arg[0]),
+            context.toCallbackArg(arg[1]),
+            context.toCallbackArg(arg[2]),
+            context.toCallbackArg(arg[3]),
+            context.toCallbackArg(arg[4]),
+            context.toCallbackArg(arg[5]),
+            context.toCallbackArg(arg[6]),
+            context.toCallbackArg(arg[7]),
+            context.toCallbackArg(arg[8]),
+            context.toCallbackArg(arg[9])
+          );
+        };
       },
       readCStringFromMemory: function (start) {
         const data = new Uint8Array(this.module.instance.exports.memory.buffer);
@@ -156,17 +163,23 @@ window.JsWasm = {
         const bytes = this.utf8enc.encode(str + String.fromCharCode(0));
         const len = bytes.length;
         const start = this.module.instance.exports.malloc(len);
-        const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
+        const memory = new Uint8Array(
+          this.module.instance.exports.memory.buffer
+        );
         memory.set(bytes, start);
         return start;
       },
       readUtf8FromMemory: function (start, len) {
-        const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
+        const memory = new Uint8Array(
+          this.module.instance.exports.memory.buffer
+        );
         const text = this.utf8dec.decode(memory.subarray(start, start + len));
         return text;
       },
       readUint8ArrayFromMemory(start) {
-        const data32 = new Uint32Array(this.module.instance.exports.memory.buffer);
+        const data32 = new Uint32Array(
+          this.module.instance.exports.memory.buffer
+        );
         const ptr = data32[start / 4];
         const length = data32[ptr / 4];
         let b = mem.slice(ptr + 4, ptr + 4 + length);
@@ -176,7 +189,9 @@ window.JsWasm = {
         const bytes = utf8enc.encode(str);
         const len = bytes.length;
         const start = this.module.instance.exports.malloc(len);
-        const memory = new Uint8Array(this.module.instance.exports.memory.buffer);
+        const memory = new Uint8Array(
+          this.module.instance.exports.memory.buffer
+        );
         memory.set(bytes, start);
         return start;
       },
@@ -200,7 +215,9 @@ window.JsWasm = {
       js_register_function(start, len) {
         let functionBody = context.readUtf8FromMemory(start, len);
         let id = context.functions.length;
-        context.functions.push(eval("(" + functionBody + ")"));
+        context.functions.push(
+          Function(`"use strict";return(${functionBody})`)()
+        );
         return id;
       },
       js_invoke_function(funcHandle, a, b, c, d, e, f, g, h, i, j) {
@@ -218,7 +235,7 @@ window.JsWasm = {
           j
         );
       }
-    }
+    };
   },
 
   async load_and_run_wasm(wasmURL) {
@@ -231,10 +248,12 @@ window.JsWasm = {
     env.context.module = module;
     module.instance.exports.main();
   }
-}
+};
 
 document.addEventListener("DOMContentLoaded", function () {
-  const wasmScripts = document.querySelectorAll("script[type='application/wasm']");
+  const wasmScripts = document.querySelectorAll(
+    "script[type='application/wasm']"
+  );
   for (let i = 0; i < wasmScripts.length; i++) {
     const src = wasmScripts[i].src;
     if (src) {
@@ -250,6 +269,6 @@ if (window.WasmScriptComponents) {
     return {
       ...e,
       ...JsWasm.createEnvironment()
-    }
-  }
+    };
+  };
 }

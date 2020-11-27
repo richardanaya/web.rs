@@ -5,7 +5,7 @@ pub fn main() {
             function(selectorStart, selectorEnd){
                 let selector = this.readUtf8FromMemory(selectorStart,selectorEnd);
                 let obj = document.querySelector(selector);
-                return context.storeObject(obj.getContext("2d"));
+                return this.storeObject(obj.getContext("2d"));
             }"#,
     );
     let fn_set_color = js::register_function(

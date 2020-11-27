@@ -10,15 +10,18 @@ pub fn set_timeout(
     milliseconds: impl Into<f64>,
 ) -> (Handle, JSFunction) {
     let cb = create_callback_0(callback);
-    lazy_static::lazy_static! {
-    static ref FN: JSFunction= {
-        register_function(
-            "function(handler,time){
-                window.setTimeout(this.createCallback(handler),time);
-            }",
-        )
-    };};
-    let handle = FN.invoke_2(cb, milliseconds);
+    let fn = {
+        lazy_static::lazy_static! {
+        static ref FN: JSFunction= {
+            register_function(
+                "function(handler,time){
+                    window.setTimeout(this.createCallback(handler),time);
+                }",
+            )
+        };};
+        &FN
+    };
+    let handle = fn.invoke_2(cb, milliseconds);
     (handle, cb.into())
 }
 
