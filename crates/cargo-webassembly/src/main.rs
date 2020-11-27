@@ -164,7 +164,7 @@ fn build_project_in_dir(dir: &PathBuf) {
     std::fs::copy(
         dir.join(format!(
             "target/wasm32-unknown-unknown/release/{}.wasm",
-            name
+            name.replace("-","_")
         )),
         dir.join(format!("dist/{}.wasm", name)),
     )
