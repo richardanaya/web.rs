@@ -89,7 +89,10 @@ async fn main() -> tide::Result<()> {
             });
             let port = matches.value_of("port").unwrap().parse::<u32>().unwrap();
             let addr = format!("{}{}", "http://127.0.0.1:", port);
-            Url::parse(&addr).unwrap().open();
+            let addr2 = addr.clone();
+            async_std::task::spawn(async move {
+                Url::parse(&addr2).unwrap().open();
+            });
             println!(
                 "   {} webassembly `{}` package on port {}",
                 "Running".green().bold(),
