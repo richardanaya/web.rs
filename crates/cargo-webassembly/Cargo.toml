@@ -1,6 +1,6 @@
 [package]
 name = "cargo-webassembly"
-version = "0.0.9"
+version = "0.0.10"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
