@@ -2,6 +2,12 @@
 
 This cargo extension is for developing front end applications in WebAssembly.
 
+This project is currently **beta**, but totally functional! Next steps include:
+
+* cleaning up the code to use less `unwrap`
+* use a better open url library (the current one has some weird behavior).
+* support project file watching and recompiling
+
 <p align="center">
   <img height="300" src="../../images/undraw_website_builder_bxki.png">
 </p>
