@@ -1,5 +1,4 @@
 #![no_std]
-use callback::*;
 use core::future::Future;
 use js::*;
 

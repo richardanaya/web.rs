@@ -1,5 +1,4 @@
 #![no_std]
-use callback::*;
 use js::*;
 extern crate alloc;
 
