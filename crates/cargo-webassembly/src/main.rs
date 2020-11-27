@@ -8,9 +8,28 @@ use colored::*;
 use std::env;
 use std::fs::create_dir;
 use std::path::PathBuf;
+use tide::prelude::*;
+use tide::Request;
 use url::Url;
 
-fn main() {
+pub fn from_extension(extension: impl AsRef<str>) -> Option<tide::http::mime::Mime> {
+    match extension.as_ref() {
+        "html" => Some(tide::http::mime::HTML),
+        "js" | "mjs" | "jsonp" => Some(tide::http::mime::JAVASCRIPT),
+        "json" => Some(tide::http::mime::JSON),
+        "css" => Some(tide::http::mime::CSS),
+        "svg" => Some(tide::http::mime::SVG),
+        "xml" => Some(tide::http::mime::XML),
+        "png" => Some(tide::http::mime::PNG),
+        "jpg" | "jpeg" => Some(tide::http::mime::JPEG),
+        "wasm" => Some(tide::http::mime::WASM),
+        "ico" => Some(tide::http::mime::ICO),
+        _ => None,
+    }
+}
+
+#[async_std::main]
+async fn main() -> tide::Result<()> {
     let yaml = load_yaml!("cli.yaml");
     let matches = App::from_yaml(yaml).get_matches();
 
@@ -26,13 +45,59 @@ fn main() {
             build_project_in_dir(&dir)
         } else if let Some(_) = matches.subcommand_matches("run") {
             build_project_in_dir(&dir);
+            let name = dir.file_name().unwrap().to_str().unwrap();
             let server_dir = dir.join("dist");
-            start_server(&server_dir);
-            Url::parse("https://github.com/richardanaya/js-wasm")
-                .unwrap()
-                .open();
+            let mut app = tide::new();
+            let server_dir2 = server_dir.clone();
+            app.at("/").get(move |req: tide::Request<()>| {
+                let index = server_dir.join("index.html");
+                async move {
+                    tide::Result::Ok(
+                        tide::Response::builder(200)
+                            .body(std::fs::read(index).unwrap())
+                            .content_type(tide::http::mime::HTML)
+                            .build(),
+                    )
+                }
+            });
+            app.at("/*").get(move |req: tide::Request<()>| {
+                let server_dir3 = server_dir2.clone();
+                async move {
+                    let index = server_dir3.join("index.html");
+                    let p = server_dir3.to_str().unwrap();
+                    let p2 = req.url().path();
+                    let s = format!("{}{}", p, p2).to_string();
+                    let p3 = std::path::Path::new(&s);
+                    if p3.exists() {
+                        tide::Result::Ok(
+                            tide::Response::builder(200)
+                                .body(std::fs::read(p3).unwrap())
+                                .content_type(
+                                    from_extension(p3.extension().unwrap().to_str().unwrap())
+                                        .unwrap(),
+                                )
+                                .build(),
+                        )
+                    } else {
+                        tide::Result::Ok(
+                            tide::Response::builder(200)
+                                .body(std::fs::read(index).unwrap())
+                                .content_type(tide::http::mime::HTML)
+                                .build(),
+                        )
+                    }
+                }
+            });
+            Url::parse("http://127.0.0.1:8080").unwrap().open();
+            println!(
+                "   {} webassembly `{}` package on port http://127.0.0.1:8080",
+                "Running".green().bold(),
+                name
+            );
+            app.listen("127.0.0.1:8080").await?;
         }
     }
+    Ok(())
 }
 
 fn create_project_in_dir(dir: &PathBuf) {
@@ -89,13 +154,13 @@ fn build_project_in_dir(dir: &PathBuf) {
         .arg("wasm32-unknown-unknown")
         .arg("--release");
     echo_hello.output().expect("could not compile");
-    std::fs::copy(dir.join(format!("target/wasm32-unknown-unknown/release/{}.wasm",name)),dir.join(format!("dist/{}.wasm",name))).expect("could not copy");
-    println!(
-        "    {} webassembly target",
-        "Finished".green().bold()
-    );
-}
-
-fn start_server(dir: &PathBuf) {
-    println!("starting server in {:?}", dir)
+    std::fs::copy(
+        dir.join(format!(
+            "target/wasm32-unknown-unknown/release/{}.wasm",
+            name
+        )),
+        dir.join(format!("dist/{}.wasm", name)),
+    )
+    .expect("could not copy");
+    println!("    {} webassembly target", "Finished".green().bold());
 }

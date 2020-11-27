@@ -1,6 +1,6 @@
 [package]
 name = "cargo-webassembly"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -15,3 +15,5 @@ url="2"
 url_open="0"
 clap = {version = "2", features = ["yaml"]}
 colored = "2"
+tide = "0.14.0"
+async-std = { version = "1.6.0", features = ["attributes"] }
