@@ -23,3 +23,7 @@ subcommands:
                 about: controls testing features
             - run:
                 about: controls testing features
+                args: 
+                - port:
+                    help: Sets the port to be used when running
+                    default_value: "8080"

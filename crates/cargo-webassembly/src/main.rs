@@ -8,8 +8,6 @@ use colored::*;
 use std::env;
 use std::fs::create_dir;
 use std::path::PathBuf;
-use tide::prelude::*;
-use tide::Request;
 use url::Url;
 
 pub fn from_extension(extension: impl AsRef<str>) -> Option<tide::http::mime::Mime> {
@@ -49,7 +47,7 @@ async fn main() -> tide::Result<()> {
             let server_dir = dir.join("dist");
             let mut app = tide::new();
             let server_dir2 = server_dir.clone();
-            app.at("/").get(move |req: tide::Request<()>| {
+            app.at("/").get(move |_req: tide::Request<()>| {
                 let index = server_dir.join("index.html");
                 async move {
                     tide::Result::Ok(
@@ -88,13 +86,16 @@ async fn main() -> tide::Result<()> {
                     }
                 }
             });
-            Url::parse("http://127.0.0.1:8080").unwrap().open();
+            let port = matches.value_of("port").unwrap().parse::<u32>().unwrap();
+            let addr = format!("{}{}", "http://127.0.0.1:", port);
+            Url::parse(&addr).unwrap().open();
             println!(
-                "   {} webassembly `{}` package on port http://127.0.0.1:8080",
+                "   {} webassembly `{}` package on port {}",
                 "Running".green().bold(),
-                name
+                name,
+                addr
             );
-            app.listen("127.0.0.1:8080").await?;
+            app.listen(addr).await?;
         }
     }
     Ok(())
