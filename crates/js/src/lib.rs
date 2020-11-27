@@ -2,6 +2,8 @@
 extern crate alloc;
 use alloc::vec::Vec;
 pub use cstring::cstr_to_string;
+pub use lazy_static::lazy_static;
+
 
 pub const JS_NULL: f64 = 0.0;
 pub const JS_UNDEFINED: f64 = 1.0;
@@ -411,7 +413,7 @@ fn malloc(size: i32) -> *mut u8 {
 #[macro_export]
 macro_rules! js {
     ($e:expr) => {{
-        lazy_static::lazy_static! {
+        js::lazy_static! {
         static ref FN: js::JSFunction= {
             js::register_function(
                 "function(handler,time){
