@@ -41,7 +41,7 @@ Create JavaScript functions and invoke them
 js = "0.2"
 ```
 ```rust
-let fn_log = js::register_function(
+let fn_log = js!(
     "function(strPtr,strLen){
         console.log(this.readUtf8FromMemory(strPtr,strLen)); 
     }");
