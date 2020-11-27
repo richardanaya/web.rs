@@ -1,6 +1,6 @@
 [package]
 name = "cargo-webassembly"
-version = "0.0.12"
+version = "0.0.13"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -12,7 +12,7 @@ readme = "README.md"
 
 [dependencies]
 url= "2.2.0"
-url_open= "0.0.1"
+webbrowser = "0.5.5"
 clap = { version = "2.33.3", features = ["yaml"] }
 colored = "2.0.0"
 tide = "0.15.0"

@@ -1,14 +1,11 @@
-use url_open::UrlOpen;
 #[macro_use]
 extern crate clap;
 use clap::App;
 extern crate url;
-extern crate url_open;
 use colored::*;
 use std::env;
 use std::fs::create_dir;
 use std::path::PathBuf;
-use url::Url;
 
 pub fn from_extension(extension: impl AsRef<str>) -> Option<tide::http::mime::Mime> {
     match extension.as_ref() {
@@ -90,9 +87,7 @@ async fn main() -> tide::Result<()> {
             let port = matches.value_of("port").unwrap().parse::<u32>().unwrap();
             let addr = format!("{}{}", "http://127.0.0.1:", port);
             let addr2 = addr.clone();
-            async_std::task::spawn(async move {
-                Url::parse(&addr2).unwrap().open();
-            });
+            async_std::task::spawn(async move { webbrowser::open(&addr2) });
             println!(
                 "   {} webassembly `{}` package on port {}",
                 "Running".green().bold(),
