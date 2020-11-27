@@ -416,9 +416,7 @@ macro_rules! js {
         js::lazy_static! {
         static ref FN: js::JSFunction= {
             js::register_function(
-                "function(handler,time){
-                        window.setTimeout(this.createCallback(handler),time);
-                    }",
+                $e,
             )
         };};
         &FN
