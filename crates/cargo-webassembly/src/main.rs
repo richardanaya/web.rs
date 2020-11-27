@@ -101,7 +101,11 @@ async fn main() -> tide::Result<()> {
             );
             app.listen(addr).await?;
         } else {
-            app.print_long_help().unwrap();
+            if matches.is_present("version") {
+                println!("{}", env!("CARGO_PKG_VERSION"))
+            } else {
+                app.print_long_help().unwrap();
+            }
         }
     }
     Ok(())
@@ -164,7 +168,7 @@ fn build_project_in_dir(dir: &PathBuf) {
     std::fs::copy(
         dir.join(format!(
             "target/wasm32-unknown-unknown/release/{}.wasm",
-            name.replace("-","_")
+            name.replace("-", "_")
         )),
         dir.join(format!("dist/{}.wasm", name)),
     )

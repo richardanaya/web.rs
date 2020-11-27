@@ -1,14 +1,14 @@
 name: cargo-webassembly
-version: "0.0.1"
+version: "0.0.12"
 author: Richard Anaya <richard.anaya@gmail.com>
 about: A tool for working with WebAssembly Rust projects
-args:
-    - verbose:
-        short: v
-        multiple: true
-        help: Sets the level of verbosity
 subcommands:
     - webassembly:
+        args:
+        - version:
+            short: V
+            multiple: true
+            help: Displays the version
         about: A collection of subcommands for working with WebAssembly
         subcommands:
             - new:
