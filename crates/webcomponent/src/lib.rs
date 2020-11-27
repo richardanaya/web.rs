@@ -5,7 +5,6 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-use callback::*;
 use spin::Mutex;
 
 pub type HTMLElement = f64;
