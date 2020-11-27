@@ -30,7 +30,7 @@ cargo webassembly run
 
 This will compile and start a server by default on port `8080`, you can change the port with the `-p` option.
 
-This server is setup for front end development where all non-static file routes redirect to the root `index.html`.
+This server is setup for single-page apps where all non-static file routes redirect to the root `index.html`.
 
 # Building your project
 
