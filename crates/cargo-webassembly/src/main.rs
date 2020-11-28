@@ -141,6 +141,9 @@ fn create_project_in_dir(dir: &PathBuf) {
 }
 
 fn build_project_in_dir(dir: &PathBuf) {
+    use std::io::{self, Write};
+    use std::process::Command;
+
     if !dir.join("Cargo.toml").exists() {
         println!("must execute this command in project root");
         return;
@@ -149,17 +152,55 @@ fn build_project_in_dir(dir: &PathBuf) {
     let name = dir.file_name().unwrap().to_str().unwrap();
     println!(
         "   {} webassembly `{}` package",
+        "Pre-compile check".green().bold(),
+        name
+    );
+    let mut target_check = Command::new("cargo");
+    target_check
+        .arg("check")
+        .arg("--target")
+        .arg("wasm32-unknown-unknown");
+    let command_output = target_check
+        .output()
+        .expect("Build pre-check failed! (check that wasm32 build target is installed)");
+    io::stdout().write_all(&command_output.stdout).unwrap();
+    io::stderr().write_all(&command_output.stderr).unwrap();
+    println!(
+        "   Pre-compile check exit code status: {}",
+        command_output.status
+    );
+
+    let name = dir.file_name().unwrap().to_str().unwrap();
+    println!(
+        "   {} webassembly `{}` package",
         "Compiling".green().bold(),
         name
     );
-    use std::process::Command;
+
+    println!(
+        "   {} webassembly `{}` package",
+        "Compiling".green().bold(),
+        name
+    );
     let mut echo_hello = Command::new("cargo");
     echo_hello
         .arg("build")
         .arg("--target")
         .arg("wasm32-unknown-unknown")
         .arg("--release");
-    echo_hello.output().expect("could not compile");
+    let compile_command_output = echo_hello.output().expect("Could not compile to wasm");
+
+    io::stdout()
+        .write_all(&compile_command_output.stdout)
+        .unwrap();
+    io::stderr()
+        .write_all(&compile_command_output.stderr)
+        .unwrap();
+    println!(
+        "   Compilation exit code status: {}",
+        compile_command_output.status
+    );
+
     std::fs::copy(
         dir.join(format!(
             "target/wasm32-unknown-unknown/release/{}.wasm",
@@ -167,6 +208,6 @@ fn build_project_in_dir(dir: &PathBuf) {
         )),
         dir.join(format!("dist/{}.wasm", name)),
     )
-    .expect("could not copy");
+    .expect("Could not copy built file! (check that wasm32 build target is installed)");
     println!("    {} webassembly target", "Finished".green().bold());
 }
