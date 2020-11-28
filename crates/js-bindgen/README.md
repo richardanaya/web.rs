@@ -1,5 +1,8 @@
 # js-bindgen
 
+<p align="center">
+  <img height="300" src="../../images/undraw_convert_2gjv.png">
+</p>
 
 Generate bindings to JS via [`js-wasm`](https://wasm.js.org) for various languages:
 
