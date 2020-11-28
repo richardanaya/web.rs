@@ -12,6 +12,12 @@ This project is currently **beta**, but totally functional! Next steps include:
   <img height="300" src="../../images/undraw_website_builder_bxki.png">
 </p>
 
+First make sure you [install Rust](https://rustup.rs/) and have the `wasm32` toolchain installed:
+
+```
+rustup target add wasm32-unknown-unknown
+```
+
 Install with the following command:
 
 ```
