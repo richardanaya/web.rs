@@ -9,7 +9,7 @@ cargo install js-bindgen
 
 # Getting Started
 
-This project is able to take Javascript API descriptions like the one below:
+This project is able to take JavaScript API descriptions in yaml like the one below:
 
 ```yaml
 - namespace: console
@@ -38,7 +38,7 @@ This project is able to take Javascript API descriptions like the one below:
           type: string
 ```
 
-And turn them into bindings for various languages using `js-wasm`.
+And turn them into code.
 
 # Rust
 
