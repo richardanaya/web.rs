@@ -132,7 +132,7 @@ Sometimes you may want to create a binding to code that doesn't exist and still 
 - namespace: unicorn
   functions:
     makeUnicorns:
-      custom: |
+      code: |
         function() {
           console.log("🦄🦄🦄")
         }
