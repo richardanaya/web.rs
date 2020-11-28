@@ -4,7 +4,7 @@
   <img height="300" src="../../images/undraw_convert_2gjv.png">
 </p>
 
-Generate bindings to JS via [`js-wasm`](https://wasm.js.org) for various languages:
+Generate WebAssembly bindings to JavaSCript via [`js-wasm`](https://wasm.js.org) for various languages:
 
 * Rust
 * C
