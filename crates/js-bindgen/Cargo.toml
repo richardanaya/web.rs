@@ -1,6 +1,6 @@
 [package]
 name = "js-bindgen"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "Generate bindings that call JavaScript from WebAssembly"
