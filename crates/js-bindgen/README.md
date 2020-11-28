@@ -5,7 +5,6 @@ Generate bindings to JS via [`js-wasm`](https://wasm.js.org) for various languag
 
 * Rust
 * C
-* More coming!
 
 ```
 cargo install js-bindgen
