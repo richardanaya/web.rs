@@ -9,7 +9,7 @@ class Index {
   }
 }
 
-Index.fromNum = function (n) {
+Index.fromNum = function(n) {
   let i = ((n & 0xffffffff00000000) >> 32) & 0xffffffff;
   let g = n & 0xffffffff;
   return new Index(Number(g), Number(i));
@@ -120,19 +120,23 @@ window.JsWasm = {
     arena.insert(typeof document != "undefined" ? document : null);
     arena.insert(typeof document != "undefined" ? document.body : null);
     let context = {
-      functions: [],
+      functions: [
+        function(){
+          debugger;
+        }
+      ],
       objects: arena,
       utf8dec: new TextDecoder("utf-8"),
       utf8enc: new TextEncoder("utf-8"),
-      toCallbackArg: function (arg) {
+      toCallbackArg: function(arg) {
         if (typeof arg === "object") {
           return context.storeObject(arg);
         }
         return arg;
       },
-      createCallback: function (cb) {
+      createCallback: function(cb) {
         let fnHandleCallback = this.module.instance.exports.handle_callback;
-        return function () {
+        return function() {
           const arg = arguments;
           fnHandleCallback(
             cb,
@@ -149,7 +153,7 @@ window.JsWasm = {
           );
         };
       },
-      readCStringFromMemory: function (start) {
+      readCStringFromMemory: function(start) {
         const data = new Uint8Array(this.module.instance.exports.memory.buffer);
         const str = [];
         let i = start;
@@ -169,7 +173,7 @@ window.JsWasm = {
         memory.set(bytes, start);
         return start;
       },
-      readUtf8FromMemory: function (start, len) {
+      readUtf8FromMemory: function(start, len) {
         const memory = new Uint8Array(
           this.module.instance.exports.memory.buffer
         );
@@ -185,7 +189,7 @@ window.JsWasm = {
         let b = mem.slice(ptr + 4, ptr + 4 + length);
         return new Uint8Array(b);
       },
-      writeUtf8ToMemory: function (str) {
+      writeUtf8ToMemory: function(str) {
         const bytes = utf8enc.encode(str);
         const len = bytes.length;
         const start = this.module.instance.exports.malloc(len);
@@ -195,14 +199,14 @@ window.JsWasm = {
         memory.set(bytes, start);
         return start;
       },
-      storeObject: function (obj) {
+      storeObject: function(obj) {
         const index = this.objects.insert(obj);
         return index.toNum();
       },
-      getObject: function (handle) {
+      getObject: function(handle) {
         return this.objects.get(Index.fromNum(handle));
       },
-      releaseObject: function (handle) {
+      releaseObject: function(handle) {
         this.objects[handle] = null;
         this.free_locations.push(handle);
       }
@@ -250,7 +254,7 @@ window.JsWasm = {
   }
 };
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
   const wasmScripts = document.querySelectorAll(
     "script[type='application/wasm']"
   );
@@ -265,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 if (window.WasmScriptComponents) {
-  window.WasmScriptComponents["js-wasm"] = function (e) {
+  window.WasmScriptComponents["js-wasm"] = function(e) {
     return {
       ...e,
       ...JsWasm.createEnvironment()

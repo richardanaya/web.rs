@@ -120,7 +120,11 @@ window.JsWasm = {
     arena.insert(typeof document != "undefined" ? document : null);
     arena.insert(typeof document != "undefined" ? document.body : null);
     let context = {
-      functions: [],
+      functions: [
+        function(){
+          debugger;
+        }
+      ],
       objects: arena,
       utf8dec: new TextDecoder("utf-8"),
       utf8enc: new TextEncoder("utf-8"),
