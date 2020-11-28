@@ -1,0 +1,26 @@
+- namespace: console
+  functions:
+    clear:
+    log:
+      parameters:
+        - name: msg
+          type: string
+    warn:
+      name: warning
+      parameters:
+        - name: msg
+          type: string
+    error:
+      parameters:
+        - name: msg
+          type: string
+    time:
+      parameters:
+        - name: msg
+          type: string
+    timeEnd:
+      parameters:
+        - name: msg
+          type: string
+    
+    
