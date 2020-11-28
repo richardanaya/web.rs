@@ -128,7 +128,7 @@ void console_warning(char *msg) {
 
 Sometimes you may want to create a binding to code that doesn't exist and still have the power to generate libraries for many targets
 
-```
+```yaml
 - namespace: unicorn
   functions:
     makeUnicorns:
