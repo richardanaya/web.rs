@@ -1,7 +1,7 @@
 # js-bindgen
 
 
-Generate bindings to JS for various languages (Rust, C, etc.)
+Generate bindings to JS via [`js-wasm`](https://wasm.js.org) for various languages (Rust, C, etc.).
 
 ```
 cargo install js-bindgen
