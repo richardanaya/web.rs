@@ -49,7 +49,7 @@ And turn them into code.
 # Rust
 
 ```
-js-bindgen --lang R console.yaml
+js-bindgen --lang rust console.yaml
 ```
 
 ```rust
@@ -85,7 +85,7 @@ mod console {
 # C
 
 ```
-js-bindgen --lang C console.yaml
+js-bindgen --lang c console.yaml
 ```
 
 ```C
