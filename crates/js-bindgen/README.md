@@ -4,7 +4,7 @@
   <img height="300" src="../../images/undraw_convert_2gjv.png">
 </p>
 
-Generate bindings to JS via [`js-wasm`](https://wasm.js.org) for various languages:
+Generate WebAssembly bindings to JavaSCript via [`js-wasm`](https://wasm.js.org) for various languages:
 
 * Rust
 * C
@@ -49,7 +49,7 @@ And turn them into code.
 # Rust
 
 ```
-js-bindgen --lang R console.yaml
+js-bindgen --lang rust console.yaml
 ```
 
 ```rust
@@ -85,7 +85,7 @@ mod console {
 # C
 
 ```
-js-bindgen --lang C console.yaml
+js-bindgen --lang c console.yaml
 ```
 
 ```C
