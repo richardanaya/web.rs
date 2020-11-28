@@ -1,6 +1,13 @@
 # js-bindgen
 
+
 Generate bindings to JS for various languages (Rust, C, etc.)
+
+```
+cargo install js-bindgen
+```
+
+# Getting Started
 
 This project is able to take Javascript API descriptions like the one below:
 
@@ -31,9 +38,14 @@ This project is able to take Javascript API descriptions like the one below:
           type: string
 ```
 
-And turn them into bindings for various languages using `js-wasm`:
+And turn them into bindings for various languages using `js-wasm`.
 
-Rust:
+# Rust
+
+```
+js-bindgen --lang R console.yaml
+```
+
 ```rust
 #![no_std]
 use js::*;
@@ -64,7 +76,12 @@ mod console {
 ...
 ```
 
-C:
+# C
+
+```
+js-bindgen --lang C console.yaml
+```
+
 ```C
 #include "js-wasm.h"
 
