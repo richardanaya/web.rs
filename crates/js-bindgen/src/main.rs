@@ -1,6 +1,8 @@
 use serde::*;
 use tera::*;
 use yaml_rust::{Yaml, YamlLoader};
+use inflector::Inflector;
+
 fn main() {
     let mut tera = Tera::default();
     tera.add_raw_template("rust/module.rs", include_str!("templates/rust/module.rs"))
@@ -45,7 +47,13 @@ fn main() {
             };
             let mut jsfunc = JSFunction {
                 name: name.to_owned(),
-                friendly_name,
+                friendly_name: {
+                    if let Some(f) = friendly_name {
+                        f.to_snake_case()
+                    } else {
+                        name.to_owned().to_snake_case()
+                    }
+                },
                 parameters: vec![],
             };
             let parameters: Vec<Yaml> = {
@@ -69,6 +77,7 @@ fn main() {
                     .unwrap();
                 jsfunc.parameters.push(JSParameter {
                     name: param_name.to_owned(),
+                    friendly_name: param_name.to_owned().to_snake_case(),
                     parameter_type: param_type.to_owned(),
                 })
             }
@@ -86,13 +95,14 @@ fn main() {
 #[derive(Serialize)]
 struct JSParameter {
     name: String,
+    friendly_name: String,
     parameter_type: String,
 }
 
 #[derive(Serialize)]
 struct JSFunction {
     name: String,
-    friendly_name: Option<String>,
+    friendly_name: String,
     parameters: Vec<JSParameter>,
 }
 
