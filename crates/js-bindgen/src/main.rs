@@ -43,9 +43,10 @@ fn main() {
                     None
                 }
             };
-            let jsfunc = JSFunction {
+            let mut jsfunc = JSFunction {
                 name: name.to_owned(),
                 friendly_name,
+                parameters: vec![],
             };
             let parameters: Vec<Yaml> = {
                 if let Some(v) = func.get(&Yaml::String("parameters".to_owned())) {
@@ -66,6 +67,10 @@ fn main() {
                     .unwrap()
                     .as_str()
                     .unwrap();
+                jsfunc.parameters.push(JSParameter {
+                    name: param_name.to_owned(),
+                    parameter_type: param_type.to_owned(),
+                })
             }
             namespace.functions.push(jsfunc)
         }
@@ -79,9 +84,16 @@ fn main() {
 }
 
 #[derive(Serialize)]
+struct JSParameter {
+    name: String,
+    parameter_type: String,
+}
+
+#[derive(Serialize)]
 struct JSFunction {
     name: String,
     friendly_name: Option<String>,
+    parameters: Vec<JSParameter>,
 }
 
 #[derive(Serialize)]
