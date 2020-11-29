@@ -3,10 +3,22 @@
 #endif
 
 #ifndef JS_H
+
+unsigned int
+js_strlen(const char *str)
+{
+        const char *s;
+
+        for (s = str; *s; ++s)
+                ;
+        return (s - str);
+}
+
 typedef double JSValue;
 typedef int JSFunction;
 extern JSFunction js_register_function(char*,unsigned int);
 extern JSValue js_invoke_function(JSFunction,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue);
+extern void js_release(JSValue);
 
 JSValue const JS_NULL = 0.0;
 JSValue const JS_UNDEFINED = 1.0;
