@@ -4,6 +4,8 @@
   <img height="300" src="../../images/undraw_convert_2gjv.png">
 </p>
 
+**The project is very ALPHA right now, but it is generating some very basic bindings for Rust and C right now**
+
 Generate WebAssembly bindings to JavaSCript via [`js-wasm`](https://wasm.js.org) for various languages:
 
 * Rust
