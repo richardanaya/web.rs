@@ -1,0 +1,37 @@
+---
+- object: CanvasElement
+  functions:
+    - name: getContext
+      parameters:
+        - name: el
+          parameter_type: self
+
+- object: CanvasContext
+  properties:
+    - name: fillStyle
+      property_type: string
+  functions:
+    - name: fillRect
+      parameters:
+        - name: ctx
+          parameter_type: self
+        - name: x
+          parameter_type: f64
+        - name: "y"
+          parameter_type: f64
+        - name: height
+          parameter_type: f64
+        - name: width
+          parameter_type: f64
+    - name: clearRect
+      parameters:
+        - name: ctx
+          parameter_type: self
+        - name: x
+          parameter_type: f64
+        - name: "y"
+          parameter_type: f64
+        - name: height
+          parameter_type: f64
+        - name: width
+          parameter_type: f64

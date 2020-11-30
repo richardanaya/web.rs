@@ -213,8 +213,11 @@ window.JsWasm = {
     };
     return {
       context,
+      abort() {
+	throw new Error("WebAssembly module aborted");
+      },
       js_release(obj) {
-        //context.releaseObject(obj);
+        context.releaseObject(obj);
       },
       js_register_function(start, len) {
         let functionBody = context.readUtf8FromMemory(start, len);
