@@ -65,6 +65,4 @@ pub mod {{namespace.name}} {
             {%- endfor -%});
     }
     {%- endfor %}
-}
-{%- endfor %}
-
+}{%- endfor -%}

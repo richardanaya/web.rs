@@ -1,14 +1,34 @@
 use inflector::Inflector;
 use serde::*;
 use tera::*;
+use clap::{Arg, App };
 
 fn main() {
+    let matches = App::new("js-bindgen")
+                          .version("0.0")
+                          .author("Richard Anaya <richard.anaya@gmail.com>")
+                          .about("Creates js-wasm bindings for various languages")
+                          .arg(Arg::with_name("lang")
+                               .short("c")
+                               .long("language")
+                               .help("Sets a custom config file")
+                               .takes_value(true)
+                               .required(true))
+                            .arg(Arg::with_name("INPUT")
+                               .help("Sets the input file to use")
+                               .required(true)
+                               .index(1))
+                          .get_matches();
+    
+
     let mut tera = Tera::default();
     tera.add_raw_template("rust/module.rs", include_str!("templates/rust/module.rs"))
         .unwrap();
+    
+    tera.add_raw_template("c/header.h", include_str!("templates/c/header.h"))
+    .unwrap();
 
-    let args = std::env::args().collect::<Vec<String>>();
-    let file = &args[1];
+    let file = matches.value_of("INPUT").unwrap();
     let text = std::fs::read_to_string(file).unwrap();
 
     let mut namespaces: Vec<NameSpace> = serde_yaml::from_str(&text).unwrap();
@@ -36,8 +56,15 @@ fn main() {
 
     let mut context = Context::new();
     context.insert("namespaces", &namespaces);
-    let r = tera.render("rust/module.rs", &context).unwrap();
-    println!("{}", r);
+
+    if let Some(l) = matches.value_of("lang") {
+        let r = if l == "rust" {
+            tera.render("rust/module.rs", &context).unwrap()
+        } else {
+            tera.render("c/header.h", &context).unwrap()
+        };
+        println!("{}", r);
+    }
 }
 
 #[derive(Serialize, Deserialize)]
