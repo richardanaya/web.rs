@@ -18,30 +18,33 @@ cargo install js-bindgen
 This project is able to take JavaScript API descriptions in yaml like the one below:
 
 ```yaml
-- namespace: console
+Bindings to web console
+----
+- name: console
   functions:
-    clear:
-    log:
+    - name: clear
+    - name: log
       parameters:
         - name: msg
-          type: string
-    warn:
-      name: warning
+          parameter_type: string
+    - name: warn
+      friendly_name: warning
       parameters:
         - name: msg
-          type: string
-    error:
+          parameter_type: string
+    - name: error
       parameters:
         - name: msg
-          type: string
-    time:
+          parameter_type: string
+    - name: time
       parameters:
         - name: msg
-          type: string
-    timeEnd:
+          parameter_type: string
+    - name: timeEnd
       parameters:
         - name: msg
-          type: string
+          parameter_type: string
+
 ```
 
 And turn them into code.
