@@ -26,7 +26,7 @@ pub mod {{namespace.name}} {
         {% set_global i = i + 1 -%}
         let a{{i}} = {{param.friendly_name}}.len() as u32;
         {% else %}
-        let a{{i}} = {{param.friendly_name}};
+        let a{{i}} = {{param.friendly_name}}.into();
         {% endif -%}
         {% set_global i = i + 1 %}
         {%- endfor -%}
@@ -35,17 +35,17 @@ pub mod {{namespace.name}} {
             {{param.name}}Ptr,{{param.name}}Len
             {%- else -%}
             {{param.name}}
-            {% endif -%}
+            {%- endif -%}
             {%- if loop.index != loop.last -%}
             ,
             {%- endif -%}
             {%- endfor -%}){
-                {{namespace.name}}.{{function.name}}({% for param in function.parameters -%}
+                    {% if function.output -%}return {% endif %}{{namespace.name}}.{{function.name}}({% for param in function.parameters -%}
                     {%- if param.parameter_type == "string" -%}
                     this.readUtf8FromMemory({{param.name}}Ptr,{{param.name}}Len)
                     {%- else -%}
                     {{param.name}}
-                    {% endif -%}
+                    {%- endif -%}
                     {%- if loop.index != loop.last -%}
                     ,
                     {%- endif -%}
@@ -62,7 +62,7 @@ pub mod {{namespace.name}} {
                 {%- endif -%}
             {%- if loop.index != loop.last -%}
             , {% endif -%}
-            {%- endfor -%});
+            {%- endfor -%}){%- if not function.output -%};{%- endif %}
     }
     {%- endfor %}
 }{%- endfor -%}

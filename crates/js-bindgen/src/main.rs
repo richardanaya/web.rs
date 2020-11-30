@@ -79,6 +79,7 @@ struct JSFunction {
     name: String,
     friendly_name: Option<String>,
     parameters: Option<Vec<JSParameter>>,
+    output: Option<String>
 }
 
 #[derive(Serialize, Deserialize)]
