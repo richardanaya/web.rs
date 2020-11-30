@@ -100,26 +100,6 @@ In your JS function context `this` contains several functions handle most issues
   <img height="300" src="images/undraw_design_team_af2y.png">
 </p>
 
-# Don't Recreate the Wheel
-
-A number of libraries exist to help save you time from writing your own bindings. 
-
-
-**Browser Functionality Libraries:**
-
-| Name          | Documentation | Description   |
-| ------------- | ------------- | ------------- |
-| [`web_console`](https://github.com/richardanaya/js-wasm/tree/master/crates/web_console) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  | logging, errors, timing |
-| [`web_timer`](https://github.com/richardanaya/js-wasm/tree/master/crates/web_timer) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  timers, animation loops, async sleep |
-| [`web_random`](https://github.com/richardanaya/js-wasm/tree/master/crates/web_random) | <a href="https://docs.rs/web_console"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  random numbers  |
-
-**UI:** 
-
-| Name          | Documentation | Description   |
-| ------------- | ------------- | ------------- |
-| [`lit-html-rs`](https://github.com/richardanaya/js-wasm/tree/master/crates/lit-html) | <a href="https://docs.rs/lit-html"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>  |  a prototype of using [lit-html](https://lit-html.polymer-project.org/) HTML rendering  |
-
-
 # Who is making this?
 
 My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm a technologist from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world! 
