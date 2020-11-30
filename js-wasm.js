@@ -241,9 +241,9 @@ window.JsWasm = {
       js_register_function(start, len, utfByteLen) {
         let functionBody;
         if(utfByteLen === 16) {
-          context.readUtf16FromMemory(start, len);
+          functionBody = context.readUtf16FromMemory(start, len);
         } else {
-          context.readUtf8FromMemory(start, len);
+          functionBody = context.readUtf8FromMemory(start, len);
         }
         let id = context.functions.length;
         context.functions.push(
