@@ -1,26 +1,25 @@
-- namespace: console
+---
+- name: console
   functions:
     - name: clear
     - name: log
       parameters:
         - name: msg
-          type: string
+          parameter_type: string
     - name: warn
       friendly_name: warning
       parameters:
         - name: msg
-          type: string
+          parameter_type: string
     - name: error
       parameters:
         - name: msg
-          type: string
+          parameter_type: string
     - name: time
       parameters:
         - name: msg
-          type: string
+          parameter_type: string
     - name: timeEnd
       parameters:
         - name: msg
-          type: string
-    
-    
+          parameter_type: string
