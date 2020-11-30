@@ -1,4 +1,4 @@
-#include "console.h"
+#include "../../headers/console.h"
 
 export int main() {
 	console_log("hello");

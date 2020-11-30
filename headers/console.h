@@ -1,4 +1,4 @@
-#include "../../js-wasm.h"
+#include "js-wasm.h"
 
 void console_log(char *msg){
 	static int log;
