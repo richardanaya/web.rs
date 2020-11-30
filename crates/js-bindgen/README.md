@@ -54,30 +54,25 @@ js-bindgen --lang rust console.yaml
 
 ```rust
 #![no_std]
-use js::*;
 
-mod console {
-    pub fn clear() {
-        js!("function(){
-            console.clear(); 
-        }")
-        .invoke_0();
+pub mod console {
+    use js::*;
+    
+    pub fn clear(){
+        let func = js!(r###"function(){
+                console.clear();
+            }"###);
+        func.invoke_0();
     }
-
-    pub fn log(msg: &str) {
-        js!("function(strPtr,strLen){
-            console.log(this.readUtf8FromMemory(strPtr,strLen)); 
-        }")
-        .invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+    
+    pub fn log(msg: &str){
+        let a0 = msg.as_ptr() as u32;
+        let a1 = msg.len() as u32;
+        let func = js!(r###"function(msgPtr,msgLen){
+                console.log(this.readUtf8FromMemory(msgPtr,msgLen));
+            }"###);
+        func.invoke_2(a0, a1);
     }
-
-    pub fn warning(msg: &str) {
-        js!("function(strPtr,strLen){
-            console.warn(this.readUtf8FromMemory(strPtr,strLen)); 
-        }")
-        .invoke_2(msg.as_ptr() as u32, msg.len() as u32);
-    }
-}
 
 ...
 ```
@@ -91,34 +86,24 @@ js-bindgen --lang c console.yaml
 ```C
 #include "js-wasm.h"
 
-void console_clear() {
+void console_clear(){
     static int fn;
+    char *fn_code = "function(){ console.clear(); }";
     if(fn == 0){
-        fn = js_register("function(){\
-            console.clear();\
-        }");
+        fn = js_register_function(fn_code,js_strlen(fn_code));
     }
-    js_invoke0(fn);
+    js_invoke_function_0(fn);
 }
 
-void console_log(char *msg) { 
+void console_log(char * msg){
     static int fn;
+    unsigned int a0 = (unsigned int)msg;
+    unsigned int a1 = js_strlen(msg);
+    char *fn_code = "function(msgPtr,msgLen){ console.log(this.readUtf8FromMemory(msgPtr,msgLen)); }";
     if(fn == 0){
-        fn = js_register("function(strPtr,strLen){\
-            console.log(this.readUtf8FromMemory(strPtr,strLen));\
-        }");
+        fn = js_register_function(fn_code,js_strlen(fn_code));
     }
-    js_invoke2(fn, msg,strlen(msg));
-}
-
-void console_warning(char *msg) { 
-    static int fn;
-    if(fn == 0){
-        fn = js_register("function(strPtr,strLen){\
-            console.warn(this.readUtf8FromMemory(strPtr,strLen));\
-        }");
-    }
-    js_invoke2(fn, msg, strlen(msg));
+    js_invoke_function_2(fn, a0, a1);
 }
 
 ...
