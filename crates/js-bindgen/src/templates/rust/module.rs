@@ -18,14 +18,14 @@ pub mod {{namespace.name}} {
             {%- if loop.index != loop.last -%}
             ,
             {%- endif -%}
-        {%- endfor -%}){
+        {%- endfor -%}){% if function.output %} -> f64{% endif %} {
         {% set_global i = 0 %}
         {%- for param in function.parameters -%}
         {%- if param.parameter_type == "string" -%}
         let a{{i}} = {{param.friendly_name}}.as_ptr() as u32;
         {% set_global i = i + 1 -%}
         let a{{i}} = {{param.friendly_name}}.len() as u32;
-        {% else %}
+        {% else -%}
         let a{{i}} = {{param.friendly_name}}.into();
         {% endif -%}
         {% set_global i = i + 1 %}
@@ -51,8 +51,8 @@ pub mod {{namespace.name}} {
                     {%- if loop.index != loop.last -%}
                     ,
                     {%- endif -%}
-                    {%- endfor -%});
-            }"###){% if function.output == "object" %}){% endif %};
+                    {%- endfor -%}){% if function.output == "object" %}){% endif %};
+            }"###);
         func.invoke_{{i}}(
             {%- set i = 0 -%}
             {%- for param in function.parameters -%}
