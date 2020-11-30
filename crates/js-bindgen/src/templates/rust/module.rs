@@ -40,9 +40,11 @@ pub mod {{namespace.name}} {
             ,
             {%- endif -%}
             {%- endfor -%}){
-                    {% if function.output -%}return {% endif %}{{namespace.name}}.{{function.name}}({% for param in function.parameters -%}
+                    {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{namespace.name}}.{{function.name}}({% for param in function.parameters -%}
                     {%- if param.parameter_type == "string" -%}
                     this.readUtf8FromMemory({{param.name}}Ptr,{{param.name}}Len)
+                    {%- elif param.parameter_type == "object" -%}
+                    this.getObject({{param.name}})
                     {%- else -%}
                     {{param.name}}
                     {%- endif -%}
@@ -50,7 +52,7 @@ pub mod {{namespace.name}} {
                     ,
                     {%- endif -%}
                     {%- endfor -%});
-            }"###);
+            }"###){% if function.output == "object" %}){% endif %};
         func.invoke_{{i}}(
             {%- set i = 0 -%}
             {%- for param in function.parameters -%}
