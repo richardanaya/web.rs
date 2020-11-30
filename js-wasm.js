@@ -128,6 +128,8 @@ window.JsWasm = {
       objects: arena,
       utf8dec: new TextDecoder("utf-8"),
       utf8enc: new TextEncoder("utf-8"),
+      utf16dec: new TextDecoder("utf-16"),
+      utf16enc: new TextEncoder("utf-16"),
       toCallbackArg: function(arg) {
         if (typeof arg === "object") {
           return context.storeObject(arg);
@@ -180,15 +182,6 @@ window.JsWasm = {
         const text = this.utf8dec.decode(memory.subarray(start, start + len));
         return text;
       },
-      readUint8ArrayFromMemory(start) {
-        const data32 = new Uint32Array(
-          this.module.instance.exports.memory.buffer
-        );
-        const ptr = data32[start / 4];
-        const length = data32[ptr / 4];
-        let b = mem.slice(ptr + 4, ptr + 4 + length);
-        return new Uint8Array(b);
-      },
       writeUtf8ToMemory: function(str) {
         const bytes = utf8enc.encode(str);
         const len = bytes.length;
@@ -198,6 +191,32 @@ window.JsWasm = {
         );
         memory.set(bytes, start);
         return start;
+      },
+      readUtf16FromMemory: function(start, len) {
+        const memory = new Uint8Array(
+          this.module.instance.exports.memory.buffer
+        );
+        const text = this.utf16dec.decode(memory.subarray(start, start + len));
+        return text;
+      },
+      writeUtf16ToMemory: function(str) {
+        const bytes = utf16enc.encode(str);
+        const len = bytes.length;
+        const start = this.module.instance.exports.malloc(len);
+        const memory = new Uint8Array(
+          this.module.instance.exports.memory.buffer
+        );
+        memory.set(bytes, start);
+        return start;
+      },
+      readUint8ArrayFromMemory(start) {
+        const data32 = new Uint32Array(
+          this.module.instance.exports.memory.buffer
+        );
+        const ptr = data32[start / 4];
+        const length = data32[ptr / 4];
+        let b = mem.slice(ptr + 4, ptr + 4 + length);
+        return new Uint8Array(b);
       },
       storeObject: function(obj) {
         const index = this.objects.insert(obj);
