@@ -35,7 +35,7 @@ Load WebAssembly like JavaScript.
 
 Create JavaScript functions and invoke them
 
-**Rust:**
+## Rust
 ```toml
 [dependencies]
 js = "0.2"
@@ -50,7 +50,7 @@ let msg = "Hello World!";
 
 fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 ```
-**AssemblyScript:**
+## AssemblyScript:
 ```typescript
 import {js_register_function,js_invoke_function} from "./js-wasm"
 
@@ -68,7 +68,7 @@ export function main():void {
 }
 ```
 
-**C/C++:**
+## C/C++
 ```c
 #include "js-wasm.h"
  
