@@ -7,6 +7,7 @@
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $none_=>_none (func))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
+ (type $f64_f64_f64_=>_none (func (param f64 f64 f64)))
  (type $f64_f64_f64_=>_f64 (func (param f64 f64 f64) (result f64)))
  (type $f64_f64_f64_f64_f64_f64_f64_f64_f64_f64_f64_=>_f64 (func (param f64 f64 f64 f64 f64 f64 f64 f64 f64 f64 f64) (result f64)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
@@ -24,7 +25,12 @@
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/ASC_LOW_MEMORY_LIMIT i32 (i32.const 0))
  (global $~lib/ASC_SHRINK_LEVEL i32 (i32.const 0))
+ (global $../../assemblyscript/web_console/console_clear_fn (mut f64) (f64.const 0))
  (global $../../assemblyscript/web_console/console_log_fn (mut f64) (f64.const 0))
+ (global $../../assemblyscript/web_console/console_warning_fn (mut f64) (f64.const 0))
+ (global $../../assemblyscript/web_console/console_error_fn (mut f64) (f64.const 0))
+ (global $../../assemblyscript/web_console/console_time_fn (mut f64) (f64.const 0))
+ (global $../../assemblyscript/web_console/console_time_end_fn (mut f64) (f64.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 464))
  (global $~lib/memory/__heap_base i32 (i32.const 492))
  (export "memory" (memory $0))
@@ -3001,10 +3007,36 @@
   i32.const 1
   i32.shr_u
  )
+ (func $../../assemblyscript/js-wasm/js_invoke_function_2 (param $0 f64) (param $1 f64) (param $2 f64)
+  local.get $0
+  local.get $1
+  local.get $2
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  f64.const 0
+  call $../../assemblyscript/js-wasm/js_invoke_function
+  drop
+ )
  (func $../../assemblyscript/web_console/console_log (param $0 i32)
+  (local $1 f64)
+  (local $2 f64)
   local.get $0
   call $~lib/rt/pure/__retain
   local.set $0
+  local.get $0
+  f64.convert_i32_u
+  local.set $1
+  local.get $0
+  call $~lib/string/String#get:length
+  i32.const 2
+  i32.mul
+  f64.convert_i32_s
+  local.set $2
   global.get $../../assemblyscript/web_console/console_log_fn
   f64.const 0
   f64.eq
@@ -3021,23 +3053,9 @@
    global.set $../../assemblyscript/web_console/console_log_fn
   end
   global.get $../../assemblyscript/web_console/console_log_fn
-  local.get $0
-  f64.convert_i32_u
-  local.get $0
-  call $~lib/string/String#get:length
-  f64.convert_i32_s
-  f64.const 2
-  f64.mul
-  f64.const 0
-  f64.const 0
-  f64.const 0
-  f64.const 0
-  f64.const 0
-  f64.const 0
-  f64.const 0
-  f64.const 0
-  call $../../assemblyscript/js-wasm/js_invoke_function
-  drop
+  local.get $1
+  local.get $2
+  call $../../assemblyscript/js-wasm/js_invoke_function_2
   local.get $0
   call $~lib/rt/pure/__release
  )

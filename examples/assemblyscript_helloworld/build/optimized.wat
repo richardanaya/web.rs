@@ -1470,9 +1470,23 @@
  )
  (func $../../assemblyscript/web_console/console_log (param $0 i32)
   (local $1 f64)
+  (local $2 f64)
+  (local $3 f64)
   local.get $0
   call $~lib/rt/pure/__retain
-  local.set $0
+  local.tee $0
+  f64.convert_i32_u
+  local.set $1
+  local.get $0
+  i32.const 20
+  i32.sub
+  i32.load offset=16
+  i32.const 1
+  i32.shr_u
+  i32.const 1
+  i32.shl
+  f64.convert_i32_s
+  local.set $2
   global.get $../../assemblyscript/web_console/console_log_fn
   f64.const 0
   f64.eq
@@ -1483,26 +1497,16 @@
    i32.const 1
    i32.shr_u
    f64.convert_i32_s
-   local.tee $1
-   local.get $1
+   local.tee $3
+   local.get $3
    f64.add
    f64.const 16
    call $../../assemblyscript/js-wasm/js_register_function
    global.set $../../assemblyscript/web_console/console_log_fn
   end
   global.get $../../assemblyscript/web_console/console_log_fn
-  local.get $0
-  f64.convert_i32_u
-  local.get $0
-  i32.const 20
-  i32.sub
-  i32.load offset=16
-  i32.const 1
-  i32.shr_u
-  f64.convert_i32_s
-  local.tee $1
   local.get $1
-  f64.add
+  local.get $2
   f64.const 0
   f64.const 0
   f64.const 0
