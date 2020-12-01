@@ -1,10 +1,10 @@
 #include "js-wasm.h"
 
-double _get_element_by_id(double id){
+double document_get_element_by_id(double id){
     static int fn;
     
     double a0 = id;
-    char *fn_code = "function(id){ return  this.storeObject(.getElementById(id)); }";
+    char *fn_code = "function(id){ return  this.storeObject(document.getElementById(id)); }";
     if(fn == 0){
         fn = js_register_function(fn_code,js_strlen(fn_code));
     }

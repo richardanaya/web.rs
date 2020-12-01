@@ -1,12 +1,14 @@
 ---
-- object: CanvasElement
+- namespace: canvas
+  object: CanvasElement
   functions:
     - name: getContext
       parameters:
         - name: el
           parameter_type: self
 
-- object: CanvasContext
+- namespace: canvas
+  object: CanvasContext
   properties:
     - name: fillStyle
       property_type: string

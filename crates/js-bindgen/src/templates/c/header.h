@@ -35,15 +35,13 @@
     {{param.name}}
     {%- endif -%}
     {%- if not loop.last -%}
-    ,
-    {%- endif -%}
+    , {% endif -%}
     {%- endfor -%}){ {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{binding.namespace}}.{{function.name}}({% for param in function.parameters -%}
                     {%- if param.parameter_type == "string" -%}
                     this.readUtf8FromMemory({{param.name}}Ptr,{{param.name}}Len)
                     {%- elif param.parameter_type == "object" -%}this.getObject({{param.name}})
                     {%- else -%}{{param.name}}
-                    {%- endif -%}{%- if not loop.last -%},
-                    {%- endif -%}{%- endfor -%}){% if function.output == "object" %}){% endif %}; }";
+                    {%- endif -%}{%- if not loop.last -%}, {% endif -%}{%- endfor -%}){% if function.output == "object" %}){% endif %}; }";
     if(fn == 0){
         fn = js_register_function(fn_code,js_strlen(fn_code));
     }

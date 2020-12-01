@@ -1,17 +1,17 @@
 #include "js-wasm.h"
 
-void _get_context(double el){
+void canvas_get_context(double el){
     static int fn;
     
     double a0 = el;
-    char *fn_code = "function(el){ .getContext(el); }";
+    char *fn_code = "function(el){ canvas.getContext(el); }";
     if(fn == 0){
         fn = js_register_function(fn_code,js_strlen(fn_code));
     }
     js_invoke_function_1(fn, a0);
 }
 
-void _fill_rect(double ctxdouble xdouble ydouble heightdouble width){
+void canvas_fill_rect(double ctx, double x, double y, double height, double width){
     static int fn;
     
     double a0 = ctx;
@@ -23,14 +23,14 @@ void _fill_rect(double ctxdouble xdouble ydouble heightdouble width){
     double a3 = height;
     
     double a4 = width;
-    char *fn_code = "function(ctxxyheightwidth){ .fillRect(ctxxyheightwidth); }";
+    char *fn_code = "function(ctx, x, y, height, width){ canvas.fillRect(ctx, x, y, height, width); }";
     if(fn == 0){
         fn = js_register_function(fn_code,js_strlen(fn_code));
     }
-    js_invoke_function_5(fn, a0a0a0a0a0);
+    js_invoke_function_5(fn, a0, a0, a0, a0, a0);
 }
 
-void _clear_rect(double ctxdouble xdouble ydouble heightdouble width){
+void canvas_clear_rect(double ctx, double x, double y, double height, double width){
     static int fn;
     
     double a0 = ctx;
@@ -42,9 +42,9 @@ void _clear_rect(double ctxdouble xdouble ydouble heightdouble width){
     double a3 = height;
     
     double a4 = width;
-    char *fn_code = "function(ctxxyheightwidth){ .clearRect(ctxxyheightwidth); }";
+    char *fn_code = "function(ctx, x, y, height, width){ canvas.clearRect(ctx, x, y, height, width); }";
     if(fn == 0){
         fn = js_register_function(fn_code,js_strlen(fn_code));
     }
-    js_invoke_function_5(fn, a0a0a0a0a0);
+    js_invoke_function_5(fn, a0, a0, a0, a0, a0);
 }

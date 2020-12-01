@@ -1,5 +1,5 @@
 ---
-- name: document
+- namespace: document
   functions:
     - name: getElementById
       parameters:
