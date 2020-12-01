@@ -23,7 +23,7 @@ This project is able to take JavaScript API descriptions in yaml like the one be
 ```yaml
 Bindings to web console
 ----
-- name: console
+- namespace: console
   functions:
     - name: clear
     - name: log
