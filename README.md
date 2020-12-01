@@ -60,7 +60,7 @@ export function console_log(msg: string) : void {
     const code = "function(msgPtr,msgLen){ console.log(this.readUtf16FromMemory(msgPtr,msgLen)); }";
     console_log_fn = <f64>js_register_function(<f64>changetype<usize>(code),<f64>code.length*2, 16);
   }
-  js_invoke_function(<f64>console_log_fn,<f64>changetype<usize>(msg),<f64>msg.length*2,0,0,0,0,0,0,0,0)
+  js_invoke_2(<f64>console_log_fn,<f64>changetype<usize>(msg),<f64>msg.length*2);
 }
 
 export function main():void {
