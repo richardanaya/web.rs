@@ -10,6 +10,7 @@ Generate WebAssembly bindings to JavaSCript via [`js-wasm`](https://wasm.js.org)
 
 * Rust
 * C
+* AssemblyScript
 
 ```
 cargo install js-bindgen
