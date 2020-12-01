@@ -28,6 +28,9 @@ fn main() {
     tera.add_raw_template("c/header.h", include_str!("templates/c/header.h"))
     .unwrap();
 
+    tera.add_raw_template("assemblyscript/module.ts", include_str!("templates/assemblyscript/module.ts"))
+    .unwrap();
+
     let file = matches.value_of("INPUT").unwrap();
     let text = std::fs::read_to_string(file).unwrap();
 
@@ -60,6 +63,8 @@ fn main() {
     if let Some(l) = matches.value_of("lang") {
         let r = if l == "rust" {
             tera.render("rust/module.rs", &context).unwrap()
+        } else if l == "assemblyscript" {
+            tera.render("assemblyscript/module.rs", &context).unwrap()
         } else {
             tera.render("c/header.h", &context).unwrap()
         };
