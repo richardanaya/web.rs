@@ -64,7 +64,7 @@ fn main() {
         let r = if l == "rust" {
             tera.render("rust/module.rs", &context).unwrap()
         } else if l == "assemblyscript" {
-            tera.render("assemblyscript/module.rs", &context).unwrap()
+            tera.render("assemblyscript/module.ts", &context).unwrap()
         } else {
             tera.render("c/header.h", &context).unwrap()
         };
