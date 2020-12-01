@@ -15,9 +15,8 @@ pub mod {{binding.namespace}} {
             {%- else -%}
                 impl Into<f64>
             {%- endif -%}
-            {%- if loop.index != loop.last -%}
-            ,
-            {%- endif -%}
+            {%- if not loop.last -%}
+            , {% endif -%}
         {%- endfor -%}){% if function.output %} -> f64{% endif %} {
         {% set_global i = 0 %}
         {%- for param in function.parameters -%}
@@ -36,9 +35,8 @@ pub mod {{binding.namespace}} {
             {%- else -%}
             {{param.name}}
             {%- endif -%}
-            {%- if loop.index != loop.last -%}
-            ,
-            {%- endif -%}
+            {%- if not loop.last -%}
+            , {% endif -%}
             {%- endfor -%}){
                     {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{binding.namespace}}.{{function.name}}({% for param in function.parameters -%}
                     {%- if param.parameter_type == "string" -%}
@@ -48,9 +46,8 @@ pub mod {{binding.namespace}} {
                     {%- else -%}
                     {{param.name}}
                     {%- endif -%}
-                    {%- if loop.index != loop.last -%}
-                    ,
-                    {%- endif -%}
+                    {%- if not loop.last -%}
+                    , {% endif -%}
                     {%- endfor -%}){% if function.output == "object" %}){% endif %};
             }"###);
         func.invoke_{{i}}(
@@ -62,7 +59,7 @@ pub mod {{binding.namespace}} {
                 {%- else -%}
                 a{{i}}
                 {%- endif -%}
-            {%- if loop.index != loop.last -%}
+            {%- if not loop.last -%}
             , {% endif -%}
             {%- endfor -%}){%- if not function.output -%};{%- endif %}
     }

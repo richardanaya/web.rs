@@ -9,7 +9,7 @@ fn main() {
                           .author("Richard Anaya <richard.anaya@gmail.com>")
                           .about("Creates js-wasm bindings for various languages")
                           .arg(Arg::with_name("lang")
-                               .short("lang")
+                               .short("l")
                                .long("language")
                                .help("Sets a custom config file")
                                .takes_value(true)
