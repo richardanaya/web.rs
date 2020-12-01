@@ -115,6 +115,38 @@ void console_log(char * msg){
 ...
 ```
 
+# AssemblyScript
+
+```
+js-bindgen --lang assemblyscript console.yaml
+```
+
+```ts
+import * as jswasm from "./js-wasm"
+
+let console_clear_fn:f64 = 0;
+export function console_clear() : void {
+    if( console_clear_fn === 0) {
+        const code = `function(){ console.clear(); }`;
+        console_clear_fn = <f64>jswasm.js_register_function(<f64>changetype<usize>(code),<f64>code.length*2, 16);
+    }
+    jswasm.js_invoke_function_0(console_clear_fn);
+}
+
+let console_log_fn:f64 = 0;
+export function console_log(msg: string) : void {
+    const a0: f64 = <f64>changetype<usize>(msg);
+    const a1: f64 = msg.length*2;
+    if( console_log_fn === 0) {
+        const code = `function(msgPtr,msgLen){ console.log(this.readUtf16FromMemory(msgPtr,msgLen)); }`;
+        console_log_fn = <f64>jswasm.js_register_function(<f64>changetype<usize>(code),<f64>code.length*2, 16);
+    }
+    jswasm.js_invoke_function_2(console_log_fn, a0, a1);
+}
+
+...
+```
+
 # Custom Code
 
 Sometimes you may want to create a binding to code that doesn't exist and still have the power to generate libraries for many targets
