@@ -1,9 +1,9 @@
 #![no_std]
 
-{%- for namespace in namespaces %}
-pub mod {{namespace.name}} {
+{%- for binding in bindings %}
+pub mod {{binding.namespace}} {
     use js::*;
-    {%- for function in namespace.functions %}
+    {%- for function in binding.functions %}
     
     pub fn {% if function.friendly_name -%}
         {{function.friendly_name}}
@@ -40,7 +40,7 @@ pub mod {{namespace.name}} {
             ,
             {%- endif -%}
             {%- endfor -%}){
-                    {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{namespace.name}}.{{function.name}}({% for param in function.parameters -%}
+                    {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{binding.namespace}}.{{function.name}}({% for param in function.parameters -%}
                     {%- if param.parameter_type == "string" -%}
                     this.readUtf8FromMemory({{param.name}}Ptr,{{param.name}}Len)
                     {%- elif param.parameter_type == "object" -%}

@@ -1,9 +1,9 @@
 #include "js-wasm.h"
 
-{%- for namespace in namespaces %}
-{%- for function in namespace.functions %}
+{%- for binding in bindings %}
+{%- for function in binding.functions %}
 
-{% if function.output -%}double{% else %}void{% endif %} {{namespace.name}}_{% if function.friendly_name -%}
+{% if function.output -%}double{% else %}void{% endif %} {{binding.namespace}}_{% if function.friendly_name -%}
 {{function.friendly_name}}
 {%- else -%}
 {{function.name}}
@@ -38,7 +38,7 @@
     {%- if loop.index != loop.last -%}
     ,
     {%- endif -%}
-    {%- endfor -%}){ {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{namespace.name}}.{{function.name}}({% for param in function.parameters -%}
+    {%- endfor -%}){ {% if function.output -%}return {% endif %}{% if function.output == "object" %} this.storeObject({% endif %}{{binding.namespace}}.{{function.name}}({% for param in function.parameters -%}
                     {%- if param.parameter_type == "string" -%}
                     this.readUtf8FromMemory({{param.name}}Ptr,{{param.name}}Len)
                     {%- elif param.parameter_type == "object" -%}this.getObject({{param.name}})

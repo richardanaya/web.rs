@@ -9,7 +9,7 @@ fn main() {
                           .author("Richard Anaya <richard.anaya@gmail.com>")
                           .about("Creates js-wasm bindings for various languages")
                           .arg(Arg::with_name("lang")
-                               .short("c")
+                               .short("lang")
                                .long("language")
                                .help("Sets a custom config file")
                                .takes_value(true)
@@ -31,9 +31,9 @@ fn main() {
     let file = matches.value_of("INPUT").unwrap();
     let text = std::fs::read_to_string(file).unwrap();
 
-    let mut namespaces: Vec<NameSpace> = serde_yaml::from_str(&text).unwrap();
+    let mut bindings: Vec<Binding> = serde_yaml::from_str(&text).unwrap();
 
-    for n in namespaces.iter_mut() {
+    for n in bindings.iter_mut() {
         if let Some(fs) = &mut n.functions {
             for f in fs.iter_mut() {
                 if f.friendly_name.is_none() {
@@ -55,7 +55,7 @@ fn main() {
     }
 
     let mut context = Context::new();
-    context.insert("namespaces", &namespaces);
+    context.insert("bindings", &bindings);
 
     if let Some(l) = matches.value_of("lang") {
         let r = if l == "rust" {
@@ -79,11 +79,13 @@ struct JSFunction {
     name: String,
     friendly_name: Option<String>,
     parameters: Option<Vec<JSParameter>>,
-    output: Option<String>
+    output: Option<String>,
+    code: Option<String>
 }
 
 #[derive(Serialize, Deserialize)]
-struct NameSpace {
-    name: String,
+struct Binding {
+    namespace: Option<String>,
+    class: Option<String>,
     functions: Option<Vec<JSFunction>>,
 }
