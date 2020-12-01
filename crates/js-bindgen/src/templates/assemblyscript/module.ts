@@ -16,7 +16,7 @@ export function {{binding.namespace}}_{% if function.friendly_name -%}
     {%- for param in function.parameters -%}{{param.friendly_name}}: {% if param.parameter_type == "string" -%}
             string
         {%- else -%}
-            impl Into<f64>
+            f64
         {%- endif -%}
         {%- if not loop.last -%}
         , {% endif -%}

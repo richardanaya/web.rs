@@ -1,22 +1,22 @@
 ---
 - namespace: canvas
-  object: CanvasElement
-  functions:
+  class: CanvasElement
+  parameter_self: el
+  method:
     - name: getContext
       parameters:
-        - name: el
-          parameter_type: self
+        - name: contextType
+          parameter_type: string
 
 - namespace: canvas
-  object: CanvasContext
+  class: CanvasContext
+  parameter_self: ctx
   properties:
     - name: fillStyle
       property_type: string
-  functions:
+  methods:
     - name: fillRect
       parameters:
-        - name: ctx
-          parameter_type: self
         - name: x
           parameter_type: f64
         - name: "y"
@@ -27,8 +27,6 @@
           parameter_type: f64
     - name: clearRect
       parameters:
-        - name: ctx
-          parameter_type: self
         - name: x
           parameter_type: f64
         - name: "y"

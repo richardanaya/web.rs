@@ -4,5 +4,5 @@
     - name: getElementById
       parameters:
         - name: id
-          parameter_type: strings
+          parameter_type: string
       output: object
