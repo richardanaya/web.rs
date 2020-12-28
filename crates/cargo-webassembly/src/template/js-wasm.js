@@ -227,7 +227,6 @@ window.JsWasm = {
       },
       releaseObject: function(handle) {
         this.objects[handle] = null;
-        this.free_locations.push(handle);
       }
     };
     return {
