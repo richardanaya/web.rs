@@ -5,14 +5,14 @@ class Index {
   }
 
   toNum() {
-    return ((this.generation & 0xffffffff) << 32) | (this.index & 0xffffffff);
+    return Number(BigInt(this.generation) << BigInt(32) | BigInt(this.index));
   }
 }
 
-Index.fromNum = function(n) {
-  let i = ((n & 0xffffffff00000000) >> 32) & 0xffffffff;
+Index.fromNum = function (n) {
+  let i = Number(((BigInt(n) & BigInt(0xffffffff00000000)) >> BigInt(32)) & BigInt(0xffffffff));
   let g = n & 0xffffffff;
-  return new Index(Number(g), Number(i));
+  return new Index(g, i);
 };
 
 class GenerationalArena {
@@ -121,7 +121,7 @@ window.JsWasm = {
     arena.insert(typeof document != "undefined" ? document.body : null);
     let context = {
       functions: [
-        function(){
+        function () {
           debugger;
         }
       ],
@@ -130,15 +130,15 @@ window.JsWasm = {
       utf8enc: new TextEncoder("utf-8"),
       utf16dec: new TextDecoder("utf-16"),
       utf16enc: new TextEncoder("utf-16"),
-      toCallbackArg: function(arg) {
+      toCallbackArg: function (arg) {
         if (typeof arg === "object") {
           return context.storeObject(arg);
         }
         return arg;
       },
-      createCallback: function(cb) {
+      createCallback: function (cb) {
         let fnHandleCallback = this.module.instance.exports.handle_callback;
-        return function() {
+        return function () {
           const arg = arguments;
           fnHandleCallback(
             cb,
@@ -155,7 +155,7 @@ window.JsWasm = {
           );
         };
       },
-      readCStringFromMemory: function(start) {
+      readCStringFromMemory: function (start) {
         const data = new Uint8Array(this.module.instance.exports.memory.buffer);
         const str = [];
         let i = start;
@@ -175,14 +175,14 @@ window.JsWasm = {
         memory.set(bytes, start);
         return start;
       },
-      readUtf8FromMemory: function(start, len) {
+      readUtf8FromMemory: function (start, len) {
         const memory = new Uint8Array(
           this.module.instance.exports.memory.buffer
         );
         const text = this.utf8dec.decode(memory.subarray(start, start + len));
         return text;
       },
-      writeUtf8ToMemory: function(str) {
+      writeUtf8ToMemory: function (str) {
         const bytes = utf8enc.encode(str);
         const len = bytes.length;
         const start = this.module.instance.exports.malloc(len);
@@ -192,14 +192,14 @@ window.JsWasm = {
         memory.set(bytes, start);
         return start;
       },
-      readUtf16FromMemory: function(start, len) {
+      readUtf16FromMemory: function (start, len) {
         const memory = new Uint8Array(
           this.module.instance.exports.memory.buffer
         );
         const text = this.utf16dec.decode(memory.subarray(start, start + len));
         return text;
       },
-      writeUtf16ToMemory: function(str) {
+      writeUtf16ToMemory: function (str) {
         const bytes = utf16enc.encode(str);
         const len = bytes.length;
         const start = this.module.instance.exports.malloc(len);
@@ -218,28 +218,28 @@ window.JsWasm = {
         let b = mem.slice(ptr + 4, ptr + 4 + length);
         return new Uint8Array(b);
       },
-      storeObject: function(obj) {
+      storeObject: function (obj) {
         const index = this.objects.insert(obj);
         return index.toNum();
       },
-      getObject: function(handle) {
+      getObject: function (handle) {
         return this.objects.get(Index.fromNum(handle));
       },
-      releaseObject: function(handle) {
+      releaseObject: function (handle) {
         this.objects.remove(Index.fromNum(handle));
       }
     };
     return {
       context,
       abort() {
-	throw new Error("WebAssembly module aborted");
+        throw new Error("WebAssembly module aborted");
       },
       js_release(obj) {
         context.releaseObject(obj);
       },
       js_register_function(start, len, utfByteLen) {
         let functionBody;
-        if(utfByteLen === 16) {
+        if (utfByteLen === 16) {
           functionBody = context.readUtf16FromMemory(start, len);
         } else {
           functionBody = context.readUtf8FromMemory(start, len);
@@ -280,7 +280,7 @@ window.JsWasm = {
   }
 };
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   const wasmScripts = document.querySelectorAll(
     "script[type='application/wasm']"
   );
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 if (window.WasmScriptComponents) {
-  window.WasmScriptComponents["js-wasm"] = function(e) {
+  window.WasmScriptComponents["js-wasm"] = function (e) {
     return {
       ...e,
       ...JsWasm.createEnvironment()

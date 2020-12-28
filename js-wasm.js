@@ -5,14 +5,14 @@ class Index {
   }
 
   toNum() {
-    return ((this.generation & 0xffffffff) << 32) | (this.index & 0xffffffff);
+    return Number(BigInt(this.generation) << BigInt(32) | BigInt(this.index));
   }
 }
 
 Index.fromNum = function(n) {
-  let i = ((n & 0xffffffff00000000) >> 32) & 0xffffffff;
+  let i = Number(((BigInt(n)  & BigInt(0xffffffff00000000)) >> BigInt(32)) & BigInt(0xffffffff));
   let g = n & 0xffffffff;
-  return new Index(Number(g), Number(i));
+  return new Index(g, i);
 };
 
 class GenerationalArena {

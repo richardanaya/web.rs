@@ -79,7 +79,7 @@ impl Game {
         });
 
         request_animation_loop(|delta| match Game::instance().run(delta) {
-            Err(e) => error(&e.to_string()),
+            Err(e) => console_error(&e.to_string()),
             _ => (),
         });
     }
