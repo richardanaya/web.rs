@@ -226,8 +226,7 @@ window.JsWasm = {
         return this.objects.get(Index.fromNum(handle));
       },
       releaseObject: function(handle) {
-        this.objects[handle] = null;
-        this.free_locations.push(handle);
+        this.objects.remove(Index.fromNum(handle));
       }
     };
     return {
