@@ -15,7 +15,7 @@ Use any WebAssembly programming language out of the box:
 * [AssemblyScript](https://github.com/richardanaya/js-wasm/blob/master/assemblyscript/js-wasm.ts)
 * [Your own programming language](https://github.com/richardanaya/wasm-script)
 
-See a [demo](https://richardanaya.github.io/js-wasm/examples/canvas/index.html) of it working!
+See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) of it working!
 
 # How It Works?
 
