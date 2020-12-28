@@ -11,7 +11,7 @@ This project aims to provide a simple, easy to learn, technology-agnostic way br
 
 Use any WebAssembly programming language out of the box:
 * [Rust](https://docs.rs/js/latest/js/)
-* [C/C++](js-wasm.h)
+* [C/C++](headers/js-wasm.h)
 * [AssemblyScript](https://github.com/richardanaya/js-wasm/blob/master/assemblyscript/js-wasm.ts)
 * [Your own programming language](https://github.com/richardanaya/wasm-script)
 

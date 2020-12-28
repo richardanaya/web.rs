@@ -10,6 +10,7 @@ Generate WebAssembly bindings to JavaSCript via [`js-wasm`](https://wasm.js.org)
 
 * Rust
 * C
+* AssemblyScript
 
 ```
 cargo install js-bindgen
@@ -22,7 +23,7 @@ This project is able to take JavaScript API descriptions in yaml like the one be
 ```yaml
 Bindings to web console
 ----
-- name: console
+- namespace: console
   functions:
     - name: clear
     - name: log
@@ -109,6 +110,38 @@ void console_log(char * msg){
         fn = js_register_function(fn_code,js_strlen(fn_code));
     }
     js_invoke_function_2(fn, a0, a1);
+}
+
+...
+```
+
+# AssemblyScript
+
+```
+js-bindgen --lang assemblyscript console.yaml
+```
+
+```ts
+import * as jswasm from "./js-wasm"
+
+let console_clear_fn:f64 = 0;
+export function console_clear() : void {
+    if( console_clear_fn === 0) {
+        const code = `function(){ console.clear(); }`;
+        console_clear_fn = <f64>jswasm.js_register_function(<f64>changetype<usize>(code),<f64>code.length*2, 16);
+    }
+    jswasm.js_invoke_function_0(console_clear_fn);
+}
+
+let console_log_fn:f64 = 0;
+export function console_log(msg: string) : void {
+    const a0: f64 = <f64>changetype<usize>(msg);
+    const a1: f64 = msg.length*2;
+    if( console_log_fn === 0) {
+        const code = `function(msgPtr,msgLen){ console.log(this.readUtf16FromMemory(msgPtr,msgLen)); }`;
+        console_log_fn = <f64>jswasm.js_register_function(<f64>changetype<usize>(code),<f64>code.length*2, 16);
+    }
+    jswasm.js_invoke_function_2(console_log_fn, a0, a1);
 }
 
 ...
