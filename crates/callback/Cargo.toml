@@ -1,6 +1,6 @@
 [package]
 name = "callback"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["Richard Anaya"]
 edition = "2018"
 description = "A library for handling callbacks in WebAssembly"
@@ -10,7 +10,7 @@ repository = "https://github.com/richardanaya/js-wasm"
 readme = "README.md"
 
 [dependencies]
-spin = "0.7.0"
+spin = "0"
 
 [dependencies.lazy_static]
 version = "1"
