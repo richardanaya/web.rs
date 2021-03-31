@@ -19,7 +19,7 @@ pub fn local_storage_get_item(id: &str) -> Option<String> {
     let a0 = id.as_ptr() as u32;
     let a1 = id.len() as u32;
     let func = js!(r###"function(idPtr,idLen){
-                const a = window.localStorage.getItem(this.readUtf8FromMemory(idPtr,idLen),this.readUtf8FromMemory(dataPtr,dataLen));
+                const a = window.localStorage.getItem(this.readUtf8FromMemory(idPtr,idLen));
                 if(a === null){
                     return -1;
                 } 

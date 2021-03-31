@@ -1,6 +1,6 @@
 [package]
 name = "web"
-version = "0.1.9"
+version = "0.1.10"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -21,3 +21,4 @@ webcomponent={path="../../crates/webcomponent",version="0"}
 html_color={path="../../crates/html_color",version="0"}
 js = {path="../js",version="0.2"}
 spin = "0.7.0"
+web_local_storage={path="../../crates/web_local_storage",version="0"}
