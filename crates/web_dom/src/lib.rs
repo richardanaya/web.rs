@@ -1,6 +1,9 @@
 #![no_std]
 use js::*;
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use web_common::*;
 
 pub fn get_element_by_id(id: &str) -> JSObject {
     js!("function(strPtr,strLen){
@@ -75,5 +78,126 @@ pub fn get_attribute(el: impl Into<f64>, name: &str) -> Option<alloc::string::St
         return None;
     } else {
         Some(cstr_to_string(attr as i32))
+    }
+}
+
+pub struct KeyEventHandler {
+    pub handler: Option<Box<dyn Sync + FnMut(KeyEvent) + 'static + Send>>,
+}
+
+impl KeyEventHandler {
+    pub fn new(f: impl Sync + FnMut(KeyEvent) + 'static + Send) -> KeyEventHandler {
+        KeyEventHandler {
+            handler: Some(Box::new(f)),
+        }
+    }
+}
+
+pub struct KeyEvent {
+    obj: JSObject,
+}
+
+impl KeyEvent {
+    pub fn new(o: f64) -> KeyEvent {
+        KeyEvent {
+            obj: JSObject::from(o),
+        }
+    }
+
+    pub fn key_code(&self) -> usize {
+        js!("function(o){
+            return this.getObject(o).keyCode;
+        }")
+        .invoke_1(self.obj.handle) as usize
+    }
+
+    pub fn target(&self) -> JSObject {
+        let r = js!("function(o){
+            return this.storeObject(this.getObject(o).target);
+        }")
+        .invoke_1(self.obj.handle);
+        JSObject::from(r)
+    }
+}
+
+pub struct InputElement {
+    obj: JSObject,
+}
+
+impl InputElement {
+    pub fn new(o: f64) -> InputElement {
+        InputElement {
+            obj: JSObject::from(o),
+        }
+    }
+
+    pub fn from(o: JSObject) -> InputElement {
+        InputElement { obj: o }
+    }
+
+    pub fn value(&self) -> Option<String> {
+        get_property(&self.obj, "value")
+    }
+
+    pub fn set_value(&mut self, s: &str) {
+        set_property(&self.obj, "value", s)
+    }
+}
+
+pub struct MouseEventHandler {
+    pub handler: Option<Box<dyn Sync + FnMut(MouseEvent) + 'static + Send>>,
+}
+
+impl MouseEventHandler {
+    pub fn new(f: impl Sync + FnMut(MouseEvent) + 'static + Send) -> MouseEventHandler {
+        MouseEventHandler {
+            handler: Some(Box::new(f)),
+        }
+    }
+}
+
+pub struct MouseEvent {
+    obj: JSObject,
+}
+
+impl MouseEvent {
+    pub fn new(o: f64) -> MouseEvent {
+        MouseEvent {
+            obj: JSObject::from(o),
+        }
+    }
+    pub fn target(&self) -> JSObject {
+        let r = js!("function(o){
+            return this.storeObject(this.getObject(o).target);
+        }")
+        .invoke_1(self.obj.handle);
+        JSObject::from(r)
+    }
+}
+
+pub struct EventHandler {
+    pub handler: Option<Box<dyn Sync + FnMut(Event) + 'static + Send>>,
+}
+
+impl EventHandler {
+    pub fn new(f: impl Sync + FnMut(Event) + 'static + Send) -> EventHandler {
+        EventHandler {
+            handler: Some(Box::new(f)),
+        }
+    }
+}
+
+pub struct Event {
+    obj: JSObject,
+}
+
+impl Event {
+    pub fn new(o: f64) -> Event {
+        Event {
+            obj: JSObject::from(o),
+        }
+    }
+    pub fn target(&self) -> JSObject {
+        get_object(self.obj.handle)
     }
 }

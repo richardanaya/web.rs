@@ -1,6 +1,6 @@
 [package]
 name = "web-dom"
-version = "0.3.5"
+version = "0.3.6"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -12,3 +12,4 @@ readme = "README.md"
 
 [dependencies]
 js = {path="../js",version="0.2"}
+web_common = {path="../web_common", version="0"}
