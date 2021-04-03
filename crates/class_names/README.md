@@ -13,7 +13,7 @@ This library includes a macro for easily expressing a list of CSS class names (s
 
 1. use strings
 ```rust
-class_names!("big-button",String("red"))
+class_names!("big-button", "red".to_string())
 ```
 2. accepts optionals
 ```rust
