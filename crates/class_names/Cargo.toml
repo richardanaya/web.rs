@@ -1,0 +1,9 @@
+[package]
+name = "class_names"
+version = "0.0.0"
+authors = ["Richard Anaya"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "A macro library for elegantly joining class names for web frameworks"
+repository = "https://github.com/richardanaya/js-wasm"
+readme = "README.md"
