@@ -105,18 +105,12 @@ impl KeyEvent {
     }
 
     pub fn key_code(&self) -> usize {
-        js!("function(o){
-            return this.getObject(o).keyCode;
-        }")
-        .invoke_1(self.obj.handle) as usize
+        let key_code: f64 = get_property(self.obj.handle, "keyCode").unwrap();
+        key_code as usize
     }
 
     pub fn target(&self) -> JSObject {
-        let r = js!("function(o){
-            return this.storeObject(this.getObject(o).target);
-        }")
-        .invoke_1(self.obj.handle);
-        JSObject::from(r)
+        get_property(self.obj.handle, "target").unwrap()
     }
 }
 
@@ -167,11 +161,7 @@ impl MouseEvent {
         }
     }
     pub fn target(&self) -> JSObject {
-        let r = js!("function(o){
-            return this.storeObject(this.getObject(o).target);
-        }")
-        .invoke_1(self.obj.handle);
-        JSObject::from(r)
+        get_property(self.obj.handle, "target").unwrap()
     }
 }
 
@@ -198,6 +188,6 @@ impl Event {
         }
     }
     pub fn target(&self) -> JSObject {
-        get_object(self.obj.handle)
+        get_property(self.obj.handle, "target").unwrap()
     }
 }
