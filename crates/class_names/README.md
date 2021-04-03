@@ -23,7 +23,7 @@ class_names!("big-button", if btn_red { Some("red") } else { None } )
 ```rust
 class_names!("big-button", btn_inactive.then(|| "inactive"))
 ```
-4. one day in [Rust nightly](https://doc.rust-lang.org/std/primitive.bool.html#method.then_some) you'll be able to write like this
+4. one day from future features in [Rust nightly](https://doc.rust-lang.org/std/primitive.bool.html#method.then_some) you'll be able to write like this
 ```rust
 class_names!("big-button", btn_inactive.then("inactive"))
 ```
