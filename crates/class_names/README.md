@@ -1,6 +1,28 @@
-# web_common
+# class_names
 
 <a href="https://docs.rs/class_names"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
+
+```
+[dependencies]
+class_names="0"
+```
+
+# How to use
+
+This library includes a macro for easily expressing a list of CSS class names (some which may be optional).  The macro takes in a list of `&str` or `Option<&str>` and calculates a final list of class names.  Here's some examples
+
+1. use strings
+```rust
+class_names!("big-button",String("red"))
+```
+2. accepts optionals
+```rust
+class_names!("big-button", if btn_red { Some("red") } else { None } )
+```
+3. a concise way of writing an optional
+```rust
+class_names!("big-button", btn_inactive.then(|| "inactive"))
+```
 
 # License
 
