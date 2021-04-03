@@ -23,6 +23,21 @@ impl<'a> AddClassList<'a> for Option<&str> {
     }
 }
 
+impl<'a> AddClassList<'a> for Option<String> {
+    fn insert_into_list(&'a self, list: &'a ClassList<'a>) {
+        match self {
+            Some(t) => list.classes.borrow_mut().push(&t),
+            None => (),
+        };
+    }
+}
+
+impl<'a> AddClassList<'a> for String {
+    fn insert_into_list(&'a self, list: &'a ClassList<'a>) {
+        list.classes.borrow_mut().push(&self);
+    }
+}
+
 pub struct ClassList<'a> {
     classes: RefCell<Vec<&'a str>>,
 }
