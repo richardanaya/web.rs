@@ -1,4 +1,5 @@
 #![no_std]
+pub use class_names::*;
 pub use html_color::*;
 pub use js::*;
 pub use spin::{Mutex, MutexGuard};
