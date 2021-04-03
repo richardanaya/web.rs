@@ -51,7 +51,8 @@ macro_rules! class_names {
         {
             let class_list = ClassList::new();
             $(
-                class_list.add(&$element);
+                let e = $element;
+                class_list.add(&e);
             )*
             class_list.to_string()
         }
