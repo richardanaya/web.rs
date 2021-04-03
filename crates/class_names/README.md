@@ -9,11 +9,11 @@ class_names="0"
 
 # How to use
 
-This library includes a macro for easily expressing a list of CSS class names (some which may be optional).  The macro takes in a list of `&str` or `Option<&str>` and calculates a final list of class names.  Here's some examples
+This library includes a macro for easily expressing a list of CSS class names (some which may be optional).  The macro takes in a mixed list of `&str`,`String`,`Option<&str>`,or `Option<String>` and calculates a final list of class names for the HTML `class` attribute.  Here's some examples
 
 1. use strings
 ```rust
-class_names!("big-button", "red".to_string())
+class_names!("big-button", "red".to_string()) // "big-button red"
 ```
 2. accepts optionals
 ```rust
