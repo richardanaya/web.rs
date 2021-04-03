@@ -10,13 +10,36 @@ pub trait GetProperty {
 
 impl GetProperty for f64 {
     fn get_property(el: impl Into<f64>, name: &str) -> Option<Self> {
+        let v = el.into();
+        if !is_property_number(v, name) {
+            return None;
+        }
         Some(
             js!("function(el,strPtr,strLen){
             el = this.getObject(el);
             return el[this.readUtf8FromMemory(strPtr,strLen)];
         }")
-            .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32),
+            .invoke_3(v, name.as_ptr() as u32, name.len() as u32),
         )
+    }
+}
+
+impl GetProperty for bool {
+    fn get_property(el: impl Into<f64>, name: &str) -> Option<Self> {
+        let v = js!(r#"function(el,strPtr,strLen){
+            el = this.getObject(el);
+            let i = el[this.readUtf8FromMemory(strPtr,strLen)];
+            if(typeof i !== "boolean"){
+                return -1;
+            }
+            return el[this.readUtf8FromMemory(strPtr,strLen)] ? 1 : 0;
+        }"#)
+        .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+        if v == -1.0 {
+            return None;
+        } else {
+            Some(v == 1.0)
+        }
     }
 }
 
@@ -35,6 +58,25 @@ impl GetProperty for alloc::string::String {
             return None;
         } else {
             Some(cstr_to_string(attr as i32))
+        }
+    }
+}
+
+impl GetProperty for JSObject {
+    fn get_property(el: impl Into<f64>, name: &str) -> Option<Self> {
+        let o = js!(r#"function(o,strPtr,strLen){
+                o = this.getObject(o);
+                const a = o[this.readUtf8FromMemory(strPtr,strLen)];
+                if(a === null){
+                    return -1;
+                } 
+                return this.storeObject(a);
+            }"#)
+        .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+        if o == -1.0 {
+            return None;
+        } else {
+            Some(JSObject::from(o))
         }
     }
 }
@@ -76,6 +118,36 @@ impl SetProperty for &str {
     }
 }
 
+impl SetProperty for bool {
+    fn set_property(el: impl Into<f64>, name: &str, value: Self) {
+        js!(r#"function(o,strPtr,strLen,val){
+            o = this.getObject(o);
+            o[this.readUtf8FromMemory(strPtr,strLen)] = val > 0;
+        }"#)
+        .invoke_4(
+            el.into(),
+            name.as_ptr() as u32,
+            name.len() as u32,
+            if value { 1.0 } else { 0.0 },
+        );
+    }
+}
+
+impl SetProperty for JSObject {
+    fn set_property(el: impl Into<f64>, name: &str, value: Self) {
+        js!(r#"function(o,strPtr,strLen,val){
+            o = this.getObject(o);
+            o[this.readUtf8FromMemory(strPtr,strLen)] = this.getObject(val);
+        }"#)
+        .invoke_4(
+            el.into(),
+            name.as_ptr() as u32,
+            name.len() as u32,
+            value.handle,
+        );
+    }
+}
+
 pub fn set_property<T>(el: impl Into<f64>, id: &str, v: T)
 where
     T: SetProperty,
@@ -83,10 +155,65 @@ where
     T::set_property(el, id, v)
 }
 
-pub fn get_object(handle: impl Into<f64>) -> JSObject {
-    let r = js!("function(o){
-        return this.storeObject(this.getObject(o).target);
-    }")
-    .invoke_1(handle.into());
-    JSObject::from(r)
+pub fn is_property_null(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return o[this.readUtf8FromMemory(strPtr,strLen)] === null ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
+}
+
+pub fn is_property_undefined(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return o[this.readUtf8FromMemory(strPtr,strLen)] === undefined ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
+}
+
+pub fn is_property_number(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return typeof o[this.readUtf8FromMemory(strPtr,strLen)] === "number" ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
+}
+
+pub fn is_property_bool(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return typeof o[this.readUtf8FromMemory(strPtr,strLen)] === "boolean" ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
+}
+
+pub fn is_property_string(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return typeof o[this.readUtf8FromMemory(strPtr,strLen)] === "string" ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
+}
+
+pub fn is_property_object(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return typeof o[this.readUtf8FromMemory(strPtr,strLen)] === "object" ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
+}
+
+pub fn is_property_array(el: impl Into<f64>, name: &str) -> bool {
+    let v = js!(r#"function(o,strPtr,strLen,val){
+        o = this.getObject(o);
+        return Array.isArray(o[this.readUtf8FromMemory(strPtr,strLen)]) ? 1.0 : 0.0;
+    }"#)
+    .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
+    v == 1.0
 }
