@@ -2,7 +2,7 @@
 
 <a href="https://docs.rs/class_names"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
-```
+```toml
 [dependencies]
 class_names="0"
 ```
@@ -24,7 +24,9 @@ class_names!("big-button", if btn_red { Some("red") } else { None } )
 class_names!("big-button", btn_inactive.then(|| "inactive"))
 ```
 4. one day in [Rust nightly](https://doc.rust-lang.org/std/primitive.bool.html#method.then_some) you'll be able to write like this
+```rust
 class_names!("big-button", btn_inactive.then("inactive"))
+```
 
 # License
 
