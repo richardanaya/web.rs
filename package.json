@@ -7,6 +7,7 @@
     "example": "examples"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,5 +26,8 @@
   "homepage": "https://github.com/richardanaya/js-wasm#readme",
   "files": [
     "js-wasm.js"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  }
 }
