@@ -102,7 +102,7 @@ class GenerationalArena {
         };
     }
 }
-window.JsWasm = {
+const JsWasm = {
     createEnvironment() {
         let arena = new GenerationalArena();
         arena.insert(undefined);
@@ -202,39 +202,38 @@ window.JsWasm = {
                 return new Uint8Array(this.module.instance.exports.memory.buffer);
             },
         };
-        return {
-            context,
-            abort() {
-                throw new Error("WebAssembly module aborted");
-            },
-            js_release(obj) {
-                context.releaseObject(obj);
-            },
-            js_register_function(start, len, utfByteLen) {
-                let functionBody;
-                if (utfByteLen === 16) {
-                    functionBody = context.readUtf16FromMemory(start, len);
-                }
-                else {
-                    functionBody = context.readUtf8FromMemory(start, len);
-                }
-                let id = context.functions.length;
-                context.functions.push(Function(`"use strict";return(${functionBody})`)());
-                return id;
-            },
-            js_invoke_function(funcHandle, a, b, c, d, e, f, g, h, i, j) {
-                return context.functions[funcHandle].call(context, a, b, c, d, e, f, g, h, i, j);
-            },
-        };
+        return [{
+                abort() {
+                    throw new Error("WebAssembly module aborted");
+                },
+                js_release(obj) {
+                    context.releaseObject(obj);
+                },
+                js_register_function(start, len, utfByteLen) {
+                    let functionBody;
+                    if (utfByteLen === 16) {
+                        functionBody = context.readUtf16FromMemory(start, len);
+                    }
+                    else {
+                        functionBody = context.readUtf8FromMemory(start, len);
+                    }
+                    let id = context.functions.length;
+                    context.functions.push(Function(`"use strict";return(${functionBody})`)());
+                    return id;
+                },
+                js_invoke_function(funcHandle, a, b, c, d, e, f, g, h, i, j) {
+                    return context.functions[funcHandle].call(context, a, b, c, d, e, f, g, h, i, j);
+                },
+            }, context];
     },
     async load_and_run_wasm(wasmURL) {
-        const env = window.JsWasm.createEnvironment();
+        const [env, context] = JsWasm.createEnvironment();
         const response = await fetch(wasmURL);
         const bytes = await response.arrayBuffer();
         const module = await WebAssembly.instantiate(bytes, {
             env,
         });
-        env.context.module = module;
+        context.module = module;
         module.instance.exports.main();
     },
 };
@@ -243,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 0; i < wasmScripts.length; i++) {
         const src = wasmScripts[i].src;
         if (src) {
-            window.JsWasm.load_and_run_wasm(src);
+            JsWasm.load_and_run_wasm(src);
         }
         else {
             console.error("Script tag must have 'src' property.");
@@ -254,7 +253,7 @@ if (window.WasmScriptComponents) {
     window.WasmScriptComponents["js-wasm"] = function (e) {
         return {
             ...e,
-            ...window.JsWasm.createEnvironment(),
+            ...JsWasm.createEnvironment(),
         };
     };
 }

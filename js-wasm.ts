@@ -163,8 +163,8 @@ interface JSWasmHandlerContext {
   getObject: (handle: number) => any;
 }
 
-(window as any).JsWasm = {
-  createEnvironment() {
+const JsWasm = {
+  createEnvironment(): [WebAssembly.ModuleImports, JSWasmHandlerContext] {
     let arena = new GenerationalArena();
     arena.insert(undefined);
     arena.insert(null);
@@ -297,8 +297,7 @@ interface JSWasmHandlerContext {
         );
       },
     };
-    return {
-      context,
+    return [{
       abort() {
         throw new Error("WebAssembly module aborted");
       },
@@ -345,18 +344,18 @@ interface JSWasmHandlerContext {
           j
         );
       },
-    };
+    },context];
   },
 
   async load_and_run_wasm(wasmURL: string) {
-    const env = (window as any).JsWasm.createEnvironment();
+    const [env,context] = JsWasm.createEnvironment();
     const response = await fetch(wasmURL);
     const bytes = await response.arrayBuffer();
     const module = await WebAssembly.instantiate(bytes, {
       env,
     });
-    env.context.module = module;
-    (module.instance.exports as any).main();
+    context.module = module;
+    (module.instance.exports.main as ()=>void)();
   },
 };
 
@@ -367,7 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
   for (let i = 0; i < wasmScripts.length; i++) {
     const src = (wasmScripts[i] as HTMLSourceElement).src;
     if (src) {
-      (window as any).JsWasm.load_and_run_wasm(src);
+      JsWasm.load_and_run_wasm(src);
     } else {
       console.error("Script tag must have 'src' property.");
     }
@@ -378,7 +377,7 @@ if ((window as any).WasmScriptComponents) {
   (window as any).WasmScriptComponents["js-wasm"] = function (e: any) {
     return {
       ...e,
-      ...(window as any).JsWasm.createEnvironment(),
+      ...JsWasm.createEnvironment(),
     };
   };
 }
