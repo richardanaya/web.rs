@@ -86,6 +86,7 @@ In your JS function context `this` contains several functions handle most issues
 | Name          | Description   |
 | ------------- | ------------- |
 | `readUtf8FromMemory(start,length)` | Extract utf-8 text from your program's memory. |
+| `readUtf16FromMemory(start,length)` | Extract utf-16 text from your program's memory. |
 | `writeUtf8ToMemory(str)` | Write utf-8 to a memory location you are sure it should go. |
 | `readCStringFromMemory(start,length)` | Extract C string text from your program's memory. |
 | `writeCStringToMemory(str)` | Write C string to a memory location you are sure it should go. |
