@@ -89,11 +89,11 @@ In your JS function context `this` contains several functions handle most issues
 | `writeUtf8ToMemory(str)` | Write utf-8 to a memory location you are sure it should go. |
 | `readCStringFromMemory(start,length)` | Extract C string text from your program's memory. |
 | `writeCStringToMemory(str)` | Write C string to a memory location you are sure it should go. |
-| `readUtf16FromMemory(start,length)` | Extract utf-16 text from your program's memory. |
 | `readUint8ArrayFromMemory(start)` | Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory. |
 | `storeObject(object)` | Store an object in your context for later reference, get a handle you can give to WebAssembly. |
 | `getObject(handle)` | Retreive and object from your context with a handle. |
 | `releaseObject(handle)` | Release a stored object so it's memory can be freed. |
+| `createCallback(callbackHandle)` | Creates a callback function that will pass its arguments to the associated WebAssembly function represented by the handle. |
 | `module` | Get access to your program so you can call methods on it. |
 
 <p align="center">
