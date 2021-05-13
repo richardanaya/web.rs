@@ -56,9 +56,16 @@ pub trait CustomElement {
             let destruct_disconnect2 = destruct_disconnect.clone();
             let disconnect = create_callback_0(move || {
                 el2.lock().disconnected();
-                remove_callback(destruct_connect.lock().function.unwrap().into());
-                remove_callback(destruct_disconnect.lock().function.unwrap().into());
-                remove_callback(destruct_attribute_change.lock().function.unwrap().into());
+                remove_callback(destruct_connect.lock().function.as_ref().unwrap().into());
+                remove_callback(destruct_disconnect.lock().function.as_ref().unwrap().into());
+                remove_callback(
+                    destruct_attribute_change
+                        .lock()
+                        .function
+                        .as_ref()
+                        .unwrap()
+                        .into(),
+                );
             });
             destruct_disconnect2.lock().function = Some(disconnect.into());
 
