@@ -32,7 +32,7 @@ pub fn set_style(
         el = this.getObject(el);
         const name = this.readUtf8FromMemory(strPtr,strLen);
         const value = this.readUtf8FromMemory(valPtr,valLen);
-        el.styles[name] = value;
+        el.style[name] = value;
     }")
     .invoke_5(dom.into(), name.as_ptr() as u32, name.len() as u32, value.as_ptr() as u32, value.len() as u32);
 }
