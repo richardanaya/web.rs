@@ -7,11 +7,34 @@ use web_common::*;
 
 pub fn get_element_by_id(id: &str) -> JSObject {
     js!("function(strPtr,strLen){
-        let el = document.getElementById(this.readUtf8FromMemory(strPtr,strLen)); 
+        const el = document.getElementById(this.readUtf8FromMemory(strPtr,strLen)); 
         return this.storeObject(el);
     }")
     .invoke_2(id.as_ptr() as u32, id.len() as u32)
     .into()
+}
+
+pub fn query_selector(id: &str) -> JSObject {
+    js!("function(strPtr,strLen){
+        const selector = document.querySelector(this.readUtf8FromMemory(strPtr,strLen)); 
+        return this.storeObject(selector);
+    }")
+    .invoke_2(id.as_ptr() as u32, id.len() as u32)
+    .into()
+}
+
+pub fn set_style(
+    dom: impl Into<f64>,
+    name: &str,
+    value: &str,
+) {
+    js!("function(el,strPtr,strLen,valPtr,valLen){
+        el = this.getObject(el);
+        const name = this.readUtf8FromMemory(strPtr,strLen);
+        const value = this.readUtf8FromMemory(valPtr,valLen);
+        el.styles[name] = value;
+    }")
+    .invoke_5(dom.into(), name.as_ptr() as u32, name.len() as u32, value.as_ptr() as u32, value.len() as u32);
 }
 
 pub fn add_event_listener(
