@@ -41,12 +41,6 @@ impl From<f64> for JSFunction {
     }
 }
 
-impl Into<f64> for JSFunction {
-    fn into(self) -> f64 {
-        self.fn_handle
-    }
-}
-
 impl Into<f64> for &JSFunction {
     fn into(self) -> f64 {
         self.fn_handle
@@ -374,12 +368,6 @@ pub fn register_function(code: &str) -> JSFunction {
 
 pub struct JSObject {
     pub handle: f64,
-}
-
-impl Into<f64> for JSObject {
-    fn into(self) -> f64 {
-        self.handle
-    }
 }
 
 impl Into<f64> for &JSObject {
