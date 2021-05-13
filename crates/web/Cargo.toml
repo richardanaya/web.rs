@@ -1,6 +1,6 @@
 [package]
 name = "web"
-version = "0.1.13"
+version = "0.1.14"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -19,7 +19,7 @@ web_timer={path="../../crates/web_timer",version="0"}
 web_canvas={path="../../crates/web_canvas",version="0"}
 webcomponent={path="../../crates/webcomponent",version="0"}
 html_color={path="../../crates/html_color",version="0"}
-js = {path="../js",version="0.2"}
+js = {path="../js",version="0"}
 class_names= "0"
 spin = "0.9.0"
 web_local_storage={path="../../crates/web_local_storage",version="0"}

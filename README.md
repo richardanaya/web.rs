@@ -39,7 +39,7 @@ Create JavaScript functions and invoke them
 ## Rust
 ```toml
 [dependencies]
-js = "0.2"
+js = "0.3"
 ```
 ```rust
 let fn_log = js!(
