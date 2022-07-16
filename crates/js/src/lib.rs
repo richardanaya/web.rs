@@ -1,9 +1,9 @@
 #![no_std]
+#![allow(clippy::too_many_arguments)]
 extern crate alloc;
 use alloc::vec::Vec;
 pub use callback::*;
 pub use cstring::cstr_to_string;
-pub use lazy_static::lazy_static;
 
 pub const JS_NULL: f64 = 0.0;
 pub const JS_UNDEFINED: f64 = 1.0;
@@ -32,7 +32,7 @@ extern "C" {
 
 #[derive(Copy, Clone)]
 pub struct JSFunction {
-    fn_handle: f64,
+    pub fn_handle: f64,
 }
 
 impl From<f64> for JSFunction {
@@ -41,9 +41,9 @@ impl From<f64> for JSFunction {
     }
 }
 
-impl Into<f64> for &JSFunction {
-    fn into(self) -> f64 {
-        self.fn_handle
+impl From<&JSFunction> for f64 {
+    fn from(f: &JSFunction) -> Self {
+        f.fn_handle
     }
 }
 
@@ -370,9 +370,9 @@ pub struct JSObject {
     pub handle: f64,
 }
 
-impl Into<f64> for &JSObject {
-    fn into(self) -> f64 {
-        self.handle
+impl From<&JSObject> for f64 {
+    fn from(f: &JSObject) -> Self {
+        f.handle
     }
 }
 
@@ -401,12 +401,14 @@ fn malloc(size: i32) -> *mut u8 {
 #[macro_export]
 macro_rules! js {
     ($e:expr) => {{
-        js::lazy_static! {
-        static ref FN: js::JSFunction= {
-            js::register_function(
-                $e,
-            )
-        };};
-        &FN
+        static mut FN: Option<f64> = None;
+        unsafe {
+            if FN.is_none() {
+                FN = Some(js::register_function($e).fn_handle);
+            }
+            JSFunction {
+                fn_handle: FN.unwrap(),
+            }
+        }
     }};
 }
