@@ -1,4 +1,6 @@
 #![no_std]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::too_many_arguments)]
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::sync::Arc;
@@ -11,19 +13,17 @@ use core::{
 use spin::{Mutex, MutexGuard};
 
 pub enum CallbackHandler {
-    Callback0(Box<dyn FnMut() -> () + Send + 'static>),
-    Callback1(Box<dyn FnMut(f64) -> () + Send + 'static>),
-    Callback2(Box<dyn FnMut(f64, f64) -> () + Send + 'static>),
-    Callback3(Box<dyn FnMut(f64, f64, f64) -> () + Send + 'static>),
-    Callback4(Box<dyn FnMut(f64, f64, f64, f64) -> () + Send + 'static>),
-    Callback5(Box<dyn FnMut(f64, f64, f64, f64, f64) -> () + Send + 'static>),
-    Callback6(Box<dyn FnMut(f64, f64, f64, f64, f64, f64) -> () + Send + 'static>),
-    Callback7(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static>),
-    Callback8(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static>),
-    Callback9(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static>),
-    Callback10(
-        Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static>,
-    ),
+    Callback0(Box<dyn FnMut() + Send + 'static>),
+    Callback1(Box<dyn FnMut(f64) + Send + 'static>),
+    Callback2(Box<dyn FnMut(f64, f64) + Send + 'static>),
+    Callback3(Box<dyn FnMut(f64, f64, f64) + Send + 'static>),
+    Callback4(Box<dyn FnMut(f64, f64, f64, f64) + Send + 'static>),
+    Callback5(Box<dyn FnMut(f64, f64, f64, f64, f64) + Send + 'static>),
+    Callback6(Box<dyn FnMut(f64, f64, f64, f64, f64, f64) + Send + 'static>),
+    Callback7(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64) + Send + 'static>),
+    Callback8(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64, f64) + Send + 'static>),
+    Callback9(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64) + Send + 'static>),
+    Callback10(Box<dyn FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) + Send + 'static>),
 }
 
 type CallbackHandle = f64;
@@ -72,59 +72,57 @@ fn create_callback(cb: CallbackHandler) -> f64 {
     let id = h.cur_id;
     h.keys.push(id);
     h.handlers.push(Arc::new(Mutex::new(cb)));
-    return id;
+    id
 }
 
-pub fn create_callback_0(cb: impl FnMut() -> () + Send + 'static) -> f64 {
+pub fn create_callback_0(cb: impl FnMut() + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback0(Box::new(cb)))
 }
 
-pub fn create_callback_1(cb: impl FnMut(f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_1(cb: impl FnMut(f64) + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback1(Box::new(cb)))
 }
 
-pub fn create_callback_2(cb: impl FnMut(f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_2(cb: impl FnMut(f64, f64) + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback2(Box::new(cb)))
 }
 
-pub fn create_callback_3(cb: impl FnMut(f64, f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_3(cb: impl FnMut(f64, f64, f64) + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback3(Box::new(cb)))
 }
 
-pub fn create_callback_4(cb: impl FnMut(f64, f64, f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_4(cb: impl FnMut(f64, f64, f64, f64) + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback4(Box::new(cb)))
 }
 
-pub fn create_callback_5(cb: impl FnMut(f64, f64, f64, f64, f64) -> () + Send + 'static) -> f64 {
+pub fn create_callback_5(cb: impl FnMut(f64, f64, f64, f64, f64) + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback5(Box::new(cb)))
 }
 
-pub fn create_callback_6(
-    cb: impl FnMut(f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
-) -> f64 {
+pub fn create_callback_6(cb: impl FnMut(f64, f64, f64, f64, f64, f64) + Send + 'static) -> f64 {
     create_callback(CallbackHandler::Callback6(Box::new(cb)))
 }
 
 pub fn create_callback_7(
-    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
+    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64) + Send + 'static,
 ) -> f64 {
     create_callback(CallbackHandler::Callback7(Box::new(cb)))
 }
 
 pub fn create_callback_8(
-    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
+    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64) + Send + 'static,
 ) -> f64 {
     create_callback(CallbackHandler::Callback8(Box::new(cb)))
 }
 
 pub fn create_callback_9(
-    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
+    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64) + Send + 'static,
 ) -> f64 {
     create_callback(CallbackHandler::Callback9(Box::new(cb)))
 }
 
 pub fn create_callback_10(
-    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) -> () + Send + 'static,
+    cb: impl FnMut(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64) + Send + 'static,
 ) -> f64 {
     create_callback(CallbackHandler::Callback10(Box::new(cb)))
 }
@@ -191,7 +189,7 @@ impl Future for CallbackFuture0 {
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let mut shared_state = self.shared_state.lock();
         if shared_state.completed {
-            Poll::Ready(shared_state.result)
+            Poll::Ready(())
         } else {
             shared_state.waker = Some(cx.waker().clone());
             Poll::Pending
@@ -773,7 +771,7 @@ fn handle_callback(
     a8: f64,
     a9: f64,
     a10: f64,
-) -> () {
+) {
     let h = get_callback(id);
     let handler_ref = h.unwrap();
     let mut handler = handler_ref.lock();
