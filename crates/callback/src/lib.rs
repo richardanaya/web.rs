@@ -8,8 +8,7 @@ use core::{
     pin::Pin,
     task::{Context, Poll, Waker},
 };
-use spin::{Mutex,MutexGuard};
-
+use spin::{Mutex, MutexGuard};
 
 pub enum CallbackHandler {
     Callback0(Box<dyn FnMut() -> () + Send + 'static>),
@@ -35,16 +34,13 @@ pub struct CallbackManager {
     pub handlers: Vec<Arc<Mutex<CallbackHandler>>>,
 }
 
-
-fn get_callbacks() -> MutexGuard<'static, CallbackManager>{
-    lazy_static::lazy_static! {
-        static ref SINGLETON: Mutex<CallbackManager> = {
-            Mutex::new(CallbackManager {
-                cur_id: 0.0,
-                keys: Vec::new(),
-                handlers: Vec::new(),
-            })
-        };
+fn get_callbacks() -> MutexGuard<'static, CallbackManager> {
+    static SINGLETON: Mutex<CallbackManager> = {
+        Mutex::new(CallbackManager {
+            cur_id: 0.0,
+            keys: Vec::new(),
+            handlers: Vec::new(),
+        })
     };
     SINGLETON.lock()
 }
@@ -779,7 +775,7 @@ fn handle_callback(
     a10: f64,
 ) -> () {
     let h = get_callback(id);
-    let handler_ref = h.unwrap().clone();
+    let handler_ref = h.unwrap();
     let mut handler = handler_ref.lock();
     match &mut *handler {
         CallbackHandler::Callback0(c) => c(),

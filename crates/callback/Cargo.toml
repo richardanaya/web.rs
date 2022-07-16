@@ -11,8 +11,3 @@ readme = "README.md"
 
 [dependencies]
 spin = "0"
-
-[dependencies.lazy_static]
-version = "1"
-default-features = false
-features = ["spin_no_std"]
