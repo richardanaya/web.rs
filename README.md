@@ -9,7 +9,7 @@ See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) o
 
 # How It Works?
 ```bash
-cargo new helloworld
+cargo new helloworld --lib
 cd helloworld
 vim index.html
 ```
