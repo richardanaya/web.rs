@@ -8,9 +8,11 @@ This project aims to provide a simple, easy to learn, technology-agnostic way br
 See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) of it working!
 
 # How It Works?
-
-Load WebAssembly like JavaScript. 
-
+```bash
+cargo new helloworld
+cd helloworld
+vim index.html
+```
 ```html
 <html>
     <head>
@@ -23,10 +25,6 @@ Load WebAssembly like JavaScript.
     </body>
 </html>
 ```
-
-Create JavaScript functions and invoke them
-
-## Rust
 ```bash
 cargo add js
 ```
@@ -44,8 +42,10 @@ pub fn main() {
 ```
 ```bash
 cargo build --target wasm32-unknown-unknown --release
-cp target/wasm32-unknown-unknown/release/example.wasm .
+cp target/wasm32-unknown-unknown/release/helloworld.wasm .
 python3 -m http.server
+
+# open http://localhost:8000 in browser
 ```
 
 # details 
