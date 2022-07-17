@@ -21,13 +21,6 @@ class Index {
   }
 }
 
-const toBytesInt32 = (num:number) => {
-  const arr = new ArrayBuffer(4);
-  const view = new DataView(arr);
-  view.setUint32(0, num, false);
-  return arr;
-}
-
 interface GenerationItem<T> {
   generation?: number;
   value?: T;
@@ -161,12 +154,9 @@ interface JSWasmHandlerContext {
   readUtf8FromMemory: (start: number, end: number) => string;
   readUtf16FromMemory: (start: number, end: number) => string;
   getMemory: () => Uint8Array;
-  malloc: (size: number) => number;
+  createAllocation: (size: number) => [number,number] ;
   createCallback: (cb: number) => () => void;
-  readCStringFromMemory: (start: number) => string;
-  writeCStringToMemory: (txt: string) => number;
   writeUtf8ToMemory: (txt: string) => number;
-  writeUtf8ToMemoryWithLength: (txt: string) => number;
   readUint8ArrayFromMemory: (start: number) => Uint8Array;
   getObject: (handle: number) => any;
 }
@@ -230,52 +220,30 @@ const JsWasm = {
           );
         };
       },
-      readCStringFromMemory: function (start: number) {
-        const data = this.getMemory();
-        const str = [];
-        let i = start;
-        while (data[i] !== 0) {
-          str.push(data[i]);
-          i++;
-        }
-        return this.utf8dec.decode(new Uint8Array(str));
-      },
-      writeCStringToMemory(str: string) {
-        const bytes = this.utf8enc.encode(str + String.fromCharCode(0));
-        const len = bytes.length;
-        const start = this.malloc(len);
-        this.getMemory().set(bytes, start);
-        return start;
-      },
       readUtf8FromMemory: function (start: number, len: number) {
         const text = this.utf8dec.decode(
           this.getMemory().subarray(start, start + len)
         );
         return text;
       },
-      malloc: function (size: number): number {
+      createAllocation: function (size: number): [number,number] {
         if (!this.module) {
           throw new Error("module not set");
         }
-        return (this.module.instance.exports.malloc as (
+        const allocationId = (this.module.instance.exports.create_allocation as (
           size: number
         ) => number)(size);
-      },
-      writeUtf8ToMemoryWithLength: function (str: string) {
-        const bytes = this.utf8enc.encode(str);
-        const len = bytes.length;
-        const start = this.malloc(len+4);
-        const lenBytes = new Uint8Array(toBytesInt32(str.length))
-        this.getMemory().set(lenBytes, start);
-        this.getMemory().set(bytes, start+4);
-        return start;
+        const allocationPtr = (this.module.instance.exports.allocation_ptr as (
+          size: number
+        ) => number)(allocationId);
+        return [allocationId, allocationPtr];
       },
       writeUtf8ToMemory: function (str: string) {
         const bytes = this.utf8enc.encode(str);
         const len = bytes.length;
-        const start = this.malloc(len);
+        const [id,start] = this.createAllocation(len);
         this.getMemory().set(bytes, start);
-        return start;
+        return id;
       },
       readUtf16FromMemory: function (start: number, len: number) {
         const text = this.utf16dec.decode(

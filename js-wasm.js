@@ -14,12 +14,6 @@ class Index {
         return new Index(g, i);
     }
 }
-const toBytesInt32 = (num) => {
-    const arr = new ArrayBuffer(4);
-    const view = new DataView(arr);
-    view.setUint32(0, num, false);
-    return arr;
-};
 class GenerationalArena {
     constructor() {
         this.items = [];
@@ -143,48 +137,24 @@ const JsWasm = {
                     fnHandleCallback(cb, context.toCallbackArg(arg[0]), context.toCallbackArg(arg[1]), context.toCallbackArg(arg[2]), context.toCallbackArg(arg[3]), context.toCallbackArg(arg[4]), context.toCallbackArg(arg[5]), context.toCallbackArg(arg[6]), context.toCallbackArg(arg[7]), context.toCallbackArg(arg[8]), context.toCallbackArg(arg[9]));
                 };
             },
-            readCStringFromMemory: function (start) {
-                const data = this.getMemory();
-                const str = [];
-                let i = start;
-                while (data[i] !== 0) {
-                    str.push(data[i]);
-                    i++;
-                }
-                return this.utf8dec.decode(new Uint8Array(str));
-            },
-            writeCStringToMemory(str) {
-                const bytes = this.utf8enc.encode(str + String.fromCharCode(0));
-                const len = bytes.length;
-                const start = this.malloc(len);
-                this.getMemory().set(bytes, start);
-                return start;
-            },
             readUtf8FromMemory: function (start, len) {
                 const text = this.utf8dec.decode(this.getMemory().subarray(start, start + len));
                 return text;
             },
-            malloc: function (size) {
+            createAllocation: function (size) {
                 if (!this.module) {
                     throw new Error("module not set");
                 }
-                return this.module.instance.exports.malloc(size);
-            },
-            writeUtf8ToMemoryWithLength: function (str) {
-                const bytes = this.utf8enc.encode(str);
-                const len = bytes.length;
-                const start = this.malloc(len + 4);
-                const lenBytes = new Uint8Array(toBytesInt32(str.length));
-                this.getMemory().set(lenBytes, start);
-                this.getMemory().set(bytes, start + 4);
-                return start;
+                const allocationId = this.module.instance.exports.create_allocation(size);
+                const allocationPtr = this.module.instance.exports.allocation_ptr(allocationId);
+                return [allocationId, allocationPtr];
             },
             writeUtf8ToMemory: function (str) {
                 const bytes = this.utf8enc.encode(str);
                 const len = bytes.length;
-                const start = this.malloc(len);
+                const [id, start] = this.createAllocation(len);
                 this.getMemory().set(bytes, start);
-                return start;
+                return id;
             },
             readUtf16FromMemory: function (start, len) {
                 const text = this.utf16dec.decode(this.getMemory().subarray(start, start + len));
