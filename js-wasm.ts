@@ -12,23 +12,30 @@ class Index {
   }
 
   static fromNum(n: number) {
-    let i = Number(
+    const i = Number(
       ((BigInt(n) & BigInt(0xffffffff00000000)) >> BigInt(32)) &
         BigInt(0xffffffff)
     );
-    let g = n & 0xffffffff;
+    const g = n & 0xffffffff;
     return new Index(g, i);
   }
 }
 
-interface GenerationItem {
-  generation?: number;
-  value?: any;
-  next_free?: number;
+const toBytesInt32 = (num:number) => {
+  const arr = new ArrayBuffer(4);
+  const view = new DataView(arr);
+  view.setUint32(0, num, false);
+  return arr;
 }
 
-class GenerationalArena {
-  items: GenerationItem[];
+interface GenerationItem<T> {
+  generation?: number;
+  value?: T;
+  nextFree?: number;
+}
+
+class GenerationalArena<T> {
+  items: GenerationItem<T>[];
   generation: number;
   length: number;
   free_list_head?: number;
@@ -40,11 +47,11 @@ class GenerationalArena {
     this.length = 0;
   }
 
-  insert(v: any) {
+  insert(v: T) {
     // lets use the first free entry if we have one
     if (this.free_list_head !== undefined) {
       let i = this.free_list_head;
-      this.free_list_head = this.items[i].next_free;
+      this.free_list_head = this.items[i].nextFree;
       this.items[i] = {
         generation: this.generation,
         value: v,
@@ -57,7 +64,7 @@ class GenerationalArena {
       generation: this.generation,
       value: v,
     });
-    let idx = new Index(this.items.length - 1, this.generation);
+    const idx = new Index(this.items.length - 1, this.generation);
     this.length += 1;
     return idx;
   }
@@ -83,7 +90,7 @@ class GenerationalArena {
     if (e.generation !== undefined && e.generation == idx.generation) {
       this.generation += 1;
       this.items[idx.index] = {
-        next_free: this.free_list_head,
+        nextFree: this.free_list_head,
       };
       this.free_list_head = idx.index;
       this.length -= 1;
@@ -93,8 +100,8 @@ class GenerationalArena {
   }
 
   *[Symbol.iterator]() {
-    for (var i = 0; i < this.items.length; i++) {
-      let x = this.items[i];
+    for (let i = 0; i < this.items.length; i++) {
+      const x = this.items[i];
       if (x.generation !== undefined) {
         yield { index: new Index(i, x.generation), value: x.value };
       }
@@ -105,8 +112,8 @@ class GenerationalArena {
     return {
       items: this.items,
       [Symbol.iterator]: function* iter() {
-        for (var i = 0; i < this.items.length; i++) {
-          let x = this.items[i];
+        for (let i = 0; i < this.items.length; i++) {
+          const x = this.items[i];
           if (x.generation !== undefined) {
             yield new Index(i, x.generation);
           }
@@ -119,8 +126,8 @@ class GenerationalArena {
     return {
       items: this.items,
       [Symbol.iterator]: function* iter() {
-        for (var i = 0; i < this.items.length; i++) {
-          let x = this.items[i];
+        for (let i = 0; i < this.items.length; i++) {
+          const x = this.items[i];
           if (x.generation !== undefined) {
             yield x.value;
           }
@@ -143,7 +150,7 @@ interface JSWasmHandlerContext {
     i: number,
     j: number
   ) => number)[];
-  objects: GenerationalArena;
+  objects: GenerationalArena<unknown>;
   utf8dec: TextDecoder;
   utf8enc: TextEncoder;
   utf16dec: TextDecoder;
@@ -159,19 +166,20 @@ interface JSWasmHandlerContext {
   readCStringFromMemory: (start: number) => string;
   writeCStringToMemory: (txt: string) => number;
   writeUtf8ToMemory: (txt: string) => number;
+  writeUtf8ToMemoryWithLength: (txt: string) => number;
   readUint8ArrayFromMemory: (start: number) => Uint8Array;
   getObject: (handle: number) => any;
 }
 
 const JsWasm = {
   createEnvironment(): [WebAssembly.ModuleImports, JSWasmHandlerContext] {
-    let arena = new GenerationalArena();
+    const arena = new GenerationalArena();
     arena.insert(undefined);
     arena.insert(null);
     arena.insert(self);
     arena.insert(typeof document != "undefined" ? document : null);
     arena.insert(typeof document != "undefined" ? document.body : null);
-    let context: JSWasmHandlerContext = {
+    const context: JSWasmHandlerContext = {
       functions: [
         function () {
           debugger;
@@ -192,7 +200,7 @@ const JsWasm = {
         if (!this.module) {
           throw new Error("module not set");
         }
-        let fnHandleCallback = this.module.instance.exports.handle_callback as (
+        const fnHandleCallback = this.module.instance.exports.handle_callback as (
           cb: number,
           a: number,
           b: number,
@@ -253,6 +261,15 @@ const JsWasm = {
           size: number
         ) => number)(size);
       },
+      writeUtf8ToMemoryWithLength: function (str: string) {
+        const bytes = this.utf8enc.encode(str);
+        const len = bytes.length;
+        const start = this.malloc(len+4);
+        const lenBytes = new Uint8Array(toBytesInt32(str.length))
+        this.getMemory().set(lenBytes, start);
+        this.getMemory().set(bytes, start+4);
+        return start;
+      },
       writeUtf8ToMemory: function (str: string) {
         const bytes = this.utf8enc.encode(str);
         const len = bytes.length;
@@ -278,7 +295,7 @@ const JsWasm = {
         let b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
         return new Uint8Array(b);
       },
-      storeObject: function (obj: any) {
+      storeObject: function (obj: unknown) {
         const index = this.objects.insert(obj);
         return index.toNum();
       },
@@ -347,7 +364,7 @@ const JsWasm = {
     },context];
   },
 
-  async load_and_run_wasm(wasmURL: string) {
+  async loadAndRunWasm(wasmURL: string) {
     const [env,context] = JsWasm.createEnvironment();
     const response = await fetch(wasmURL);
     const bytes = await response.arrayBuffer();
@@ -366,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
   for (let i = 0; i < wasmScripts.length; i++) {
     const src = (wasmScripts[i] as HTMLSourceElement).src;
     if (src) {
-      JsWasm.load_and_run_wasm(src);
+      JsWasm.loadAndRunWasm(src);
     } else {
       console.error("Script tag must have 'src' property.");
     }

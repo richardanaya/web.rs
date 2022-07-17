@@ -8,12 +8,18 @@ class Index {
         return Number((BigInt(this.generation) << BigInt(32)) | BigInt(this.index));
     }
     static fromNum(n) {
-        let i = Number(((BigInt(n) & BigInt(0xffffffff00000000)) >> BigInt(32)) &
+        const i = Number(((BigInt(n) & BigInt(0xffffffff00000000)) >> BigInt(32)) &
             BigInt(0xffffffff));
-        let g = n & 0xffffffff;
+        const g = n & 0xffffffff;
         return new Index(g, i);
     }
 }
+const toBytesInt32 = (num) => {
+    const arr = new ArrayBuffer(4);
+    const view = new DataView(arr);
+    view.setUint32(0, num, false);
+    return arr;
+};
 class GenerationalArena {
     constructor() {
         this.items = [];
@@ -25,7 +31,7 @@ class GenerationalArena {
         // lets use the first free entry if we have one
         if (this.free_list_head !== undefined) {
             let i = this.free_list_head;
-            this.free_list_head = this.items[i].next_free;
+            this.free_list_head = this.items[i].nextFree;
             this.items[i] = {
                 generation: this.generation,
                 value: v,
@@ -37,7 +43,7 @@ class GenerationalArena {
             generation: this.generation,
             value: v,
         });
-        let idx = new Index(this.items.length - 1, this.generation);
+        const idx = new Index(this.items.length - 1, this.generation);
         this.length += 1;
         return idx;
     }
@@ -59,7 +65,7 @@ class GenerationalArena {
         if (e.generation !== undefined && e.generation == idx.generation) {
             this.generation += 1;
             this.items[idx.index] = {
-                next_free: this.free_list_head,
+                nextFree: this.free_list_head,
             };
             this.free_list_head = idx.index;
             this.length -= 1;
@@ -68,8 +74,8 @@ class GenerationalArena {
         return undefined;
     }
     *[Symbol.iterator]() {
-        for (var i = 0; i < this.items.length; i++) {
-            let x = this.items[i];
+        for (let i = 0; i < this.items.length; i++) {
+            const x = this.items[i];
             if (x.generation !== undefined) {
                 yield { index: new Index(i, x.generation), value: x.value };
             }
@@ -79,8 +85,8 @@ class GenerationalArena {
         return {
             items: this.items,
             [Symbol.iterator]: function* iter() {
-                for (var i = 0; i < this.items.length; i++) {
-                    let x = this.items[i];
+                for (let i = 0; i < this.items.length; i++) {
+                    const x = this.items[i];
                     if (x.generation !== undefined) {
                         yield new Index(i, x.generation);
                     }
@@ -92,8 +98,8 @@ class GenerationalArena {
         return {
             items: this.items,
             [Symbol.iterator]: function* iter() {
-                for (var i = 0; i < this.items.length; i++) {
-                    let x = this.items[i];
+                for (let i = 0; i < this.items.length; i++) {
+                    const x = this.items[i];
                     if (x.generation !== undefined) {
                         yield x.value;
                     }
@@ -104,13 +110,13 @@ class GenerationalArena {
 }
 const JsWasm = {
     createEnvironment() {
-        let arena = new GenerationalArena();
+        const arena = new GenerationalArena();
         arena.insert(undefined);
         arena.insert(null);
         arena.insert(self);
         arena.insert(typeof document != "undefined" ? document : null);
         arena.insert(typeof document != "undefined" ? document.body : null);
-        let context = {
+        const context = {
             functions: [
                 function () {
                     debugger;
@@ -131,7 +137,7 @@ const JsWasm = {
                 if (!this.module) {
                     throw new Error("module not set");
                 }
-                let fnHandleCallback = this.module.instance.exports.handle_callback;
+                const fnHandleCallback = this.module.instance.exports.handle_callback;
                 return function () {
                     const arg = arguments;
                     fnHandleCallback(cb, context.toCallbackArg(arg[0]), context.toCallbackArg(arg[1]), context.toCallbackArg(arg[2]), context.toCallbackArg(arg[3]), context.toCallbackArg(arg[4]), context.toCallbackArg(arg[5]), context.toCallbackArg(arg[6]), context.toCallbackArg(arg[7]), context.toCallbackArg(arg[8]), context.toCallbackArg(arg[9]));
@@ -163,6 +169,15 @@ const JsWasm = {
                     throw new Error("module not set");
                 }
                 return this.module.instance.exports.malloc(size);
+            },
+            writeUtf8ToMemoryWithLength: function (str) {
+                const bytes = this.utf8enc.encode(str);
+                const len = bytes.length;
+                const start = this.malloc(len + 4);
+                const lenBytes = new Uint8Array(toBytesInt32(str.length));
+                this.getMemory().set(lenBytes, start);
+                this.getMemory().set(bytes, start + 4);
+                return start;
             },
             writeUtf8ToMemory: function (str) {
                 const bytes = this.utf8enc.encode(str);
@@ -226,7 +241,7 @@ const JsWasm = {
                 },
             }, context];
     },
-    async load_and_run_wasm(wasmURL) {
+    async loadAndRunWasm(wasmURL) {
         const [env, context] = JsWasm.createEnvironment();
         const response = await fetch(wasmURL);
         const bytes = await response.arrayBuffer();
@@ -242,7 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let i = 0; i < wasmScripts.length; i++) {
         const src = wasmScripts[i].src;
         if (src) {
-            JsWasm.load_and_run_wasm(src);
+            JsWasm.loadAndRunWasm(src);
         }
         else {
             console.error("Script tag must have 'src' property.");
