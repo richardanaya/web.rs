@@ -3,17 +3,7 @@
 
 *JavaScript and WebAssembly should be a joy to use together.*
 
-This project aims to provide a simple, easy to learn, technology-agnostic way bridge the two worlds.
-
-<p align="center">
-  <img height="300" src="images/undraw_good_team_m7uu.png">
-</p>
-
-Use any WebAssembly programming language out of the box:
-* [Rust](https://docs.rs/js/latest/js/)
-* [C/C++](headers/js-wasm.h)
-* [AssemblyScript](https://github.com/richardanaya/js-wasm/blob/master/assemblyscript/js-wasm.ts)
-* [Your own programming language](https://github.com/richardanaya/wasm-script)
+This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using absolute setup.
 
 See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) of it working!
 
@@ -51,36 +41,8 @@ let msg = "Hello World!";
 
 fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
 ```
-## AssemblyScript:
-```typescript
-import {js_register_function,js_invoke_function} from "./js-wasm"
 
-let console_log_fn:f64 = 0;
-export function console_log(msg: string) : void {
-  if(console_log_fn === 0){
-    const code = "function(msgPtr,msgLen){ console.log(this.readUtf16FromMemory(msgPtr,msgLen)); }";
-    console_log_fn = <f64>js_register_function(<f64>changetype<usize>(code),<f64>code.length*2, 16);
-  }
-  js_invoke_2(<f64>console_log_fn,<f64>changetype<usize>(msg),<f64>msg.length*2);
-}
-
-export function main():void {
-  console_log("Hello World!");
-}
-```
-
-## C/C++
-```c
-#include "js-wasm.h"
- 
-char *code = "function(context,cstrPtr){\
-        console.log(this.getCStringFromMemory(cstrPtr));\
-    }";
-JSFunction fnLog = js_register_function(code,strlen(code));
-
-js_invoke_function_2(fnLog, "Hello World!");
-```
-
+# details 
 In your JS function context `this` contains several functions handle most issues you'll encounter
 
 | Name          | Description   |
@@ -88,8 +50,6 @@ In your JS function context `this` contains several functions handle most issues
 | `readUtf8FromMemory(start,length)` | Extract utf-8 text from your program's memory. |
 | `readUtf16FromMemory(start,length)` | Extract utf-16 text from your program's memory. |
 | `writeUtf8ToMemory(str)` | Write utf-8 to a memory location you are sure it should go. |
-| `readCStringFromMemory(start,length)` | Extract C string text from your program's memory. |
-| `writeCStringToMemory(str)` | Write C string to a memory location you are sure it should go. |
 | `readUint8ArrayFromMemory(start)` | Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory. |
 | `storeObject(object)` | Store an object in your context for later reference, get a handle you can give to WebAssembly. |
 | `getObject(handle)` | Retreive and object from your context with a handle. |
@@ -99,14 +59,6 @@ In your JS function context `this` contains several functions handle most issues
 
 <p align="center">
   <img height="300" src="images/undraw_design_team_af2y.png">
-</p>
-
-# Who is making this?
-
-My name is [RICHΛRD ΛNΛYΛ](https://github.com/richardanaya), i'm a technologist from Portland, OR. I love the potential WebAssembly has for bringing powerful experiences to the world! 
-
-<p align="center">
-  <img height="300" src="images/undraw_elements_cipa.png">
 </p>
 
 # License
