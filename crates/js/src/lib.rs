@@ -401,8 +401,9 @@ pub fn extract_string_from_memory(allocation_id: usize) -> String {
 }
 
 #[no_mangle]
-pub fn create_allocation(size: i32) -> usize {
-    let buf = Vec::with_capacity(size as usize);
+pub fn create_allocation(size: usize) -> usize {
+    let mut buf = Vec::with_capacity(size as usize);
+    buf.resize(size, 0);
     let mut allocations = ALLOCATIONS.lock();
     let i = allocations.len();
     allocations.push(Some(buf));
