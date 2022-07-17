@@ -409,6 +409,22 @@ pub fn create_allocation(size: i32) -> usize {
     i
 }
 
+#[no_mangle]
+pub fn allocation_ptr(allocation_id: i32) -> *const u8 {
+    let allocations = ALLOCATIONS.lock();
+    let allocation = allocations.get(allocation_id as usize).unwrap();
+    let vec = allocation.as_ref().unwrap();
+    vec.as_ptr()
+}
+
+#[no_mangle]
+pub fn allocation_len(allocation_id: i32) -> f64 {
+    let allocations = ALLOCATIONS.lock();
+    let allocation = allocations.get(allocation_id as usize).unwrap();
+    let vec = allocation.as_ref().unwrap();
+    vec.len() as f64
+}
+
 pub fn clear_allocation(allocation_id: usize) {
     let mut allocations = ALLOCATIONS.lock();
     allocations[allocation_id] = None;
