@@ -39,7 +39,7 @@ vim index.html
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>
-        ...
+        Open my console.
     </body>
 </html>
 ```
