@@ -3,7 +3,7 @@
 
 *JavaScript and WebAssembly should be a joy to use together.*
 
-This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using absolute setup.
+This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
 
 See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) of it working!
 
