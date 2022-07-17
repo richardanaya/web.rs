@@ -41,6 +41,18 @@ pub fn main() {
 }
 ```
 ```bash
+vim Cargo.toml
+```
+```toml
+# add these lines for WebAssembly to end of Cargo.toml
+
+[lib]
+crate-type =["cdylib"]
+
+[profile.release]
+lto = true
+```
+```bash
 cargo build --target wasm32-unknown-unknown --release
 cp target/wasm32-unknown-unknown/release/helloworld.wasm .
 python3 -m http.server
