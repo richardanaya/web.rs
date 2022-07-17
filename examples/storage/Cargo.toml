@@ -7,7 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-web = {path="../../crates/web"}
+web_console = {path="../../crates/web_console"}
+web_local_storage = {path="../../crates/web_local_storage"}
 
 [lib]
 crate-type =["cdylib"]
