@@ -63,7 +63,7 @@ python3 -m http.server
 ```
 
 # details 
-In your JS function context `this` contains several functions handle most issues you'll encounter
+In your JS function context `this` contains several functions handle most issues you'll encounter.  It's probably easiest to look at examples to figure out how they are used.
 
 | Name          | Description   |
 | ------------- | ------------- |
