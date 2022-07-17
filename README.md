@@ -19,6 +19,7 @@ use js::*;
 
 #[no_mangle]
 pub fn main() {
+    // let's dynamically create a javascript function we can invoke to write logs
     let fn_log = js!("function(strPtr,strLen){
         console.log(this.readUtf8FromMemory(strPtr,strLen)); 
     }");
@@ -60,6 +61,7 @@ cp target/wasm32-unknown-unknown/release/helloworld.wasm .
 python3 -m http.server
 
 # open http://localhost:8000 in browser
+# right click, inspect, look at message in console
 ```
 
 # details 
