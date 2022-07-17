@@ -75,10 +75,6 @@ In your JS function context `this` contains several functions handle most issues
 | `createCallback(callbackHandle)` | Creates a callback function that will pass its arguments to the associated WebAssembly function represented by the handle. |
 | `module` | Get access to your program so you can call methods on it. |
 
-<p align="center">
-  <img height="300" src="images/undraw_design_team_af2y.png">
-</p>
-
 # License
 
 This project is licensed under either of
