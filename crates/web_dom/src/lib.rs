@@ -23,24 +23,26 @@ pub fn query_selector(id: &str) -> JSObject {
     .into()
 }
 
-pub fn set_style(
-    dom: impl Into<f64>,
-    name: &str,
-    value: &str,
-) {
+pub fn set_style(dom: impl Into<f64>, name: &str, value: &str) {
     js!("function(el,strPtr,strLen,valPtr,valLen){
         el = this.getObject(el);
         const name = this.readUtf8FromMemory(strPtr,strLen);
         const value = this.readUtf8FromMemory(valPtr,valLen);
         el.style[name] = value;
     }")
-    .invoke_5(dom.into(), name.as_ptr() as u32, name.len() as u32, value.as_ptr() as u32, value.len() as u32);
+    .invoke_5(
+        dom.into(),
+        name.as_ptr() as u32,
+        name.len() as u32,
+        value.as_ptr() as u32,
+        value.len() as u32,
+    );
 }
 
 pub fn add_event_listener(
     dom: impl Into<f64>,
     event: &str,
-    handler: impl FnMut(f64) -> () + Send + 'static,
+    handler: impl FnMut(f64) + Send + 'static,
 ) {
     let cb = create_callback_1(handler);
     js!("function(el,strPtr,strLen,callback){
@@ -94,13 +96,16 @@ pub fn get_attribute(el: impl Into<f64>, name: &str) -> Option<alloc::string::St
         if(a === null){
             return -1;
         } 
-        return this.writeCStringToMemory(a);
+        return this.writeUtf8ToMemory(a);
     }"#)
     .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
     if attr == -1.0 {
-        return None;
+        None
     } else {
-        Some(cstr_to_string(attr as i32))
+        let allocation_id = attr as usize;
+        let s = extract_string_from_memory(allocation_id);
+        clear_allocation(allocation_id);
+        Some(s)
     }
 }
 
