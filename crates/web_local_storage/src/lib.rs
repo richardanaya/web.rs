@@ -23,13 +23,16 @@ pub fn local_storage_get_item(id: &str) -> Option<String> {
                 if(a === null){
                     return -1;
                 } 
-                return this.writeCStringToMemory(a);
+                return this.writeUtf8ToMemory(a);
         }"###);
     let txt = func.invoke_2(a0, a1);
     if txt == -1.0 {
         return None;
     } else {
-        Some(cstr_to_string(txt as i32))
+        let allocation_id = txt as usize;
+        let s = extract_string_from_memory(allocation_id);
+        clear_allocation(allocation_id);
+        Some(s)
     }
 }
 

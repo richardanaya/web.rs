@@ -1,6 +1,6 @@
 [package]
 name = "web_local_storage"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
