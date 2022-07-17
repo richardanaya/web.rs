@@ -51,13 +51,16 @@ impl GetProperty for alloc::string::String {
                 if(a === null){
                     return -1;
                 } 
-                return this.writeCStringToMemory(a);
+                return this.writeUtf8ToMemory(a);
             }"#)
         .invoke_3(el.into(), name.as_ptr() as u32, name.len() as u32);
         if attr == -1.0 {
             return None;
         } else {
-            Some(cstr_to_string(attr as i32))
+            let allocation_id = attr as usize;
+            let s = extract_string_from_memory(allocation_id);
+            clear_allocation(allocation_id);
+            Some(s)
         }
     }
 }
