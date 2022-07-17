@@ -27,19 +27,25 @@ Load WebAssembly like JavaScript.
 Create JavaScript functions and invoke them
 
 ## Rust
-```toml
-[dependencies]
-js = "0.3"
+```bash
+cargo add js
 ```
 ```rust
-let fn_log = js!(
-    "function(strPtr,strLen){
+use js::*;
+
+#[no_mangle]
+pub fn main() {
+    let fn_log = js!("function(strPtr,strLen){
         console.log(this.readUtf8FromMemory(strPtr,strLen)); 
     }");
-
-let msg = "Hello World!";
-
-fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+    let msg = "Hello World!";
+    fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+}
+```
+```bash
+cargo build --target wasm32-unknown-unknown --release
+cp target/wasm32-unknown-unknown/release/example.wasm .
+python3 -m http.server
 ```
 
 # details 
