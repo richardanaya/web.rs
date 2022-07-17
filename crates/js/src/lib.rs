@@ -1,8 +1,10 @@
 #![no_std]
 #![allow(clippy::too_many_arguments)]
 extern crate alloc;
+use alloc::string::String;
 use alloc::vec::Vec;
 pub use callback::*;
+use spin::Mutex;
 
 pub const JS_NULL: f64 = 0.0;
 pub const JS_UNDEFINED: f64 = 1.0;
@@ -389,12 +391,27 @@ impl Drop for JSObject {
     }
 }
 
+static ALLOCATIONS: Mutex<Vec<Option<Vec<u8>>>> = Mutex::new(Vec::new());
+
+pub fn extract_string_from_memory(allocation_id: usize) -> String {
+    let allocations = ALLOCATIONS.lock();
+    let allocation = allocations.get(allocation_id).unwrap();
+    let vec = allocation.as_ref().unwrap();
+    String::from_utf8(vec.clone()).unwrap()
+}
+
 #[no_mangle]
-fn malloc(size: i32) -> *mut u8 {
-    let mut buf = Vec::with_capacity(size as usize);
-    let ptr = buf.as_mut_ptr();
-    core::mem::forget(buf);
-    ptr
+pub fn create_allocation(size: i32) -> usize {
+    let buf = Vec::with_capacity(size as usize);
+    let mut allocations = ALLOCATIONS.lock();
+    let i = allocations.len();
+    allocations.push(Some(buf));
+    i
+}
+
+pub fn clear_allocation(allocation_id: usize) {
+    let mut allocations = ALLOCATIONS.lock();
+    allocations[allocation_id] = None;
 }
 
 #[macro_export]
