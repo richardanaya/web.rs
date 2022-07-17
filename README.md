@@ -11,6 +11,23 @@ See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) o
 ```bash
 cargo new helloworld --lib
 cd helloworld
+cargo add js
+vim src/lib.rs
+```
+```rust
+use js::*;
+
+#[no_mangle]
+pub fn main() {
+    let fn_log = js!("function(strPtr,strLen){
+        console.log(this.readUtf8FromMemory(strPtr,strLen)); 
+    }");
+    let msg = "Hello World!";
+    fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+}
+```
+
+```bash
 vim index.html
 ```
 ```html
@@ -24,21 +41,6 @@ vim index.html
         ...
     </body>
 </html>
-```
-```bash
-cargo add js
-```
-```rust
-use js::*;
-
-#[no_mangle]
-pub fn main() {
-    let fn_log = js!("function(strPtr,strLen){
-        console.log(this.readUtf8FromMemory(strPtr,strLen)); 
-    }");
-    let msg = "Hello World!";
-    fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
-}
 ```
 ```bash
 vim Cargo.toml
