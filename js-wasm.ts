@@ -333,6 +333,10 @@ const JsWasm = {
   },
 
   async loadAndRunWasm(wasmURL: string) {
+    const context = await this.load(wasmURL);
+    (context.module!.instance.exports.main as ()=>void)();
+  },
+  async load(wasmURL: string) {
     const [env,context] = JsWasm.createEnvironment();
     const response = await fetch(wasmURL);
     const bytes = await response.arrayBuffer();
@@ -340,7 +344,7 @@ const JsWasm = {
       env,
     });
     context.module = module;
-    (module.instance.exports.main as ()=>void)();
+    return context;
   },
 };
 

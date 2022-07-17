@@ -212,6 +212,10 @@ const JsWasm = {
             }, context];
     },
     async loadAndRunWasm(wasmURL) {
+        const context = await this.load(wasmURL);
+        context.module.instance.exports.main();
+    },
+    async load(wasmURL) {
         const [env, context] = JsWasm.createEnvironment();
         const response = await fetch(wasmURL);
         const bytes = await response.arrayBuffer();
@@ -219,7 +223,7 @@ const JsWasm = {
             env,
         });
         context.module = module;
-        module.instance.exports.main();
+        return context;
     },
 };
 document.addEventListener("DOMContentLoaded", function () {
