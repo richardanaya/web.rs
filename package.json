@@ -2,13 +2,16 @@
   "name": "js-wasm",
   "version": "0.4.2",
   "description": "Call JavaScript from WebAssembly ",
-  "main": "js-wasm.js",
   "directories": {
     "example": "examples"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+      "/dist"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+      "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -28,6 +31,9 @@
     "js-wasm.js"
   ],
   "devDependencies": {
-    "typescript": "^4.7"
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "externref_polyfill": "^0.0.3"
   }
 }

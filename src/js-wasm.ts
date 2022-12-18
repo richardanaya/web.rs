@@ -1,134 +1,4 @@
-class Index {
-  index: number;
-  generation: number;
-
-  constructor(index: number, generation: number) {
-    this.index = index;
-    this.generation = generation;
-  }
-
-  toNum() {
-    return Number((BigInt(this.generation) << BigInt(32)) | BigInt(this.index));
-  }
-
-  static fromNum(n: number) {
-    const i = Number(
-      ((BigInt(n) & BigInt(0xffffffff00000000)) >> BigInt(32)) &
-        BigInt(0xffffffff)
-    );
-    const g = n & 0xffffffff;
-    return new Index(g, i);
-  }
-}
-
-interface GenerationItem<T> {
-  generation?: number;
-  value?: T;
-  nextFree?: number;
-}
-
-class GenerationalArena<T> {
-  items: GenerationItem<T>[];
-  generation: number;
-  length: number;
-  free_list_head?: number;
-
-  constructor() {
-    this.items = [];
-    this.generation = 0;
-    this.free_list_head = undefined;
-    this.length = 0;
-  }
-
-  insert(v: T) {
-    // lets use the first free entry if we have one
-    if (this.free_list_head !== undefined) {
-      let i = this.free_list_head;
-      this.free_list_head = this.items[i].nextFree;
-      this.items[i] = {
-        generation: this.generation,
-        value: v,
-      };
-      this.length += 1;
-      return new Index(i, this.generation);
-    }
-
-    this.items.push({
-      generation: this.generation,
-      value: v,
-    });
-    const idx = new Index(this.items.length - 1, this.generation);
-    this.length += 1;
-    return idx;
-  }
-
-  contains(idx: Index) {
-    return this.get(idx) !== undefined;
-  }
-
-  get(i: Index) {
-    let e = this.items[i.index];
-    if (e && e.generation === i.generation) {
-      return e.value;
-    }
-    return undefined;
-  }
-
-  remove(idx: Index) {
-    if (idx.index >= this.items.length) {
-      return undefined;
-    }
-
-    let e = this.items[idx.index];
-    if (e.generation !== undefined && e.generation == idx.generation) {
-      this.generation += 1;
-      this.items[idx.index] = {
-        nextFree: this.free_list_head,
-      };
-      this.free_list_head = idx.index;
-      this.length -= 1;
-      return e.value;
-    }
-    return undefined;
-  }
-
-  *[Symbol.iterator]() {
-    for (let i = 0; i < this.items.length; i++) {
-      const x = this.items[i];
-      if (x.generation !== undefined) {
-        yield { index: new Index(i, x.generation), value: x.value };
-      }
-    }
-  }
-
-  indices() {
-    return {
-      items: this.items,
-      [Symbol.iterator]: function* iter() {
-        for (let i = 0; i < this.items.length; i++) {
-          const x = this.items[i];
-          if (x.generation !== undefined) {
-            yield new Index(i, x.generation);
-          }
-        }
-      },
-    };
-  }
-
-  values() {
-    return {
-      items: this.items,
-      [Symbol.iterator]: function* iter() {
-        for (let i = 0; i < this.items.length; i++) {
-          const x = this.items[i];
-          if (x.generation !== undefined) {
-            yield x.value;
-          }
-        }
-      },
-    };
-  }
-}
+import { ExternRef } from 'externref_polyfill';
 
 interface JSWasmHandlerContext {
   functions: ((
@@ -143,13 +13,12 @@ interface JSWasmHandlerContext {
     i: number,
     j: number
   ) => number)[];
-  objects: GenerationalArena<unknown>;
   utf8dec: TextDecoder;
   utf8enc: TextEncoder;
   utf16dec: TextDecoder;
-  toCallbackArg: (arg: number | object) => number;
-  storeObject: (obj: any) => number;
-  releaseObject: (objHandle: number) => void;
+  toCallbackArg: (arg: number | object) => number | bigint;
+  storeObject: (obj: unknown) => bigint;
+  releaseObject: (objHandle: bigint) => void;
   module?: WebAssembly.WebAssemblyInstantiatedSource;
   readUtf8FromMemory: (start: number, end: number) => string;
   readUtf16FromMemory: (start: number, end: number) => string;
@@ -158,17 +27,24 @@ interface JSWasmHandlerContext {
   createCallback: (cb: number) => () => void;
   writeUtf8ToMemory: (txt: string) => number;
   readUint8ArrayFromMemory: (start: number) => Uint8Array;
-  getObject: (handle: number) => any;
+  getObject: (handle: bigint) => unknown;
 }
 
 const JsWasm = {
   createEnvironment(): [WebAssembly.ModuleImports, JSWasmHandlerContext] {
-    const arena = new GenerationalArena();
-    arena.insert(undefined);
-    arena.insert(null);
-    arena.insert(self);
-    arena.insert(typeof document != "undefined" ? document : null);
-    arena.insert(typeof document != "undefined" ? document.body : null);
+    ExternRef.create(undefined);
+    ExternRef.create(null);
+    ExternRef.create(self);
+    ExternRef.create(typeof document != "undefined" ? document : null);
+    ExternRef.create(typeof document != "undefined" ? document.body : null);
+
+    // 0 is reserved for undefined
+    // 1 is reserved for null
+    // 2 is reserved for self
+    // 3 is reserved for document
+    // 4 is reserved for document.body
+
+
     const context: JSWasmHandlerContext = {
       functions: [
         function () {
@@ -176,11 +52,10 @@ const JsWasm = {
           return 0;
         },
       ],
-      objects: arena,
       utf8dec: new TextDecoder("utf-8"),
       utf8enc: new TextEncoder(),
       utf16dec: new TextDecoder("utf-16"),
-      toCallbackArg: function (arg: number | object) {
+      toCallbackArg: function (arg: number | object) : number | bigint {
         if (typeof arg === "object") {
           return context.storeObject(arg);
         }
@@ -191,17 +66,17 @@ const JsWasm = {
           throw new Error("module not set");
         }
         const fnHandleCallback = this.module.instance.exports.handle_callback as (
-          cb: number,
-          a: number,
-          b: number,
-          c: number,
-          d: number,
-          e: number,
-          f: number,
-          g: number,
-          h: number,
-          i: number,
-          j: number
+          cb: number ,
+          a: number | bigint,
+          b: number | bigint,
+          c: number | bigint,
+          d: number | bigint,
+          e: number | bigint,
+          f: number | bigint,
+          g: number | bigint,
+          h: number | bigint,
+          i: number | bigint,
+          j: number | bigint
         ) => void;
         return function () {
           const arg = arguments;
@@ -263,15 +138,14 @@ const JsWasm = {
         let b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
         return new Uint8Array(b);
       },
-      storeObject: function (obj: unknown) {
-        const index = this.objects.insert(obj);
-        return index.toNum();
+      storeObject: function (obj: unknown) : bigint {
+        return ExternRef.create(obj);
       },
-      getObject: function (handle: number) {
-        return this.objects.get(Index.fromNum(handle));
+      getObject: function (handle: bigint) {
+        return ExternRef.load(handle);
       },
-      releaseObject: function (handle: number) {
-        this.objects.remove(Index.fromNum(handle));
+      releaseObject: function (handle: bigint) {
+        ExternRef.delete(handle);
       },
       getMemory: function () {
         if (!this.module) {
@@ -286,7 +160,7 @@ const JsWasm = {
       abort() {
         throw new Error("WebAssembly module aborted");
       },
-      js_release(obj: number) {
+      js_release(obj: bigint) {
         context.releaseObject(obj);
       },
       js_register_function(start: number, len: number, utfByteLen: number) {

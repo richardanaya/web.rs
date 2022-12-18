@@ -35,7 +35,7 @@ vim index.html
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="https://unpkg.com/js-wasm/js-wasm.js"></script>
+        <script src="https://unpkg.com/js-wasm/dist/js-wasm.js"></script>
         <script type="application/wasm" src="helloworld.wasm"></script>
     </head>
     <body>

@@ -1,115 +1,18 @@
 "use strict";
-class Index {
-    constructor(index, generation) {
-        this.index = index;
-        this.generation = generation;
-    }
-    toNum() {
-        return Number((BigInt(this.generation) << BigInt(32)) | BigInt(this.index));
-    }
-    static fromNum(n) {
-        const i = Number(((BigInt(n) & BigInt(0xffffffff00000000)) >> BigInt(32)) &
-            BigInt(0xffffffff));
-        const g = n & 0xffffffff;
-        return new Index(g, i);
-    }
-}
-class GenerationalArena {
-    constructor() {
-        this.items = [];
-        this.generation = 0;
-        this.free_list_head = undefined;
-        this.length = 0;
-    }
-    insert(v) {
-        // lets use the first free entry if we have one
-        if (this.free_list_head !== undefined) {
-            let i = this.free_list_head;
-            this.free_list_head = this.items[i].nextFree;
-            this.items[i] = {
-                generation: this.generation,
-                value: v,
-            };
-            this.length += 1;
-            return new Index(i, this.generation);
-        }
-        this.items.push({
-            generation: this.generation,
-            value: v,
-        });
-        const idx = new Index(this.items.length - 1, this.generation);
-        this.length += 1;
-        return idx;
-    }
-    contains(idx) {
-        return this.get(idx) !== undefined;
-    }
-    get(i) {
-        let e = this.items[i.index];
-        if (e && e.generation === i.generation) {
-            return e.value;
-        }
-        return undefined;
-    }
-    remove(idx) {
-        if (idx.index >= this.items.length) {
-            return undefined;
-        }
-        let e = this.items[idx.index];
-        if (e.generation !== undefined && e.generation == idx.generation) {
-            this.generation += 1;
-            this.items[idx.index] = {
-                nextFree: this.free_list_head,
-            };
-            this.free_list_head = idx.index;
-            this.length -= 1;
-            return e.value;
-        }
-        return undefined;
-    }
-    *[Symbol.iterator]() {
-        for (let i = 0; i < this.items.length; i++) {
-            const x = this.items[i];
-            if (x.generation !== undefined) {
-                yield { index: new Index(i, x.generation), value: x.value };
-            }
-        }
-    }
-    indices() {
-        return {
-            items: this.items,
-            [Symbol.iterator]: function* iter() {
-                for (let i = 0; i < this.items.length; i++) {
-                    const x = this.items[i];
-                    if (x.generation !== undefined) {
-                        yield new Index(i, x.generation);
-                    }
-                }
-            },
-        };
-    }
-    values() {
-        return {
-            items: this.items,
-            [Symbol.iterator]: function* iter() {
-                for (let i = 0; i < this.items.length; i++) {
-                    const x = this.items[i];
-                    if (x.generation !== undefined) {
-                        yield x.value;
-                    }
-                }
-            },
-        };
-    }
-}
+Object.defineProperty(exports, "__esModule", { value: true });
+const externref_polyfill_1 = require("externref_polyfill");
 const JsWasm = {
     createEnvironment() {
-        const arena = new GenerationalArena();
-        arena.insert(undefined);
-        arena.insert(null);
-        arena.insert(self);
-        arena.insert(typeof document != "undefined" ? document : null);
-        arena.insert(typeof document != "undefined" ? document.body : null);
+        externref_polyfill_1.ExternRef.create(undefined);
+        externref_polyfill_1.ExternRef.create(null);
+        externref_polyfill_1.ExternRef.create(self);
+        externref_polyfill_1.ExternRef.create(typeof document != "undefined" ? document : null);
+        externref_polyfill_1.ExternRef.create(typeof document != "undefined" ? document.body : null);
+        // 0 is reserved for undefined
+        // 1 is reserved for null
+        // 2 is reserved for self
+        // 3 is reserved for document
+        // 4 is reserved for document.body
         const context = {
             functions: [
                 function () {
@@ -117,7 +20,6 @@ const JsWasm = {
                     return 0;
                 },
             ],
-            objects: arena,
             utf8dec: new TextDecoder("utf-8"),
             utf8enc: new TextEncoder(),
             utf16dec: new TextDecoder("utf-16"),
@@ -171,14 +73,13 @@ const JsWasm = {
                 return new Uint8Array(b);
             },
             storeObject: function (obj) {
-                const index = this.objects.insert(obj);
-                return index.toNum();
+                return externref_polyfill_1.ExternRef.create(obj);
             },
             getObject: function (handle) {
-                return this.objects.get(Index.fromNum(handle));
+                return externref_polyfill_1.ExternRef.load(handle);
             },
             releaseObject: function (handle) {
-                this.objects.remove(Index.fromNum(handle));
+                externref_polyfill_1.ExternRef.delete(handle);
             },
             getMemory: function () {
                 if (!this.module) {
