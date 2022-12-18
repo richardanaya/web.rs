@@ -16,7 +16,6 @@ interface JSWasmHandlerContext {
   utf8dec: TextDecoder;
   utf8enc: TextEncoder;
   utf16dec: TextDecoder;
-  toCallbackArg: (arg: number | object) => number | bigint;
   storeObject: (obj: unknown) => bigint;
   releaseObject: (objHandle: bigint) => void;
   module?: WebAssembly.WebAssemblyInstantiatedSource;
@@ -24,7 +23,6 @@ interface JSWasmHandlerContext {
   readUtf16FromMemory: (start: number, end: number) => string;
   getMemory: () => Uint8Array;
   createAllocation: (size: number) => [number,number] ;
-  createCallback: (cb: number) => () => void;
   writeUtf8ToMemory: (txt: string) => number;
   readUint8ArrayFromMemory: (start: number) => Uint8Array;
   getObject: (handle: bigint) => unknown;
@@ -55,46 +53,6 @@ const JsWasm = {
       utf8dec: new TextDecoder("utf-8"),
       utf8enc: new TextEncoder(),
       utf16dec: new TextDecoder("utf-16"),
-      toCallbackArg: function (arg: number | object) : number | bigint {
-        if (typeof arg === "object") {
-          return context.storeObject(arg);
-        }
-        return arg;
-      },
-      createCallback: function (cb: number) {
-        if (!this.module) {
-          throw new Error("module not set");
-        }
-        const fnHandleCallback = this.module.instance.exports.handle_callback as (
-          cb: number ,
-          a: number | bigint,
-          b: number | bigint,
-          c: number | bigint,
-          d: number | bigint,
-          e: number | bigint,
-          f: number | bigint,
-          g: number | bigint,
-          h: number | bigint,
-          i: number | bigint,
-          j: number | bigint
-        ) => void;
-        return function () {
-          const arg = arguments;
-          fnHandleCallback(
-            cb,
-            context.toCallbackArg(arg[0]),
-            context.toCallbackArg(arg[1]),
-            context.toCallbackArg(arg[2]),
-            context.toCallbackArg(arg[3]),
-            context.toCallbackArg(arg[4]),
-            context.toCallbackArg(arg[5]),
-            context.toCallbackArg(arg[6]),
-            context.toCallbackArg(arg[7]),
-            context.toCallbackArg(arg[8]),
-            context.toCallbackArg(arg[9])
-          );
-        };
-      },
       readUtf8FromMemory: function (start: number, len: number) {
         const text = this.utf8dec.decode(
           this.getMemory().subarray(start, start + len)
@@ -170,7 +128,7 @@ const JsWasm = {
         } else {
           functionBody = context.readUtf8FromMemory(start, len);
         }
-        let id = context.functions.length;
+        const id = context.functions.length;
         context.functions.push(
           Function(`"use strict";return(${functionBody})`)()
         );
@@ -178,16 +136,16 @@ const JsWasm = {
       },
       js_invoke_function(
         funcHandle: number,
-        a: number,
-        b: number,
-        c: number,
-        d: number,
-        e: number,
-        f: number,
-        g: number,
-        h: number,
-        i: number,
-        j: number
+        a?: number | bigint,
+        b?: number | bigint,
+        c?: number | bigint,
+        d?: number | bigint,
+        e?: number | bigint,
+        f?: number | bigint,
+        g?: number | bigint,
+        h?: number | bigint,
+        i?: number | bigint,
+        j?: number | bigint
       ) {
         return context.functions[funcHandle].call(
           context,
@@ -235,12 +193,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 });
-
-if ((window as any).WasmScriptComponents) {
-  (window as any).WasmScriptComponents["js-wasm"] = function (e: any) {
-    return {
-      ...e,
-      ...JsWasm.createEnvironment(),
-    };
-  };
-}

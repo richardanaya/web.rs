@@ -20,8 +20,8 @@ extern JSFunction js_register_function(char*,unsigned int);
 extern JSValue js_invoke_function(JSFunction,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue,JSValue);
 extern void js_release(JSValue);
 
-JSValue const JS_NULL = 0.0;
-JSValue const JS_UNDEFINED = 1.0;
+JSValue const JS_UNDEFINED = 0.0;
+JSValue const JS_NULL = 1.0;
 JSValue const DOM_SELF = 2.0;
 JSValue const DOM_WINDOW = 2.0;
 JSValue const DOM_DOCUMENT = 3.0;

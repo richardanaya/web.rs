@@ -23,22 +23,6 @@ const JsWasm = {
             utf8dec: new TextDecoder("utf-8"),
             utf8enc: new TextEncoder(),
             utf16dec: new TextDecoder("utf-16"),
-            toCallbackArg: function (arg) {
-                if (typeof arg === "object") {
-                    return context.storeObject(arg);
-                }
-                return arg;
-            },
-            createCallback: function (cb) {
-                if (!this.module) {
-                    throw new Error("module not set");
-                }
-                const fnHandleCallback = this.module.instance.exports.handle_callback;
-                return function () {
-                    const arg = arguments;
-                    fnHandleCallback(cb, context.toCallbackArg(arg[0]), context.toCallbackArg(arg[1]), context.toCallbackArg(arg[2]), context.toCallbackArg(arg[3]), context.toCallbackArg(arg[4]), context.toCallbackArg(arg[5]), context.toCallbackArg(arg[6]), context.toCallbackArg(arg[7]), context.toCallbackArg(arg[8]), context.toCallbackArg(arg[9]));
-                };
-            },
             readUtf8FromMemory: function (start, len) {
                 const text = this.utf8dec.decode(this.getMemory().subarray(start, start + len));
                 return text;
@@ -103,7 +87,7 @@ const JsWasm = {
                     else {
                         functionBody = context.readUtf8FromMemory(start, len);
                     }
-                    let id = context.functions.length;
+                    const id = context.functions.length;
                     context.functions.push(Function(`"use strict";return(${functionBody})`)());
                     return id;
                 },
@@ -139,11 +123,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
-if (window.WasmScriptComponents) {
-    window.WasmScriptComponents["js-wasm"] = function (e) {
-        return {
-            ...e,
-            ...JsWasm.createEnvironment(),
-        };
-    };
-}
