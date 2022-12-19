@@ -236,7 +236,7 @@ const $569963205592bc01$var$JsWasm = {
                 abort () {
                     throw new Error("WebAssembly module aborted");
                 },
-                js_release (obj) {
+                externref_drop (obj) {
                     context.releaseObject(obj);
                 },
                 js_register_function (start, len, utfByteLen) {
