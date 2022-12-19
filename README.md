@@ -261,7 +261,7 @@ If you don't feel like recreating the wheel, there's an ongoing collection of co
 ```rust
 use web::*;
 
-#no_mangle
+#[no_mangle]
 fn main() {
     console_log("Hello world!");
 }
