@@ -110,6 +110,8 @@ const JsWasm = {
         //4 = string (followed by 32-bit start and size of string in memory)
         //5 = extern ref
         //6 = array of float-64 (followed by 32-bit start and size of string in memory)
+        //7 = true
+        //8 = false
         
         const values: unknown[] = [];
         let i = 0;
@@ -119,18 +121,17 @@ const JsWasm = {
           switch (type) {
             case 0:
               values.push(undefined);
-              i += 4;
               break;
             case 1:
               values.push(null);  
-              i += 4;
               break;
             case 2:
               values.push(new DataView(parameters.buffer).getFloat64(i, true));
-              i += 4;
+              i += 8;
               break;
             case 3:
               values.push(new DataView(parameters.buffer).getBigInt64(i,true));
+              i += 8;
               break;
             case 4: {
               const start = new DataView(parameters.buffer).getInt32(i, true);
@@ -153,13 +154,27 @@ const JsWasm = {
               i += 4;
               const len = new DataView(parameters.buffer).getInt32(i, true);
               i += 4;
-              values.push(
-                new Float64Array(
-                  parameters.buffer,
-                  start,
-                  len
-                )
-              );
+              const memory = context.getMemory();
+              const slice = memory.buffer.slice(start, start + len * 4);
+              const array = new Float32Array(slice);
+              values.push(array);
+              break;
+            }
+            case 7:
+              values.push(true);
+              break;
+            case 8:
+              values.push(false);  
+              break;
+            case 9: {
+              const start = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              const len = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              const memory = context.getMemory();
+              const slice = memory.buffer.slice(start, start + len * 8);
+              const array = new Float64Array(slice);
+              values.push(array);
               break;
             }
             default:

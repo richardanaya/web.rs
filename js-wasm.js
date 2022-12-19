@@ -156,6 +156,8 @@ const $569963205592bc01$var$JsWasm = {
                 //4 = string (followed by 32-bit start and size of string in memory)
                 //5 = extern ref
                 //6 = array of float-64 (followed by 32-bit start and size of string in memory)
+                //7 = true
+                //8 = false
                 const values = [];
                 let i = 0;
                 while(i < parameters.length){
@@ -164,18 +166,17 @@ const $569963205592bc01$var$JsWasm = {
                     switch(type){
                         case 0:
                             values.push(undefined);
-                            i += 4;
                             break;
                         case 1:
                             values.push(null);
-                            i += 4;
                             break;
                         case 2:
                             values.push(new DataView(parameters.buffer).getFloat64(i, true));
-                            i += 4;
+                            i += 8;
                             break;
                         case 3:
                             values.push(new DataView(parameters.buffer).getBigInt64(i, true));
+                            i += 8;
                             break;
                         case 4:
                             {
@@ -199,7 +200,28 @@ const $569963205592bc01$var$JsWasm = {
                                 i += 4;
                                 const len1 = new DataView(parameters.buffer).getInt32(i, true);
                                 i += 4;
-                                values.push(new Float64Array(parameters.buffer, start2, len1));
+                                const memory = context.getMemory();
+                                const slice = memory.buffer.slice(start2, start2 + len1 * 4);
+                                const array = new Float32Array(slice);
+                                values.push(array);
+                                break;
+                            }
+                        case 7:
+                            values.push(true);
+                            break;
+                        case 8:
+                            values.push(false);
+                            break;
+                        case 9:
+                            {
+                                const start3 = new DataView(parameters.buffer).getInt32(i, true);
+                                i += 4;
+                                const len2 = new DataView(parameters.buffer).getInt32(i, true);
+                                i += 4;
+                                const memory1 = context.getMemory();
+                                const slice1 = memory1.buffer.slice(start3, start3 + len2 * 8);
+                                const array1 = new Float64Array(slice1);
+                                values.push(array1);
                                 break;
                             }
                         default:

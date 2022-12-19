@@ -3,8 +3,8 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use spin::Mutex;
 use raw_parts::RawParts;
+use spin::Mutex;
 
 pub const JS_UNDEFINED: f64 = 0.0;
 pub const JS_NULL: f64 = 1.0;
@@ -16,8 +16,16 @@ pub const DOM_BODY: f64 = 4.0;
 extern "C" {
     fn js_register_function(start: f64, len: f64) -> f64;
     fn js_release(obj: f64);
-    fn js_invoke_function(fn_handle: f64, parameters_start: *const u8, parameters_length: usize) -> f64;
-    fn js_invoke_function_and_return_object(fn_handle: f64, parameters_start: *const u8, parameters_length: usize) -> i64;
+    fn js_invoke_function(
+        fn_handle: f64,
+        parameters_start: *const u8,
+        parameters_length: usize,
+    ) -> f64;
+    fn js_invoke_function_and_return_object(
+        fn_handle: f64,
+        parameters_start: *const u8,
+        parameters_length: usize,
+    ) -> i64;
 }
 
 #[derive(Copy, Clone)]
@@ -41,7 +49,9 @@ pub enum InvokeParam<'a> {
     BigInt(i64),
     String(&'a str),
     ExternRef(i64),
-    Array(&'a [f64]),
+    Float32Array(&'a [f32]),
+    Float64Array(&'a [f64]),
+    Bool(bool),
 }
 
 impl Into<InvokeParam<'_>> for f64 {
@@ -56,16 +66,27 @@ impl Into<InvokeParam<'_>> for i64 {
     }
 }
 
-
 impl<'a> Into<InvokeParam<'a>> for &'a str {
     fn into(self) -> InvokeParam<'a> {
         InvokeParam::String(self)
     }
 }
 
+impl<'a> Into<InvokeParam<'a>> for &'a [f32] {
+    fn into(self) -> InvokeParam<'a> {
+        InvokeParam::Float32Array(self)
+    }
+}
+
 impl<'a> Into<InvokeParam<'a>> for &'a [f64] {
     fn into(self) -> InvokeParam<'a> {
-        InvokeParam::Array(self)
+        InvokeParam::Float64Array(self)
+    }
+}
+
+impl Into<InvokeParam<'_>> for bool {
+    fn into(self) -> InvokeParam<'static> {
+        InvokeParam::Bool(self)
     }
 }
 
@@ -98,8 +119,22 @@ fn param_to_bytes(params: &Vec<InvokeParam>) -> Vec<u8> {
                 param_bytes.push(5);
                 param_bytes.extend_from_slice(&i.to_le_bytes());
             }
-            InvokeParam::Array(a) => {
+            InvokeParam::Float32Array(a) => {
                 param_bytes.push(6);
+                let start = a.as_ptr() as usize;
+                let len = a.len();
+                param_bytes.extend_from_slice(&start.to_le_bytes());
+                param_bytes.extend_from_slice(&len.to_le_bytes());
+            }
+            InvokeParam::Bool(b) => {
+                if *b {
+                    param_bytes.push(7);
+                } else {
+                    param_bytes.push(8);
+                }
+            }
+            InvokeParam::Float64Array(a) => {
+                param_bytes.push(9);
                 let start = a.as_ptr() as usize;
                 let len = a.len();
                 param_bytes.extend_from_slice(&start.to_le_bytes());
@@ -114,14 +149,22 @@ impl JSFunction {
     pub fn invoke(&self, params: &Vec<InvokeParam>) -> f64
 where {
         let param_bytes = param_to_bytes(params);
-        let RawParts { ptr, length, capacity: _ } = RawParts::from_vec(param_bytes);
+        let RawParts {
+            ptr,
+            length,
+            capacity: _,
+        } = RawParts::from_vec(param_bytes);
         unsafe { js_invoke_function(self.fn_handle, ptr, length) }
     }
 
     pub fn invoke_and_return_object(&self, params: &Vec<InvokeParam>) -> i64
 where {
         let param_bytes = param_to_bytes(params);
-        let RawParts { ptr, length, capacity: _ } = RawParts::from_vec(param_bytes);
+        let RawParts {
+            ptr,
+            length,
+            capacity: _,
+        } = RawParts::from_vec(param_bytes);
         unsafe { js_invoke_function_and_return_object(self.fn_handle, ptr, length) }
     }
 }
