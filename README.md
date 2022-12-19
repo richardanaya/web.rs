@@ -5,7 +5,7 @@
 
 This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
 
-# How It Works?
+# Example
 ```bash
 cargo new helloworld --lib
 cd helloworld
@@ -61,6 +61,118 @@ python3 -m http.server
 ```
 
 Full example is [here](https://github.com/richardanaya/js-wasm/tree/master/examples/helloworld).
+
+# How it works?
+
+The `js` crate makes it really easy to instantiate a javascript function and pass it parameters.  Right now this crate supports these types as parameters:
+
+* Undefined,
+* Float64
+* BigInt
+* String
+* Javascript Object References
+* Float32Array
+* Float64Array
+* Boolean
+
+# Interacting with DOM objects
+
+Here's a more complex example that invokes functions that return references to DOM objects
+
+<img width="152" alt="Screen Shot 2022-12-18 at 9 21 54 PM" src="https://user-images.githubusercontent.com/294042/208353503-00c21fcb-f45b-4612-be3c-e9624040d0e9.png">
+
+
+```rust
+use js::*;
+
+fn query_selector(selector: &str) -> ExternRef {
+    let query_selector = js!(r#"
+        function(selector){
+            return document.querySelector(selector);
+        }"#);
+    query_selector.invoke_and_return_object(&[selector.into()])
+}
+
+fn canvas_get_context(canvas: &ExternRef) -> ExternRef {
+    let get_context = js!(r#"
+        function(canvas){
+            return canvas.getContext("2d");
+        }"#);
+    get_context.invoke_and_return_object(&[canvas.into()])
+}
+
+fn canvas_set_fill_style(ctx: &ExternRef, color: &str) {
+    let set_fill_style = js!(r#"
+        function(ctx, color){
+            ctx.fillStyle = color;
+        }"#);
+    set_fill_style.invoke(&[ctx.into(), color.into()]);
+}
+
+fn canvas_fill_rect(ctx: &ExternRef, x: f64, y: f64, width: f64, height: f64) {
+    let fill_rect = js!(r#"
+        function(ctx, x, y, width, height){
+            ctx.fillRect(x, y, width, height);
+        }"#);
+    fill_rect.invoke(&[ctx.into(), x.into(), y.into(), width.into(), height.into()]);
+}
+
+#[no_mangle]
+pub fn main() {
+    let screen = query_selector("#screen");
+    let ctx = &canvas_get_context(&screen);
+    canvas_set_fill_style(&ctx, "red");
+    canvas_fill_rect(&ctx, 10.0, 10.0, 100.0, 100.0);
+    canvas_set_fill_style(&ctx, "green");
+    canvas_fill_rect(&ctx, 20.0, 20.0, 100.0, 100.0);
+    canvas_set_fill_style(&ctx, "blue");
+    canvas_fill_rect(&ctx, 30.0, 30.0, 100.0, 100.0);
+}
+```
+
+The invocation `invoke_and_return_object` returns a structure called an `ExternRef` that is an indirect reference to something received from JavaScript. You can pass around this reference to other JavaScript invocations that will receive the option. When the structure dropped according to Rust lifetimes, it's handle is released from the JavaScript side.
+
+# Callbacks and timers
+
+This library is not opinionated about how to callback into Rust. There are several methods one can use. Here's a simple example.
+
+```rust
+use js::*;
+
+fn console_log(s: &str) {
+    let console_log = js!(r#"
+        function(s){
+            console.log(s);
+        }"#);
+    console_log.invoke(&[s.into()]);
+}
+
+fn random() -> f64 {
+    let random = js!(r#"
+        function(){
+            return Math.random();
+        }"#);
+    random.invoke(&[])
+}
+
+#[no_mangle]
+pub fn main() {
+    let start_loop = js!(r#"
+        function(){
+            window.setInterval(()=>{
+                this.module.instance.exports.run_loop();
+            }, 1000)
+        }"#);
+    start_loop.invoke(&[]);
+}
+
+#[no_mangle]
+pub fn run_loop(){
+    console_log(&format!("⏰ {}", random()));
+}
+```
+
+Notice how in the `start_loop` function, `this` actually references a context object that can be used to perform useful functions (see below) and for the importance of this demo, get ahold of the WebAssembly module so we can callback functions on it.
 
 # License
 
