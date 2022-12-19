@@ -119,6 +119,7 @@ pub fn main() {
 }
 ```
 
+The invocation `invoke_and_return_object` returns a structure called an `ExternRef` that is an indirect reference to something received from JavaScript. You can pass around this reference to other JavaScript invocations that will receive the option. When the structure dropped according to Rust lifetimes, it's handle is released from the JavaScript side.
 
 # License
 
