@@ -32,7 +32,6 @@ fn fetch(url: &str, callback: &str) {
             fetch(url).then((response)=>{
                 return response.text();
             }).then((text)=>{
-                debugger;
                 const allocationId = this.writeUtf8ToMemory(text);
                 this.module.instance.exports[callback](allocationId);
             });
