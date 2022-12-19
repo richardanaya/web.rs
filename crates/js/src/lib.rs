@@ -4,7 +4,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use raw_parts::RawParts;
 use spin::Mutex;
-use externref_polyfill::ExternRef;
+pub use externref_polyfill::ExternRef;
 
 pub const JS_UNDEFINED: f64 = 0.0;
 pub const JS_NULL: f64 = 1.0;

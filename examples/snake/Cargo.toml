@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-web = {path="../../crates/web"}
+js = {path="../../crates/js"}
 hecs = "0.3.1"
 
 [dependencies.lazy_static]

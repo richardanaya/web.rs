@@ -8,7 +8,6 @@ edition = "2018"
 
 [dependencies]
 js = {path="../../crates/js"}
-web = {path="../../crates/web"}
 
 [lib]
 crate-type =["cdylib"]
