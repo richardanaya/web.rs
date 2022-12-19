@@ -4,6 +4,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use spin::Mutex;
+use raw_parts::RawParts;
 
 pub const JS_UNDEFINED: f64 = 0.0;
 pub const JS_NULL: f64 = 1.0;
@@ -15,8 +16,8 @@ pub const DOM_BODY: f64 = 4.0;
 extern "C" {
     fn js_register_function(start: f64, len: f64) -> f64;
     fn js_release(obj: f64);
-    fn js_invoke_function(fn_handle: f64, parameters_start: *const u8) -> f64;
-    fn js_invoke_function_and_return_object(fn_handle: f64, parameters_start: *const u8) -> i64;
+    fn js_invoke_function(fn_handle: f64, parameters_start: *const u8, parameters_length: usize) -> f64;
+    fn js_invoke_function_and_return_object(fn_handle: f64, parameters_start: *const u8, parameters_length: usize) -> i64;
 }
 
 #[derive(Copy, Clone)]
@@ -88,13 +89,15 @@ impl JSFunction {
     pub fn invoke(&self, params: &Vec<InvokeParams>) -> f64
 where {
         let param_bytes = param_to_bytes(params);
-        unsafe { js_invoke_function(self.fn_handle, param_bytes.as_ptr()) }
+        let RawParts { ptr, length, capacity: _ } = RawParts::from_vec(param_bytes);
+        unsafe { js_invoke_function(self.fn_handle, ptr, length) }
     }
 
     pub fn invoke_and_return_object(&self, params: &Vec<InvokeParams>) -> i64
 where {
         let param_bytes = param_to_bytes(params);
-        unsafe { js_invoke_function_and_return_object(self.fn_handle, param_bytes.as_ptr()) }
+        let RawParts { ptr, length, capacity: _ } = RawParts::from_vec(param_bytes);
+        unsafe { js_invoke_function_and_return_object(self.fn_handle, ptr, length) }
     }
 }
 

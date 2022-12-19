@@ -9,6 +9,7 @@ categories = ["wasm", "no-std"]
 
 [dependencies]
 cty = "0.2.1"
+raw-parts = "1.1.2"
 memchr = { version = "2.3.4", default-features = false }	
 
 [features]

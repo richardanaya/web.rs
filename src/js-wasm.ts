@@ -1,4 +1,4 @@
-import { ExternRef } from 'externref_polyfill';
+import { ExternRef } from '../node_modules/externref_polyfill/';
 
 interface JSWasmHandlerContext {
   functions: ((...args: unknown[]) => number)[];
@@ -13,9 +13,9 @@ interface JSWasmHandlerContext {
   getMemory: () => Uint8Array;
   createAllocation: (size: number) => [number,number] ;
   writeUtf8ToMemory: (txt: string) => number;
-  readUint8ArrayFromMemory: (start: number) => Uint8Array;
+  readUint8ArrayFromMemory: (start: number, length: number) => Uint8Array;
   getObject: (handle: bigint) => unknown;
-  readParameters: (start: number) => unknown[];
+  readParameters: (start: number, length: number) => unknown[];
 }
 
 const JsWasm = {
@@ -74,16 +74,11 @@ const JsWasm = {
         );
         return text;
       },
-      readUint8ArrayFromMemory(start: number) {
+      readUint8ArrayFromMemory(start: number, length: number) {
         if (!this.module) {
           throw new Error("module not set");
         }
-        const data32 = new Uint32Array(
-          (this.module.instance.exports.memory as WebAssembly.Memory).buffer
-        );
-        const ptr = data32[start / 4];
-        const length = data32[ptr / 4];
-        const b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
+        const b = this.getMemory().slice(start,start+length);
         return new Uint8Array(b);
       },
       storeObject: function (obj: unknown) : bigint {
@@ -103,9 +98,9 @@ const JsWasm = {
           (this.module.instance.exports.memory as WebAssembly.Memory).buffer
         );
       },
-      readParameters: function (start: number) {
+      readParameters: function (start: number, length: number) {
         //get bytes of parameters out of wasm module
-        const parameters = this.readUint8ArrayFromMemory(start);
+        const parameters = this.readUint8ArrayFromMemory(start, length);
         //convert bytes to array of values  
         //assuming each paramter is preceded by a 32 bit integer indicating its type
         //0 = undefined
@@ -199,9 +194,10 @@ const JsWasm = {
       },
       js_invoke_function(
         funcHandle: number,
-        parametersStart: number
+        parametersStart: number,
+        parametersLength: number
       ) {
-        const values = context.readParameters(parametersStart);
+        const values = context.readParameters(parametersStart, parametersLength);
         
         return context.functions[funcHandle].call(
           context,
@@ -210,9 +206,10 @@ const JsWasm = {
       },
       js_invoke_function_and_return_object(
         funcHandle: number,
-        parametersStart: number
+        parametersStart: number,
+        parametersLength: number
       ) {
-        const values = context.readParameters(parametersStart);
+        const values = context.readParameters(parametersStart, parametersLength);
         const result = context.functions[funcHandle].call(
           context,
           ...values 

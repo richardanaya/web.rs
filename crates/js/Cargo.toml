@@ -13,5 +13,6 @@ rust-version="1.63"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-callback= {path="../callback",version="0.5"}
 spin = "0.9.4"
+raw-parts = "1.1.2"
+

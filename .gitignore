@@ -1,5 +1,7 @@
+.parcel-cache
 .vscode
 target
 Cargo.lock
 tmp
 node_modules
+dist
