@@ -45,6 +45,9 @@ vim index.html
     </body>
 </html>
 ```
+
+This library has a fairly simple mechanism for executing your WebAssembly during page load.
+
 ```bash
 vim Cargo.toml
 ```
