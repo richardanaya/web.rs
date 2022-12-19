@@ -1,18 +1,7 @@
 import { ExternRef } from 'externref_polyfill';
 
 interface JSWasmHandlerContext {
-  functions: ((
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-    g: number,
-    h: number,
-    i: number,
-    j: number
-  ) => number)[];
+  functions: ((...args: unknown[]) => number)[];
   utf8dec: TextDecoder;
   utf8enc: TextEncoder;
   utf16dec: TextDecoder;
@@ -26,6 +15,7 @@ interface JSWasmHandlerContext {
   writeUtf8ToMemory: (txt: string) => number;
   readUint8ArrayFromMemory: (start: number) => Uint8Array;
   getObject: (handle: bigint) => unknown;
+  readParameters: (start: number) => unknown[];
 }
 
 const JsWasm = {
@@ -93,7 +83,7 @@ const JsWasm = {
         );
         const ptr = data32[start / 4];
         const length = data32[ptr / 4];
-        let b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
+        const b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
         return new Uint8Array(b);
       },
       storeObject: function (obj: unknown) : bigint {
@@ -113,6 +103,79 @@ const JsWasm = {
           (this.module.instance.exports.memory as WebAssembly.Memory).buffer
         );
       },
+      readParameters: function (start: number) {
+        //get bytes of parameters out of wasm module
+        const parameters = this.readUint8ArrayFromMemory(start);
+        //convert bytes to array of values  
+        //assuming each paramter is preceded by a 32 bit integer indicating its type
+        //0 = undefined
+        //1 = null
+        //2 = float-64
+        //3 = bigint
+        //4 = string (followed by 32-bit start and size of string in memory)
+        //5 = extern ref
+        //6 = array of float-64 (followed by 32-bit start and size of string in memory)
+        
+        const values: unknown[] = [];
+        let i = 0;
+        while (i < parameters.length) {
+          const type = parameters[i];
+          i++;
+          switch (type) {
+            case 0:
+              values.push(undefined);
+              i += 4;
+              break;
+            case 1:
+              values.push(null);  
+              i += 4;
+              break;
+            case 2:
+              values.push(new DataView(parameters.buffer).getFloat64(i, true));
+              i += 4;
+              break;
+            case 3:
+              values.push(
+                new BigInt64Array(parameters.buffer, i, 1)[0]
+              );
+              i += 8;
+              break;
+            case 4: {
+              const start = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              const len = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              values.push(
+                context.readUtf8FromMemory(start, len)
+              );
+              break;
+            }
+            case 5: {
+              const handle = new BigInt64Array(parameters.buffer, i, 1)[0];
+              values.push(context.getObject(handle));
+              i += 8;
+              break;
+            }
+            case 6: {
+              const start = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              const len = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              values.push(
+                new Float64Array(
+                  parameters.buffer,
+                  start,
+                  len
+                )
+              );
+              break;
+            }
+            default:
+              throw new Error("unknown parameter type");
+          }
+        }
+        return values;
+      }
     };
     return [{
       abort() {
@@ -136,30 +199,25 @@ const JsWasm = {
       },
       js_invoke_function(
         funcHandle: number,
-        a?: number | bigint,
-        b?: number | bigint,
-        c?: number | bigint,
-        d?: number | bigint,
-        e?: number | bigint,
-        f?: number | bigint,
-        g?: number | bigint,
-        h?: number | bigint,
-        i?: number | bigint,
-        j?: number | bigint
+        parametersStart: number
       ) {
+        const values = context.readParameters(parametersStart);
+        
         return context.functions[funcHandle].call(
           context,
-          a,
-          b,
-          c,
-          d,
-          e,
-          f,
-          g,
-          h,
-          i,
-          j
+          ...values 
         );
+      },
+      js_invoke_function_and_return_object(
+        funcHandle: number,
+        parametersStart: number
+      ) {
+        const values = context.readParameters(parametersStart);
+        const result = context.functions[funcHandle].call(
+          context,
+          ...values 
+        );
+        return context.storeObject(result);
       },
     },context];
   },
@@ -168,6 +226,7 @@ const JsWasm = {
     const context = await this.load(wasmURL);
     (context.module!.instance.exports.main as ()=>void)();
   },
+
   async load(wasmURL: string) {
     const [env,context] = JsWasm.createEnvironment();
     const response = await fetch(wasmURL);

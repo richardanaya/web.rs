@@ -53,7 +53,7 @@ const JsWasm = {
                 const data32 = new Uint32Array(this.module.instance.exports.memory.buffer);
                 const ptr = data32[start / 4];
                 const length = data32[ptr / 4];
-                let b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
+                const b = this.getMemory().slice(ptr + 4, ptr + 4 + length);
                 return new Uint8Array(b);
             },
             storeObject: function (obj) {
@@ -71,6 +71,68 @@ const JsWasm = {
                 }
                 return new Uint8Array(this.module.instance.exports.memory.buffer);
             },
+            readParameters: function (start) {
+                //get bytes of parameters out of wasm module
+                const parameters = this.readUint8ArrayFromMemory(start);
+                //convert bytes to array of values  
+                //assuming each paramter is preceded by a 32 bit integer indicating its type
+                //0 = undefined
+                //1 = null
+                //2 = float-64
+                //3 = bigint
+                //4 = string (followed by 32-bit start and size of string in memory)
+                //5 = extern ref
+                //6 = array of float-64 (followed by 32-bit start and size of string in memory)
+                const values = [];
+                let i = 0;
+                while (i < parameters.length) {
+                    const type = parameters[i];
+                    i++;
+                    switch (type) {
+                        case 0:
+                            values.push(undefined);
+                            i += 4;
+                            break;
+                        case 1:
+                            values.push(null);
+                            i += 4;
+                            break;
+                        case 2:
+                            values.push(new DataView(parameters.buffer).getFloat64(i, true));
+                            i += 4;
+                            break;
+                        case 3:
+                            values.push(new BigInt64Array(parameters.buffer, i, 1)[0]);
+                            i += 8;
+                            break;
+                        case 4: {
+                            const start = new DataView(parameters.buffer).getInt32(i, true);
+                            i += 4;
+                            const len = new DataView(parameters.buffer).getInt32(i, true);
+                            i += 4;
+                            values.push(context.readUtf8FromMemory(start, len));
+                            break;
+                        }
+                        case 5: {
+                            const handle = new BigInt64Array(parameters.buffer, i, 1)[0];
+                            values.push(context.getObject(handle));
+                            i += 8;
+                            break;
+                        }
+                        case 6: {
+                            const start = new DataView(parameters.buffer).getInt32(i, true);
+                            i += 4;
+                            const len = new DataView(parameters.buffer).getInt32(i, true);
+                            i += 4;
+                            values.push(new Float64Array(parameters.buffer, start, len));
+                            break;
+                        }
+                        default:
+                            throw new Error("unknown parameter type");
+                    }
+                }
+                return values;
+            }
         };
         return [{
                 abort() {
@@ -91,8 +153,14 @@ const JsWasm = {
                     context.functions.push(Function(`"use strict";return(${functionBody})`)());
                     return id;
                 },
-                js_invoke_function(funcHandle, a, b, c, d, e, f, g, h, i, j) {
-                    return context.functions[funcHandle].call(context, a, b, c, d, e, f, g, h, i, j);
+                js_invoke_function(funcHandle, parametersStart) {
+                    const values = context.readParameters(parametersStart);
+                    return context.functions[funcHandle].call(context, ...values);
+                },
+                js_invoke_function_and_return_object(funcHandle, parametersStart) {
+                    const values = context.readParameters(parametersStart);
+                    const result = context.functions[funcHandle].call(context, ...values);
+                    return context.storeObject(result);
                 },
             }, context];
     },

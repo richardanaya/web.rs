@@ -79,7 +79,6 @@ In your JS function context `this` contains several functions handle most issues
 | `storeObject(object)` | Store an object in your context for later reference, get a handle you can give to WebAssembly. |
 | `getObject(handle)` | Retreive and object from your context with a handle. |
 | `releaseObject(handle)` | Release a stored object so it's memory can be freed. |
-| `createCallback(callbackHandle)` | Creates a callback function that will pass its arguments to the associated WebAssembly function represented by the handle. |
 | `module` | Get access to your program so you can call methods on it. |
 
 # License

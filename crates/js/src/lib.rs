@@ -3,11 +3,10 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-pub use callback::*;
 use spin::Mutex;
 
-pub const JS_NULL: f64 = 0.0;
-pub const JS_UNDEFINED: f64 = 1.0;
+pub const JS_UNDEFINED: f64 = 0.0;
+pub const JS_NULL: f64 = 1.0;
 pub const DOM_SELF: f64 = 2.0;
 pub const DOM_WINDOW: f64 = 2.0;
 pub const DOM_DOCUMENT: f64 = 3.0;
@@ -16,19 +15,8 @@ pub const DOM_BODY: f64 = 4.0;
 extern "C" {
     fn js_register_function(start: f64, len: f64) -> f64;
     fn js_release(obj: f64);
-    fn js_invoke_function(
-        fn_handle: f64,
-        a: f64,
-        b: f64,
-        c: f64,
-        d: f64,
-        e: f64,
-        f: f64,
-        g: f64,
-        h: f64,
-        i: f64,
-        j: f64,
-    ) -> f64;
+    fn js_invoke_function(fn_handle: f64, parameters_start: *const u8) -> f64;
+    fn js_invoke_function_and_return_object(fn_handle: f64, parameters_start: *const u8) -> i64;
 }
 
 #[derive(Copy, Clone)]
@@ -36,324 +24,77 @@ pub struct JSFunction {
     pub fn_handle: f64,
 }
 
-impl From<f64> for JSFunction {
-    fn from(f: f64) -> Self {
-        JSFunction { fn_handle: f }
-    }
+//convert invoke parameters into bytes
+//assuming each parameter is preceded by a 32 bit integer indicating its type
+//0 = undefined
+//1 = null
+//2 = float-64
+//3 = bigint
+//4 = string (followed by 32-bit start and size of string in memory)
+//5 = extern ref
+//6 = array of float-64 (followed by 32-bit start and size of string in memory)
+pub enum InvokeParams<'a> {
+    Undefined,
+    Null,
+    Float64(f64),
+    BigInt(i64),
+    String(&'a str),
+    ExternRef(i64),
+    Array(&'a [f64]),
 }
 
-impl From<&JSFunction> for f64 {
-    fn from(f: &JSFunction) -> Self {
-        f.fn_handle
+fn param_to_bytes(params: &Vec<InvokeParams>) -> Vec<u8> {
+    let mut param_bytes = Vec::new();
+    for param in params {
+        match param {
+            InvokeParams::Undefined => {
+                param_bytes.push(0);
+            }
+            InvokeParams::Null => {
+                param_bytes.push(1);
+            }
+            InvokeParams::Float64(f) => {
+                param_bytes.push(2);
+                param_bytes.extend_from_slice(&f.to_le_bytes());
+            }
+            InvokeParams::BigInt(i) => {
+                param_bytes.push(3);
+                param_bytes.extend_from_slice(&i.to_le_bytes());
+            }
+            InvokeParams::String(s) => {
+                param_bytes.push(4);
+                let start = s.as_ptr() as usize;
+                let len = s.len();
+                param_bytes.extend_from_slice(&start.to_le_bytes());
+                param_bytes.extend_from_slice(&len.to_le_bytes());
+            }
+            InvokeParams::ExternRef(i) => {
+                param_bytes.push(5);
+                param_bytes.extend_from_slice(&i.to_le_bytes());
+            }
+            InvokeParams::Array(a) => {
+                param_bytes.push(6);
+                let start = a.as_ptr() as usize;
+                let len = a.len();
+                param_bytes.extend_from_slice(&start.to_le_bytes());
+                param_bytes.extend_from_slice(&len.to_le_bytes());
+            }
+        }
     }
+    param_bytes
 }
 
 impl JSFunction {
-    pub fn invoke_0(&self) -> f64
+    pub fn invoke(&self, params: &Vec<InvokeParams>) -> f64
 where {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
+        let param_bytes = param_to_bytes(params);
+        unsafe { js_invoke_function(self.fn_handle, param_bytes.as_ptr()) }
     }
 
-    pub fn invoke_1<A>(&self, a: A) -> f64
-    where
-        A: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_2<A, B>(&self, a: A, b: B) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_3<A, B, C>(&self, a: A, b: B, c: C) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_4<A, B, C, D>(&self, a: A, b: B, c: C, d: D) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_5<A, B, C, D, E>(&self, a: A, b: B, c: C, d: D, e: E) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-        E: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                e.into(),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_6<A, B, C, D, E, F>(&self, a: A, b: B, c: C, d: D, e: E, f: F) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-        E: Into<f64>,
-        F: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                e.into(),
-                f.into(),
-                0.0,
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_7<A, B, C, D, E, F, G>(&self, a: A, b: B, c: C, d: D, e: E, f: F, g: G) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-        E: Into<f64>,
-        F: Into<f64>,
-        G: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                e.into(),
-                f.into(),
-                g.into(),
-                0.0,
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_8<A, B, C, D, E, F, G, H>(
-        &self,
-        a: A,
-        b: B,
-        c: C,
-        d: D,
-        e: E,
-        f: F,
-        g: G,
-        h: H,
-    ) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-        E: Into<f64>,
-        F: Into<f64>,
-        G: Into<f64>,
-        H: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                e.into(),
-                f.into(),
-                g.into(),
-                h.into(),
-                0.0,
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_9<A, B, C, D, E, F, G, H, I>(
-        &self,
-        a: A,
-        b: B,
-        c: C,
-        d: D,
-        e: E,
-        f: F,
-        g: G,
-        h: H,
-        i: I,
-    ) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-        E: Into<f64>,
-        F: Into<f64>,
-        G: Into<f64>,
-        H: Into<f64>,
-        I: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                e.into(),
-                f.into(),
-                g.into(),
-                h.into(),
-                i.into(),
-                0.0,
-            )
-        }
-    }
-
-    pub fn invoke_10<A, B, C, D, E, F, G, H, I, J>(
-        &self,
-        a: A,
-        b: B,
-        c: C,
-        d: D,
-        e: E,
-        f: F,
-        g: G,
-        h: H,
-        i: I,
-        j: J,
-    ) -> f64
-    where
-        A: Into<f64>,
-        B: Into<f64>,
-        C: Into<f64>,
-        D: Into<f64>,
-        E: Into<f64>,
-        F: Into<f64>,
-        G: Into<f64>,
-        H: Into<f64>,
-        I: Into<f64>,
-        J: Into<f64>,
-    {
-        unsafe {
-            js_invoke_function(
-                self.fn_handle,
-                a.into(),
-                b.into(),
-                c.into(),
-                d.into(),
-                e.into(),
-                f.into(),
-                g.into(),
-                h.into(),
-                i.into(),
-                j.into(),
-            )
-        }
+    pub fn invoke_and_return_object(&self, params: &Vec<InvokeParams>) -> i64
+where {
+        let param_bytes = param_to_bytes(params);
+        unsafe { js_invoke_function_and_return_object(self.fn_handle, param_bytes.as_ptr()) }
     }
 }
 
