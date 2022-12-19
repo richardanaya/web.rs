@@ -3,7 +3,7 @@
 
 *JavaScript and WebAssembly should be a joy to use together.*
 
-This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
+This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools. My hope is almost any Rust developer familiar with JavaScript could learn how to use it in a lazy afternoon.
 
 # Hello World
 
@@ -83,6 +83,8 @@ The `js` crate makes it really easy to instantiate a javascript function and pas
 * Float32Array
 * Float64Array
 * Boolean
+
+Below are several examples that show common operations one might want to do.
 
 # Interacting with DOM objects
 
