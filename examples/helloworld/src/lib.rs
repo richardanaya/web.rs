@@ -2,10 +2,8 @@ use js::*;
 
 #[no_mangle]
 pub fn main() {
-    let fn_log = js!("function(str){
-        debugger;
-        console.log(str); 
-    }");
-    let msg = "Hello World!";
-    fn_log.invoke(&vec![InvokeParams::String(&msg)]);
+    js!("function(str,n){
+        console.log(str,n); 
+    }")
+    .invoke(&vec!["Hello World!".into(), 1.into()]);
 }

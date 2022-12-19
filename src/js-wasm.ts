@@ -130,10 +130,7 @@ const JsWasm = {
               i += 4;
               break;
             case 3:
-              values.push(
-                new BigInt64Array(parameters.buffer, i, 1)[0]
-              );
-              i += 8;
+              values.push(new DataView(parameters.buffer).getBigInt64(i,true));
               break;
             case 4: {
               const start = new DataView(parameters.buffer).getInt32(i, true);
@@ -146,7 +143,7 @@ const JsWasm = {
               break;
             }
             case 5: {
-              const handle = new BigInt64Array(parameters.buffer, i, 1)[0];
+              const handle = new DataView(parameters.buffer).getBigInt64(i,true);
               values.push(context.getObject(handle));
               i += 8;
               break;

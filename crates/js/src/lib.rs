@@ -34,7 +34,7 @@ pub struct JSFunction {
 //4 = string (followed by 32-bit start and size of string in memory)
 //5 = extern ref
 //6 = array of float-64 (followed by 32-bit start and size of string in memory)
-pub enum InvokeParams<'a> {
+pub enum InvokeParam<'a> {
     Undefined,
     Null,
     Float64(f64),
@@ -44,36 +44,61 @@ pub enum InvokeParams<'a> {
     Array(&'a [f64]),
 }
 
-fn param_to_bytes(params: &Vec<InvokeParams>) -> Vec<u8> {
+impl Into<InvokeParam<'_>> for f64 {
+    fn into(self) -> InvokeParam<'static> {
+        InvokeParam::Float64(self)
+    }
+}
+
+impl Into<InvokeParam<'_>> for i64 {
+    fn into(self) -> InvokeParam<'static> {
+        InvokeParam::BigInt(self)
+    }
+}
+
+
+impl<'a> Into<InvokeParam<'a>> for &'a str {
+    fn into(self) -> InvokeParam<'a> {
+        InvokeParam::String(self)
+    }
+}
+
+impl<'a> Into<InvokeParam<'a>> for &'a [f64] {
+    fn into(self) -> InvokeParam<'a> {
+        InvokeParam::Array(self)
+    }
+}
+
+fn param_to_bytes(params: &Vec<InvokeParam>) -> Vec<u8> {
     let mut param_bytes = Vec::new();
     for param in params {
         match param {
-            InvokeParams::Undefined => {
+            InvokeParam::Undefined => {
                 param_bytes.push(0);
             }
-            InvokeParams::Null => {
+            InvokeParam::Null => {
                 param_bytes.push(1);
             }
-            InvokeParams::Float64(f) => {
+            InvokeParam::Float64(f) => {
                 param_bytes.push(2);
                 param_bytes.extend_from_slice(&f.to_le_bytes());
             }
-            InvokeParams::BigInt(i) => {
+            InvokeParam::BigInt(i) => {
                 param_bytes.push(3);
                 param_bytes.extend_from_slice(&i.to_le_bytes());
             }
-            InvokeParams::String(s) => {
+            InvokeParam::String(s) => {
                 param_bytes.push(4);
                 let start = s.as_ptr() as usize;
                 let len = s.len();
                 param_bytes.extend_from_slice(&start.to_le_bytes());
                 param_bytes.extend_from_slice(&len.to_le_bytes());
             }
-            InvokeParams::ExternRef(i) => {
+            InvokeParam::ExternRef(i) => {
                 param_bytes.push(5);
                 param_bytes.extend_from_slice(&i.to_le_bytes());
             }
-            InvokeParams::Array(a) => {
+            InvokeParam::Array(a) => {
                 param_bytes.push(6);
                 let start = a.as_ptr() as usize;
                 let len = a.len();
@@ -86,14 +111,14 @@ fn param_to_bytes(params: &Vec<InvokeParams>) -> Vec<u8> {
 }
 
 impl JSFunction {
-    pub fn invoke(&self, params: &Vec<InvokeParams>) -> f64
+    pub fn invoke(&self, params: &Vec<InvokeParam>) -> f64
 where {
         let param_bytes = param_to_bytes(params);
         let RawParts { ptr, length, capacity: _ } = RawParts::from_vec(param_bytes);
         unsafe { js_invoke_function(self.fn_handle, ptr, length) }
     }
 
-    pub fn invoke_and_return_object(&self, params: &Vec<InvokeParams>) -> i64
+    pub fn invoke_and_return_object(&self, params: &Vec<InvokeParam>) -> i64
 where {
         let param_bytes = param_to_bytes(params);
         let RawParts { ptr, length, capacity: _ } = RawParts::from_vec(param_bytes);
