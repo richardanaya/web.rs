@@ -3,15 +3,19 @@
 
 *JavaScript and WebAssembly should be a joy to use together.*
 
-This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
+This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools. My hope is almost any Rust developer familiar with JavaScript could learn how to use it in a lazy afternoon.
 
-# Example
+# Hello World
+
+Let's just look at a basic example of how to put things in the console:
+
 ```bash
 cargo new helloworld --lib
 cd helloworld
 cargo add js
 vim src/lib.rs
 ```
+
 ```rust
 use js::*;
 
@@ -23,6 +27,8 @@ pub fn main() {
     .invoke(&["Hello, World!".into()]);
 }
 ```
+
+Notice the basic syntax is building up a function, and then invoking it with an array of parameters.  Underneath the covers, this is an array of enums called `InvokeParameter`, i've made little converters for various types (see below) to help the data cross the barrier.  For the most part you can convert data using `.into()` for `InvokeParameter`.
 
 ```bash
 vim index.html
@@ -39,6 +45,9 @@ vim index.html
     </body>
 </html>
 ```
+
+This library has a fairly simple mechanism for executing your WebAssembly during page load.
+
 ```bash
 vim Cargo.toml
 ```
@@ -74,6 +83,8 @@ The `js` crate makes it really easy to instantiate a javascript function and pas
 * Float32Array
 * Float64Array
 * Boolean
+
+Below are several examples that show common operations one might want to do.
 
 # Interacting with DOM objects
 
@@ -120,7 +131,7 @@ fn canvas_fill_rect(ctx: &ExternRef, x: f64, y: f64, width: f64, height: f64) {
 #[no_mangle]
 pub fn main() {
     let screen = query_selector("#screen");
-    let ctx = &canvas_get_context(&screen);
+    let ctx = canvas_get_context(&screen);
     canvas_set_fill_style(&ctx, "red");
     canvas_fill_rect(&ctx, 10.0, 10.0, 100.0, 100.0);
     canvas_set_fill_style(&ctx, "green");
@@ -173,6 +184,75 @@ pub fn run_loop(){
 ```
 
 Notice how in the `start_loop` function, `this` actually references a context object that can be used to perform useful functions (see below) and for the importance of this demo, get ahold of the WebAssembly module so we can callback functions on it.
+
+# Getting data back into WebAssembly
+
+Let's focus on one last example.  A button that when you click it, fetches data from the public Pokemon API and put's it on the screen.
+
+```rust
+use js::*;
+
+fn query_selector(selector: &str) -> ExternRef {
+    let query_selector = js!(r#"
+        function(selector){
+            return document.querySelector(selector);
+        }"#);
+    query_selector.invoke_and_return_object(&[selector.into()])
+}
+
+fn add_click_listener(element: &ExternRef, callback: &str) {
+    let add_click_listener = js!(r#"
+        function(element, callback){
+            element.addEventListener("click", ()=>{
+                this.module.instance.exports[callback]();
+            });
+        }"#);
+    add_click_listener.invoke(&[element.into(), callback.into()]);
+}
+
+fn element_set_inner_html(element: &ExternRef, html: &str) {
+    let set_inner_html = js!(r#"
+        function(element, html){
+            element.innerHTML = html;
+        }"#);
+    set_inner_html.invoke(&[element.into(), html.into()]);
+}
+
+fn fetch(url: &str, callback: &str) {
+    let fetch = js!(r#"
+        function(url, callback){
+            fetch(url).then((response)=>{
+                return response.text();
+            }).then((text)=>{
+                const allocationId = this.writeUtf8ToMemory(text);
+                this.module.instance.exports[callback](text);
+            });
+        }"#);
+    fetch.invoke(&[url.into(), callback.into()]);
+}
+
+#[no_mangle]
+pub fn main() {
+    let button = query_selector("#fetch_button");
+    add_click_listener(&button, "button_clicked");
+}
+
+#[no_mangle]
+pub fn button_clicked() {
+    // get pokemon data
+    let url = "https://pokeapi.co/api/v2/pokemon/1/";
+    fetch(url, "fetch_callback");
+}
+
+#[no_mangle]
+pub fn fetch_callback(text_allocation_id: usize) {
+    let text = extract_string_from_memory(text_allocation_id);
+    let result = query_selector("#data_output");
+    element_set_inner_html(&result, &text);
+}
+```
+
+Notice in the fetch function handling, we have a function specifically for helping put strings inside of WebAssembly `writeUtf8ToMemory`.  This returns back an ID that can be used to rebuild the string on WebAssembly side `extract_string_from_memory`.
 
 # License
 
