@@ -131,7 +131,7 @@ fn canvas_fill_rect(ctx: &ExternRef, x: f64, y: f64, width: f64, height: f64) {
 #[no_mangle]
 pub fn main() {
     let screen = query_selector("#screen");
-    let ctx = &canvas_get_context(&screen);
+    let ctx = canvas_get_context(&screen);
     canvas_set_fill_style(&ctx, "red");
     canvas_fill_rect(&ctx, 10.0, 10.0, 100.0, 100.0);
     canvas_set_fill_style(&ctx, "green");
