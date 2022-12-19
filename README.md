@@ -132,6 +132,48 @@ pub fn main() {
 
 The invocation `invoke_and_return_object` returns a structure called an `ExternRef` that is an indirect reference to something received from JavaScript. You can pass around this reference to other JavaScript invocations that will receive the option. When the structure dropped according to Rust lifetimes, it's handle is released from the JavaScript side.
 
+# Callbacks and timers
+
+This library is not opinionated about how to callback into Rust. There are several methods one can use. Here's a simple example.
+
+```rust
+use js::*;
+
+fn console_log(s: &str) {
+    let console_log = js!(r#"
+        function(s){
+            console.log(s);
+        }"#);
+    console_log.invoke(&[s.into()]);
+}
+
+fn random() -> f64 {
+    let random = js!(r#"
+        function(){
+            return Math.random();
+        }"#);
+    random.invoke(&[])
+}
+
+#[no_mangle]
+pub fn main() {
+    let start_loop = js!(r#"
+        function(){
+            window.setInterval(()=>{
+                this.module.instance.exports.run_loop();
+            }, 1000)
+        }"#);
+    start_loop.invoke(&[]);
+}
+
+#[no_mangle]
+pub fn run_loop(){
+    console_log(&format!("⏰ {}", random()));
+}
+```
+
+Notice how in the `start_loop` function, `this` actually references a context object that can be used to perform useful functions (see below) and for the importance of this demo, get ahold of the WebAssembly module so we can callback functions on it.
+
 # License
 
 This project is licensed under either of
