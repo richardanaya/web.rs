@@ -93,7 +93,6 @@ pub fn main() {
 
     let get_context = js!(r#"
         function(el){
-            debugger;
             return el.getContext("2d");
         }"#);
 
@@ -101,13 +100,11 @@ pub fn main() {
 
     let set_fill_style = js!(r#"
         function(ctx, color){
-            debugger;
             ctx.fillStyle = color;
         }"#);
 
     let fill_rect = js!(r#"
         function(ctx, x, y, w, h){
-            debugger;
             ctx.fillRect(x, y, w, h);
         }"#);
 
