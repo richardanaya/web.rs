@@ -5,13 +5,17 @@
 
 This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
 
-# Example
+# Hello World
+
+Let's just look at a basic example of how to put things in the console:
+
 ```bash
 cargo new helloworld --lib
 cd helloworld
 cargo add js
 vim src/lib.rs
 ```
+
 ```rust
 use js::*;
 
@@ -23,6 +27,8 @@ pub fn main() {
     .invoke(&["Hello, World!".into()]);
 }
 ```
+
+Notice the basic syntax is building up a function, and then invoking it with an array of parameters.  Underneath the covers, this is an array of enums called `InvokeParameter`, i've made little converters for various types (see below) to help the data cross the barrier.  For the most part you can convert data using `.into()` for `InvokeParameter`.
 
 ```bash
 vim index.html
