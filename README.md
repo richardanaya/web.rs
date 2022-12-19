@@ -62,17 +62,6 @@ python3 -m http.server
 
 Full example is [here](https://github.com/richardanaya/js-wasm/tree/master/examples/helloworld).
 
-# License
-
-This project is licensed under either of
-
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
-   http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or
-   http://opensource.org/licenses/MIT)
-
-at your option.
-
 # How it works?
 
 The `js` crate makes it really easy to instantiate a javascript function and pass it parameters.  Right now this crate supports these types as parameters:
@@ -85,6 +74,18 @@ The `js` crate makes it really easy to instantiate a javascript function and pas
 * Float32Array
 * Float64Array
 * Boolean
+
+
+# License
+
+This project is licensed under either of
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
+   http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or
+   http://opensource.org/licenses/MIT)
+
+at your option.
 
 ### Contribution
 
