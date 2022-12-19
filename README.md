@@ -79,6 +79,8 @@ The `js` crate makes it really easy to instantiate a javascript function and pas
 
 Here's a more complex example that invokes functions that return references to DOM objects
 
+<img width="168" alt="Screen Shot 2022-12-18 at 9 21 18 PM" src="https://user-images.githubusercontent.com/294042/208353426-f208d619-e2b2-446f-9022-f7788336bf11.png">
+
 ```rust
 use js::*;
 
