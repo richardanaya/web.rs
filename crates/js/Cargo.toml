@@ -15,4 +15,5 @@ rust-version="1.63"
 [dependencies]
 spin = "0.9.4"
 raw-parts = "1.1.2"
+externref_polyfill = "0.1.0"
 

@@ -2,32 +2,39 @@ use js::*;
 
 #[no_mangle]
 pub fn main() {
-    let fn_get_2d_context = js!(r#"
-            function(selectorStart, selectorEnd){
-                let selector = this.readUtf8FromMemory(selectorStart,selectorEnd);
-                let obj = document.querySelector(selector);
-                return this.storeObject(obj.getContext("2d"));
-            }"#);
-    let fn_set_color = js!(r#"
-            function(ctxHandle, colorStart, colorEnd){
-                let color = this.readUtf8FromMemory(colorStart, colorEnd);
-                let ctx = this.getObject(ctxHandle);
-                ctx.fillStyle = color;
-            }"#);
-    let fn_fill_rect = js!(r#"
-            function(ctxHandle, x, y, width, height){
-                let ctx = this.getObject(ctxHandle);
-                ctx.fillRect(x, y, width, height);
-            }"#);
-    let target = "#screen";
-    let ctx = fn_get_2d_context.invoke_2(target.as_ptr() as u32, target.len() as u32);
-    let color = "red";
-    fn_set_color.invoke_3(ctx, color.as_ptr() as u32, color.len() as u32);
-    fn_fill_rect.invoke_5(ctx, 10.0, 10.0, 50.0, 50.0);
-    let color = "blue";
-    fn_set_color.invoke_3(ctx, color.as_ptr() as u32, color.len() as u32);
-    fn_fill_rect.invoke_5(ctx, 20.0, 20.0, 50.0, 50.0);
-    let color = "green";
-    fn_set_color.invoke_3(ctx, color.as_ptr() as u32, color.len() as u32);
-    fn_fill_rect.invoke_5(ctx, 30.0, 30.0, 50.0, 50.0);
+    let query_selector = js!(r#"
+        function(selector){
+            return document.querySelector(selector);
+        }"#);
+
+    let screen = &query_selector.invoke_and_return_object(&["#screen".into()]);
+
+    let get_context = js!(r#"
+        function(el){
+            debugger;
+            return el.getContext("2d");
+        }"#);
+
+    let ctx = &get_context.invoke_and_return_object(&[screen.into()]);
+
+    let set_fill_style = js!(r#"
+        function(ctx, color){
+            debugger;
+            ctx.fillStyle = color;
+        }"#);
+
+    let fill_rect = js!(r#"
+        function(ctx, x, y, w, h){
+            debugger;
+            ctx.fillRect(x, y, w, h);
+        }"#);
+
+    set_fill_style.invoke(&[ctx.into(), "red".into()]);
+    fill_rect.invoke(&[ctx.into(), 10.into(), 10.into(), 100.into(), 100.into()]);
+
+    set_fill_style.invoke(&[ctx.into(), "green".into()]);
+    fill_rect.invoke(&[ctx.into(), 20.into(), 20.into(), 100.into(), 100.into()]);
+
+    set_fill_style.invoke(&[ctx.into(), "blue".into()]);
+    fill_rect.invoke(&[ctx.into(), 30.into(), 30.into(), 100.into(), 100.into()]);
 }

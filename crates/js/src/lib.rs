@@ -4,6 +4,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use raw_parts::RawParts;
 use spin::Mutex;
+use externref_polyfill::ExternRef;
 
 pub const JS_UNDEFINED: f64 = 0.0;
 pub const JS_NULL: f64 = 1.0;
@@ -14,7 +15,6 @@ pub const DOM_BODY: f64 = 4.0;
 
 extern "C" {
     fn js_register_function(start: f64, len: f64) -> f64;
-    fn js_release(obj: f64);
     fn js_invoke_function(
         fn_handle: f64,
         parameters_start: *const u8,
@@ -47,7 +47,7 @@ pub enum InvokeParam<'a> {
     Float64(f64),
     BigInt(i64),
     String(&'a str),
-    ExternRef(i64),
+    ExternRef(&'a ExternRef),
     Float32Array(&'a [f32]),
     Float64Array(&'a [f64]),
     Bool(bool),
@@ -56,6 +56,18 @@ pub enum InvokeParam<'a> {
 impl From<f64> for InvokeParam<'_> {
     fn from(f: f64) -> Self {
         InvokeParam::Float64(f)
+    }
+}
+
+impl From<i32> for InvokeParam<'_> {
+    fn from(i: i32) -> Self {
+        InvokeParam::Float64(i as f64)
+    }
+}
+
+impl From<usize> for InvokeParam<'_> {
+    fn from(i: usize) -> Self {
+        InvokeParam::Float64(i as f64)
     }
 }
 
@@ -68,6 +80,12 @@ impl From<i64> for InvokeParam<'_> {
 impl<'a> From<&'a str> for InvokeParam<'a> {
     fn from(s: &'a str) -> Self {
         InvokeParam::String(s)
+    }
+}
+
+impl<'a> From<&'a ExternRef> for InvokeParam<'a> {
+    fn from(i: &'a ExternRef) -> Self {
+        InvokeParam::ExternRef(i)
     }
 }
 
@@ -116,7 +134,7 @@ fn param_to_bytes(params: &[InvokeParam]) -> Vec<u8> {
             }
             InvokeParam::ExternRef(i) => {
                 param_bytes.push(5);
-                param_bytes.extend_from_slice(&i.to_le_bytes());
+                param_bytes.extend_from_slice(&i.value.to_le_bytes());
             }
             InvokeParam::Float32Array(a) => {
                 param_bytes.push(6);
@@ -156,7 +174,7 @@ where {
         unsafe { js_invoke_function(self.fn_handle, ptr, length) }
     }
 
-    pub fn invoke_and_return_object(&self, params: &[InvokeParam]) -> i64
+    pub fn invoke_and_return_object(&self, params: &[InvokeParam]) -> ExternRef
 where {
         let param_bytes = param_to_bytes(params);
         let RawParts {
@@ -164,7 +182,8 @@ where {
             length,
             capacity: _,
         } = RawParts::from_vec(param_bytes);
-        unsafe { js_invoke_function_and_return_object(self.fn_handle, ptr, length) }
+        let handle = unsafe { js_invoke_function_and_return_object(self.fn_handle, ptr, length) };
+        ExternRef{value: handle}
     }
 }
 
@@ -174,30 +193,6 @@ pub fn register_function(code: &str) -> JSFunction {
     unsafe {
         JSFunction {
             fn_handle: js_register_function(start as usize as f64, len as f64),
-        }
-    }
-}
-
-pub struct JSObject {
-    pub handle: f64,
-}
-
-impl From<&JSObject> for f64 {
-    fn from(f: &JSObject) -> Self {
-        f.handle
-    }
-}
-
-impl From<f64> for JSObject {
-    fn from(n: f64) -> Self {
-        JSObject { handle: n }
-    }
-}
-
-impl Drop for JSObject {
-    fn drop(&mut self) {
-        unsafe {
-            js_release(self.handle);
         }
     }
 }

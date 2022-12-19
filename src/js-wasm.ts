@@ -188,7 +188,7 @@ const JsWasm = {
       abort() {
         throw new Error("WebAssembly module aborted");
       },
-      js_release(obj: bigint) {
+      externref_drop(obj: bigint) {
         context.releaseObject(obj);
       },
       js_register_function(start: number, len: number, utfByteLen: number) {
