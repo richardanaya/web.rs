@@ -1,5 +1,4 @@
 #![no_std]
-#![allow(clippy::too_many_arguments)]
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -54,43 +53,43 @@ pub enum InvokeParam<'a> {
     Bool(bool),
 }
 
-impl Into<InvokeParam<'_>> for f64 {
-    fn into(self) -> InvokeParam<'static> {
-        InvokeParam::Float64(self)
+impl From<f64> for InvokeParam<'_> {
+    fn from(f: f64) -> Self {
+        InvokeParam::Float64(f)
     }
 }
 
-impl Into<InvokeParam<'_>> for i64 {
-    fn into(self) -> InvokeParam<'static> {
-        InvokeParam::BigInt(self)
+impl From<i64> for InvokeParam<'_> {
+    fn from(i: i64) -> Self {
+        InvokeParam::BigInt(i)
     }
 }
 
-impl<'a> Into<InvokeParam<'a>> for &'a str {
-    fn into(self) -> InvokeParam<'a> {
-        InvokeParam::String(self)
+impl<'a> From<&'a str> for InvokeParam<'a> {
+    fn from(s: &'a str) -> Self {
+        InvokeParam::String(s)
     }
 }
 
-impl<'a> Into<InvokeParam<'a>> for &'a [f32] {
-    fn into(self) -> InvokeParam<'a> {
-        InvokeParam::Float32Array(self)
+impl<'a> From<&'a [f32]> for InvokeParam<'a> {
+    fn from(a: &'a [f32]) -> Self {
+        InvokeParam::Float32Array(a)
     }
 }
 
-impl<'a> Into<InvokeParam<'a>> for &'a [f64] {
-    fn into(self) -> InvokeParam<'a> {
-        InvokeParam::Float64Array(self)
+impl<'a> From<&'a [f64]> for InvokeParam<'a> {
+    fn from(a: &'a [f64]) -> Self {
+        InvokeParam::Float64Array(a)
     }
 }
 
-impl Into<InvokeParam<'_>> for bool {
-    fn into(self) -> InvokeParam<'static> {
-        InvokeParam::Bool(self)
+impl From<bool> for InvokeParam<'_> {
+    fn from(b: bool) -> Self {
+        InvokeParam::Bool(b)
     }
 }
 
-fn param_to_bytes(params: &Vec<InvokeParam>) -> Vec<u8> {
+fn param_to_bytes(params: &[InvokeParam]) -> Vec<u8> {
     let mut param_bytes = Vec::new();
     for param in params {
         match param {
@@ -146,7 +145,7 @@ fn param_to_bytes(params: &Vec<InvokeParam>) -> Vec<u8> {
 }
 
 impl JSFunction {
-    pub fn invoke(&self, params: &Vec<InvokeParam>) -> f64
+    pub fn invoke(&self, params: &[InvokeParam]) -> f64
 where {
         let param_bytes = param_to_bytes(params);
         let RawParts {
@@ -157,7 +156,7 @@ where {
         unsafe { js_invoke_function(self.fn_handle, ptr, length) }
     }
 
-    pub fn invoke_and_return_object(&self, params: &Vec<InvokeParam>) -> i64
+    pub fn invoke_and_return_object(&self, params: &[InvokeParam]) -> i64
 where {
         let param_bytes = param_to_bytes(params);
         let RawParts {

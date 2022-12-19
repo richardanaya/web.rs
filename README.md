@@ -5,8 +5,6 @@
 
 This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
 
-See a [demo](https://richardanaya.github.io/js-wasm/examples/snake/index.html) of it working!
-
 # How It Works?
 ```bash
 cargo new helloworld --lib
@@ -19,12 +17,10 @@ use js::*;
 
 #[no_mangle]
 pub fn main() {
-    // let's dynamically create a javascript function we can invoke to write logs
-    let fn_log = js!("function(strPtr,strLen){
-        console.log(this.readUtf8FromMemory(strPtr,strLen)); 
-    }");
-    let msg = "Hello World!";
-    fn_log.invoke_2(msg.as_ptr() as u32, msg.len() as u32);
+    js!("function(str){
+        console.log(str)
+    }")
+    .invoke(&["Hello, World!".into()]);
 }
 ```
 
@@ -65,21 +61,6 @@ python3 -m http.server
 ```
 
 Full example is [here](https://github.com/richardanaya/js-wasm/tree/master/examples/helloworld).
-
-
-# details 
-In your JS function context `this` contains several functions handle most issues you'll encounter.  It's probably easiest to look at examples to figure out how they are used.
-
-| Name          | Description   |
-| ------------- | ------------- |
-| `readUtf8FromMemory(start,length)` | Extract utf-8 text from your program's memory. |
-| `readUtf16FromMemory(start,length)` | Extract utf-16 text from your program's memory. |
-| `writeUtf8ToMemory(str)` | Write utf-8 to a memory location you are sure it should go. |
-| `readUint8ArrayFromMemory(start)` | Read a list of uint8 from a pointer to a location of a number of elements, followed by a pointer to bytes in memory. |
-| `storeObject(object)` | Store an object in your context for later reference, get a handle you can give to WebAssembly. |
-| `getObject(handle)` | Retreive and object from your context with a handle. |
-| `releaseObject(handle)` | Release a stored object so it's memory can be freed. |
-| `module` | Get access to your program so you can call methods on it. |
 
 # License
 

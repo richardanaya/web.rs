@@ -1,8 +1,0 @@
----
-- namespace: document
-  functions:
-    - name: getElementById
-      parameters:
-        - name: id
-          parameter_type: string
-      output: object
