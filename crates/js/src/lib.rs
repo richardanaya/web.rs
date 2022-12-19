@@ -203,7 +203,8 @@ pub fn extract_string_from_memory(allocation_id: usize) -> String {
     let allocations = ALLOCATIONS.lock();
     let allocation = allocations.get(allocation_id).unwrap();
     let vec = allocation.as_ref().unwrap();
-    String::from_utf8(vec.clone()).unwrap()
+    let s = String::from_utf8(vec.clone()).unwrap();
+    s
 }
 
 #[no_mangle]
