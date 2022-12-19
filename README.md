@@ -5,7 +5,7 @@
 
 This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools.
 
-# How It Works?
+# Example
 ```bash
 cargo new helloworld --lib
 cd helloworld
@@ -72,6 +72,19 @@ This project is licensed under either of
    http://opensource.org/licenses/MIT)
 
 at your option.
+
+# How it works?
+
+The `js` crate makes it really easy to instantiate a javascript function and pass it parameters.  Right now this crate supports these types as parameters:
+
+* Undefined,
+* Float64
+* BigInt
+* String
+* Javascript Object References
+* Float32Array
+* Float64Array
+* Boolean
 
 ### Contribution
 
