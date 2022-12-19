@@ -49,7 +49,6 @@ pub fn console_time_end(label: &str) {
     console_time_end.invoke(&[label.into()]);
 }
 
-
 pub fn query_selector(selector: &str) -> ExternRef {
     let query_selector = js!(r#"
         function(selector){
