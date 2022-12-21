@@ -254,6 +254,21 @@ pub fn fetch_callback(text_allocation_id: usize) {
 
 Notice in the fetch function handling, we have a function specifically for helping put strings inside of WebAssembly `writeUtf8ToMemory`.  This returns back an ID that can be used to rebuild the string on WebAssembly side `extract_string_from_memory`.
 
+# The `web` crate
+
+If you don't feel like recreating the wheel, there's an ongoing collection of commonly used functions accumulationg in `web`.
+
+```rust
+use web::*;
+
+#[no_mangle]
+fn main() {
+    console_log("Hello world!");
+}
+```
+
+Check out the documentation [here](https://docs.rs/web)
+
 # License
 
 This project is licensed under either of
