@@ -34,7 +34,7 @@ extern "C" {
         fn_handle: f64,
         parameters_start: *const u8,
         parameters_length: usize,
-    ) -> f64;
+    ) -> usize;
 }
 
 #[derive(Copy, Clone)]
