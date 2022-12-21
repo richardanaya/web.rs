@@ -77,6 +77,38 @@ Play demo [here](https://wasm.js.org/examples/web_snake/)
 
 ## canvas
 
+This example uses canvas
+
+```rust
+//get an element and get the 2D context for canvas
+let screen = query_selector("#screen");
+let width: f64 = get_property_f64(&screen, "width");
+let height: f64 = get_property_f64(&screen, "height");
+let ctx = CanvasContext::from_element(&screen);
+
+...
+
+//clear screen
+self.ctx.clear_rect(
+    0.0,
+    0.0,
+    self.canvas_width as f64,
+    self.canvas_height as f64,
+);
+
+// iterate through all the cells of the screen and draw a rectangle
+for (_id, (pos, color)) in &mut self.world.query::<(&Position, &Color)>() {
+    self.ctx.set_fill_style(&color.0);
+    self.ctx.fill_rect(
+        (pos.0 * (self.canvas_width / MAP_WIDTH)) as f64,
+        (pos.1 * (self.canvas_height / MAP_HEIGHT)) as f64,
+        (self.canvas_width / MAP_WIDTH) as f64,
+        (self.canvas_height / MAP_HEIGHT) as f64,
+    );
+}
+```
+
+
 ## request animation frame
 
 Let's see how to run the game loop
