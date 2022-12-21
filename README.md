@@ -45,11 +45,7 @@ pub fn main() {
     </body>
 </html>
 ```
-```bash
-vim Cargo.toml
-```
-
-Remember to configure your library for WebAssembly
+Remember to configure your library `Cargo.toml` for WebAssembly
 
 ```toml
 # add these lines for WebAssembly to end of your Cargo.toml
