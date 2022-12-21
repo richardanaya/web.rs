@@ -116,6 +116,7 @@ impl Hash for FunctionHandle {
     }
 }
 
+// Mouse Events
 pub struct MouseEvent {
     pub offset_x: f64,
     pub offset_y: f64,
@@ -188,4 +189,204 @@ pub fn element_remove_click_listener(element: &ExternRef, function_handle: &Arc<
         }"#);
     remove_click_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
     remove_mouse_event_handler(function_handle);
+}
+
+pub fn element_add_mouse_move_listener(
+    element: &ExternRef,
+    handler: impl FnMut(MouseEvent) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                this.module.instance.exports.web_handle_mouse_event_handler(id,e.offsetX, e.offsetY);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("mousemove",handler);
+            return id;
+        }"#).invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_mouse_move_listener(
+    element: &ExternRef,
+    function_handle: &Arc<FunctionHandle>,
+) {
+    let remove_mouse_move_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("mousemove", f);
+        }"#);
+    remove_mouse_move_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_mouse_event_handler(function_handle);
+}
+
+pub fn element_add_mouse_down_listener(
+    element: &ExternRef,
+    handler: impl FnMut(MouseEvent) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                this.module.instance.exports.web_handle_mouse_event_handler(id,e.offsetX, e.offsetY);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("mousedown",handler);
+            return id;
+        }"#).invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_mouse_down_listener(
+    element: &ExternRef,
+    function_handle: &Arc<FunctionHandle>,
+) {
+    let remove_mouse_down_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("mousedown", f);
+        }"#);
+    remove_mouse_down_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_mouse_event_handler(function_handle);
+}
+
+pub fn element_add_mouse_up_listener(
+    element: &ExternRef,
+    handler: impl FnMut(MouseEvent) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                this.module.instance.exports.web_handle_mouse_event_handler(id,e.offsetX, e.offsetY);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("mouseup",handler);
+            return id;
+        }"#).invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_mouse_up_listener(
+    element: &ExternRef,
+    function_handle: &Arc<FunctionHandle>,
+) {
+    let remove_mouse_up_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("mouseup", f);
+        }"#);
+    remove_mouse_up_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_mouse_event_handler(function_handle);
+}
+
+// Keyboard Events
+
+pub struct KeyboardEvent {
+    pub key_code: f64,
+}
+
+static KEYBOARD_EVENT_HANDLERS: Mutex<
+    Option<HashMap<Arc<FunctionHandle>, Box<dyn FnMut(KeyboardEvent) + Send + 'static>>>,
+> = Mutex::new(None);
+
+fn add_keyboard_event_handler(
+    function_handle: Arc<FunctionHandle>,
+    handler: Box<dyn FnMut(KeyboardEvent) + Send + 'static>,
+) {
+    let mut h = KEYBOARD_EVENT_HANDLERS.lock().unwrap();
+    if h.is_none() {
+        *h = Some(HashMap::new());
+    }
+    h.as_mut().unwrap().insert(function_handle, handler);
+}
+
+fn remove_keyboard_event_handler(function_handle: &Arc<FunctionHandle>) {
+    let mut h = KEYBOARD_EVENT_HANDLERS.lock().unwrap();
+    if h.is_none() {
+        return;
+    }
+    h.as_mut().unwrap().remove(function_handle);
+}
+
+#[no_mangle]
+pub extern "C" fn web_handle_keyboard_event_handler(id: i64, key_code: f64) {
+    let mut handlers = KEYBOARD_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        for (key, handler) in h.iter_mut() {
+            if key.0.value == id {
+                handler(KeyboardEvent { key_code });
+            }
+        }
+    }
+}
+
+pub fn element_add_key_down_listener(
+    element: &ExternRef,
+    handler: impl FnMut(KeyboardEvent) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                this.module.instance.exports.web_handle_keyboard_event_handler(id,e.keyCode);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("keydown",handler);
+            return id;
+        }"#)
+    .invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_keyboard_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_key_down_listener(
+    element: &ExternRef,
+    function_handle: &Arc<FunctionHandle>,
+) {
+    let remove_key_down_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("keydown", f);
+        }"#);
+    remove_key_down_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_keyboard_event_handler(function_handle);
+}
+
+pub fn element_add_key_up_listener(
+    element: &ExternRef,
+    handler: impl FnMut(KeyboardEvent) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                this.module.instance.exports.web_handle_keyboard_event_handler(id,e.keyCode);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("keyup",handler);
+            return id;
+        }"#)
+    .invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_keyboard_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_key_up_listener(element: &ExternRef, function_handle: &Arc<FunctionHandle>) {
+    let remove_key_up_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("keyup", f);
+        }"#);
+    remove_key_up_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_keyboard_event_handler(function_handle);
 }
