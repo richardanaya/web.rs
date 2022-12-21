@@ -15,7 +15,7 @@ I wanted a library that someone could learn in an afternoon how to use and start
 * localstorage
 * fetch & XMLHttpRequest
 
-Check out the documentation [here](https://docs.rs/web)
+Check out the documentation [here](https://docs.rs/web/latest/web/#functions)
 
 ```terminal
 cargo add web
