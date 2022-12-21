@@ -991,13 +991,13 @@ impl XMLHttpRequest {
         .invoke(&[(&(self.0)).into(), key.into(), value.into()]);
     }
 
-    pub fn response_status(&self) -> u16 {
+    pub fn response_status(&self) -> usize {
         js!("
             function(request) {
                 return request.status;
             }
             ")
-        .invoke(&[(&(self.0)).into()]) as u16
+        .invoke(&[(&(self.0)).into()]) as usize
     }
 
     pub fn response_text(&self) -> String {
@@ -1041,4 +1041,50 @@ impl XMLHttpRequest {
             ")
         .invoke(&[(&(self.0)).into(), response_type.into()]);
     }
+}
+
+pub enum HTTPMethod {
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    HEAD,
+    OPTIONS,
+    PATCH,
+}
+
+pub fn fetch(
+    url: &str,
+    action: HTTPMethod,
+    body: Option<&str>,
+    headers: Option<HashMap<String, String>>,
+    mut callback: impl FnMut(usize, String) + Send + 'static,
+) {
+    let request = Arc::new(XMLHttpRequest::new());
+    let r2 = request.clone();
+    let method_str = match action {
+        HTTPMethod::GET => "GET",
+        HTTPMethod::POST => "POST",
+        HTTPMethod::PUT => "PUT",
+        HTTPMethod::DELETE => "DELETE",
+        HTTPMethod::HEAD => "HEAD",
+        HTTPMethod::OPTIONS => "OPTIONS",
+        HTTPMethod::PATCH => "PATCH",
+    };
+    request.open(method_str, url);
+    if let Some(body) = body {
+        request.send_with_body(body);
+    } else {
+        request.send();
+    }
+    if let Some(headers) = headers {
+        for (key, value) in headers {
+            request.set_request_header(&key, &value);
+        }
+    }
+    request.set_on_load(move || {
+        let status = r2.response_status();
+        let text = r2.response_text();
+        callback(status, text);
+    });
 }
