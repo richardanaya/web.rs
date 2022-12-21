@@ -2,9 +2,9 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+pub use externref_polyfill::ExternRef;
 use raw_parts::RawParts;
 use spin::Mutex;
-pub use externref_polyfill::ExternRef;
 
 pub const JS_UNDEFINED: ExternRef = ExternRef { value: 0 };
 pub const JS_NULL: ExternRef = ExternRef { value: 1 };
@@ -193,7 +193,7 @@ where {
             capacity: _,
         } = RawParts::from_vec(param_bytes);
         let handle = unsafe { js_invoke_function_and_return_object(self.fn_handle, ptr, length) };
-        ExternRef{value: handle}
+        ExternRef { value: handle }
     }
 
     pub fn invoke_and_return_bigint(&self, params: &[InvokeParam]) -> i64
@@ -215,7 +215,8 @@ where {
             length,
             capacity: _,
         } = RawParts::from_vec(param_bytes);
-        let allocation_id = unsafe { js_invoke_function_and_return_string(self.fn_handle, ptr, length) };
+        let allocation_id =
+            unsafe { js_invoke_function_and_return_string(self.fn_handle, ptr, length) };
         extract_string_from_memory(allocation_id)
     }
 }
