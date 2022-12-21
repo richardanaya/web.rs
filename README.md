@@ -133,6 +133,7 @@ request_animation_frame(game_loop);
 ## events
 
 ```
+let body = query_selector("body");
 element_add_key_down_listener(&body, |e| {
     Game::instance().key_down(e.key_code as u32);
 });
