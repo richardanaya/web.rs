@@ -117,6 +117,81 @@ impl Hash for FunctionHandle {
     }
 }
 
+// Change Events
+pub struct ChangeEvent {
+    pub value: String,
+}
+
+static CHANGE_EVENT_HANDLERS: Mutex<
+    Option<HashMap<Arc<FunctionHandle>, Box<dyn FnMut(ChangeEvent) + Send + 'static>>>,
+> = Mutex::new(None);
+
+fn add_change_event_handler(
+    id: Arc<FunctionHandle>,
+    handler: Box<dyn FnMut(ChangeEvent) + Send + 'static>,
+) {
+    let mut handlers = CHANGE_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        h.insert(id, handler);
+    } else {
+        let mut h = HashMap::new();
+        h.insert(id, handler);
+        *handlers = Some(h);
+    }
+}
+
+fn remove_change_event_handler(id: &Arc<FunctionHandle>) {
+    let mut handlers = CHANGE_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        h.remove(id);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn web_handle_change_event(id: i64, allocation_id: usize) {
+    let mut handlers = CHANGE_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        for (key, handler) in h.iter_mut() {
+            if key.0.value == id {
+                let value = extract_string_from_memory(allocation_id);
+                handler(ChangeEvent { value });
+            }
+        }
+    }
+}
+
+pub fn add_change_event_listener(
+    element: &ExternRef,
+    handler: impl FnMut(ChangeEvent) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                const value = e.target.value;
+                const allocationId = this.writeUtf8ToMemory(value);
+                this.module.instance.exports.web_handle_change_event_handler(id, allocationId);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("change",handler);
+            return id;
+        }"#)
+    .invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_change_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_change_listener(element: &ExternRef, function_handle: &Arc<FunctionHandle>) {
+    let remove_change_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("change", f);
+        }"#);
+    remove_change_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_change_event_handler(function_handle);
+}
+
 // Mouse Events
 pub struct MouseEvent {
     pub offset_x: f64,
@@ -291,12 +366,12 @@ pub fn element_remove_mouse_up_listener(
 // Request Animation Frame
 
 static ANIMATION_FRAME_EVENT_HANDLERS: Mutex<
-    Option<HashMap<i64, Box<dyn FnMut() + Send  + 'static>>>,
+    Option<HashMap<i64, Box<dyn FnMut() + Send + 'static>>>,
 > = Mutex::new(None);
 
 fn add_animation_frame_event_handler(
     function_handle: i64,
-    handler: Box<dyn FnMut() + Send  + 'static>,
+    handler: Box<dyn FnMut() + Send + 'static>,
 ) {
     let mut h = ANIMATION_FRAME_EVENT_HANDLERS.lock().unwrap();
     if h.is_none() {
@@ -311,8 +386,8 @@ pub extern "C" fn web_handle_animation_frame_event_handler(id: i64) {
     {
         let mut handlers = ANIMATION_FRAME_EVENT_HANDLERS.lock().unwrap();
         if let Some(h) = handlers.as_mut() {
-            // remove 
-            if let Some(handler) = h.remove(& id ) {
+            // remove
+            if let Some(handler) = h.remove(&id) {
                 c = Some(handler);
             }
         }
@@ -795,4 +870,46 @@ impl CanvasContext {
             dheight.into(),
         ]);
     }
+}
+
+pub fn local_storage_set(key: &str, value: &str) {
+    let local_storage_set = js!(r#"
+        function(key, value){
+            localStorage.setItem(key, value);
+        }"#);
+    local_storage_set.invoke(&[key.into(), value.into()]);
+}
+
+pub fn local_storage_remove(key: &str) {
+    let local_storage_remove = js!(r#"
+        function(key){
+            localStorage.removeItem(key);
+        }"#);
+    local_storage_remove.invoke(&[key.into()]);
+}
+
+pub fn local_storage_get(key: &str) -> Option<String> {
+    let local_storage_get = js!(r#"
+        function(key){
+            const text = localStorage.getItem(key);
+            if(text === null){
+                return 0;
+            }
+            const allocationId = this.writeUtf8ToMemory(text);
+            return allocationId;
+        }"#);
+    let text_allocation_id = local_storage_get.invoke(&[key.into()]);
+    if text_allocation_id == 0.0 {
+        return None;
+    }
+    let text = extract_string_from_memory(text_allocation_id as usize);
+    Some(text)
+}
+
+pub fn local_storage_clear() {
+    let local_storage_clear = js!(r#"
+        function(){
+            localStorage.clear();
+        }"#);
+    local_storage_clear.invoke(&[]);
 }
