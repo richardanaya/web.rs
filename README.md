@@ -27,9 +27,6 @@ pub fn main() {
     console_log("Hello World!");
 }
 ```
-```bash
-vim index.html
-```
 ```html
 <html>
     <head>
