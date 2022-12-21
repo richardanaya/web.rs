@@ -1,5 +1,8 @@
-#![no_std]
+use core::hash::{Hash, Hasher};
 pub use js::*;
+use std::collections::HashMap;
+use std::sync::Arc;
+use std::sync::Mutex;
 
 pub fn random() -> f64 {
     let random = js!(r#"
@@ -95,4 +98,86 @@ pub fn element_remove(element: &ExternRef) {
             element.remove();
         }"#);
     remove.invoke(&[element.into()]);
+}
+
+pub struct FunctionHandle(ExternRef);
+
+impl PartialEq for FunctionHandle {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.value == other.0.value
+    }
+}
+
+impl Eq for FunctionHandle {}
+
+impl Hash for FunctionHandle {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.value.hash(state);
+    }
+}
+
+static MOUSE_EVENT_HANDLERS: Mutex<
+    Option<HashMap<Arc<FunctionHandle>, Box<dyn FnMut(f64, f64) + Send + 'static>>>,
+> = Mutex::new(None);
+
+fn add_mouse_event_handler(
+    id: Arc<FunctionHandle>,
+    handler: Box<dyn FnMut(f64, f64) + Send + 'static>,
+) {
+    let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        h.insert(id, handler);
+    } else {
+        let mut h = HashMap::new();
+        h.insert(id, handler);
+        *handlers = Some(h);
+    }
+}
+
+fn remove_mouse_event_handler(id: &Arc<FunctionHandle>) {
+    let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        h.remove(id);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn web_handle_mouse_event_handler(id: i64, x: f64, y: f64) {
+    let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
+    if let Some(h) = handlers.as_mut() {
+        for (key, handler) in h.iter_mut() {
+            if key.0.value == id {
+                handler(x, y);
+            }
+        }
+    }
+}
+
+pub fn element_add_click_listener(
+    element: &ExternRef,
+    handler: impl FnMut(f64, f64) + Send + 'static,
+) -> Arc<FunctionHandle> {
+    let function_ref = js!(r#"
+        function(element ){
+            const handler = (e) => {
+                this.module.instance.exports.web_handle_mouse_event_handler(id,e.offsetX, e.offsetY);
+            };
+            const id = this.storeObject(handler);
+            element.addEventListener("click",handler);
+            return id;
+        }"#).invoke_and_return_bigint(&[element.into()]);
+    let function_handle = Arc::new(FunctionHandle(ExternRef {
+        value: function_ref,
+    }));
+    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    function_handle
+}
+
+pub fn element_remove_click_listener(element: &ExternRef, function_handle: &Arc<FunctionHandle>) {
+    let remove_click_listener = js!(r#"
+        function(element, f){
+            element.removeEventListener("click", f);
+        }"#);
+    remove_click_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
+    remove_mouse_event_handler(function_handle);
 }
