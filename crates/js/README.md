@@ -1,4 +1,5 @@
-#js-wasm
+# js-wasm
+
 <a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
 *JavaScript and WebAssembly should be a joy to use together.*
