@@ -34,7 +34,6 @@ const MAP_WIDTH: i32 = 30;
 const MAP_HEIGHT: i32 = 30;
 const ITERATION_TIME: i32 = 100;
 
-
 fn game_loop() {
     match Game::instance().run(15.0) {
         Err(e) => console_error(&e.to_string()),
