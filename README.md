@@ -67,6 +67,16 @@ python3 -m http.server
 
 Full example is [here](https://github.com/richardanaya/web.rs/tree/master/examples/helloworld).
 
+# Something more advanced?
+
+Let's look at our `snake example` and some of it's key feature usages:
+
+## canvas
+
+## request animation frame
+
+## events
+
 # License
 
 This project is licensed under either of
