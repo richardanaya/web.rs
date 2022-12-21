@@ -1,4 +1,8 @@
-# js-wasm
+<p align="center">
+<img src="https://user-images.githubusercontent.com/294042/208995865-88502572-76f7-4ce7-8157-9bca9f1c9444.png"/>
+</p>
+
+
 <a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
 
 *JavaScript and WebAssembly should be a joy to use together.*
