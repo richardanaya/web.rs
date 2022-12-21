@@ -7,7 +7,13 @@
 
 *Make writing web applications using Rust WebAssembly easy*
 
-I wanted a library that someone could learn in an afternoon how to use and start making interactive browser experiences with.  This project doesn't support every browser function under the sun.  Though you can easily add your own using the [Javascript invoking mechanism](https://github.com/richardanaya/web.rs/tree/master/crates/js) used by this library.
+I wanted a library that someone could learn in an afternoon how to use and start making interactive browser experiences with.  This project doesn't support every browser function under the sun.  Though you can easily add your own using the [Javascript invoking mechanism](https://github.com/richardanaya/web.rs/tree/master/crates/js) used by this library.  Feel free to submit a PR for more functionality.
+
+* basic element operations
+* basic event listeners
+* canvas2d
+* localstorage
+* fetch & XMLHttpRequest
 
 Check out the documentation [here](https://docs.rs/web)
 
