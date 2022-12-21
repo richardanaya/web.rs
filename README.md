@@ -11,16 +11,13 @@ I wanted a library that someone could learn in an afternoon how to use and start
 
 Check out the documentation [here](https://docs.rs/web)
 
+```terminal
+cargo add web
+```
+
 # Hello World
 
 Let's just look at a basic example of how to put things in the console:
-
-```bash
-cargo new helloworld --lib
-cd helloworld
-cargo add web
-vim src/lib.rs
-```
 
 ```rust
 use web::*;
@@ -48,6 +45,9 @@ vim index.html
 ```bash
 vim Cargo.toml
 ```
+
+Remember to configure your library for WebAssembly
+
 ```toml
 # add these lines for WebAssembly to end of Cargo.toml
 
