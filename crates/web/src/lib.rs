@@ -402,7 +402,7 @@ pub fn request_animation_frame(handler: impl FnMut() + Send + Sync + 'static) {
         function(){
             const handler = () => {
                 this.module.instance.exports.web_handle_animation_frame_event_handler(id);
-                this.deleteObject(id);
+                this.releaseObject(id);
             };
             const id = this.storeObject(handler);
             requestAnimationFrame(handler);
@@ -914,72 +914,131 @@ pub fn local_storage_clear() {
     local_storage_clear.invoke(&[]);
 }
 
+static HTTP_LOAD_HANDLERS: Mutex<Option<HashMap<i64, Box<dyn FnMut() + Send + 'static>>>> =
+    Mutex::new(None);
+
+fn add_http_load_event_handler(function_handle: i64, handler: Box<dyn FnMut() + Send + 'static>) {
+    let mut h = HTTP_LOAD_HANDLERS.lock().unwrap();
+    if h.is_none() {
+        *h = Some(HashMap::new());
+    }
+    h.as_mut().unwrap().insert(function_handle, handler);
+}
+
+#[no_mangle]
+pub extern "C" fn web_handle_http_load_event_handler(id: i64) {
+    let mut c = None;
+    {
+        let mut handlers = HTTP_LOAD_HANDLERS.lock().unwrap();
+        if let Some(h) = handlers.as_mut() {
+            // remove
+            if let Some(handler) = h.remove(&id) {
+                c = Some(handler);
+            }
+        }
+    }
+    if let Some(mut c) = c {
+        c();
+    }
+}
+
 pub struct XMLHttpRequest(ExternRef);
 
 impl XMLHttpRequest {
-    pub fn new() -> HttpRequest {
-        let create_new_request = js!("
+    pub fn new() -> XMLHttpRequest {
+        let request = js!("
             function() {
                 return new XMLHttpRequest();
             }
-            ");
-        let request = create_new_request.invoke_and_return_object(&[]);
-        HttpRequest(request)
+            ")
+        .invoke_and_return_object(&[]);
+        XMLHttpRequest(request)
     }
 
     pub fn open(&self, method: &str, url: &str) {
-        let open = js!("
+        js!("
             function(request, method, url) {
                 request.open(method, url);
             }
-            ");
-        open.invoke(&[method.into(), url.into(), (&(self.0)).into()]);
+            ")
+        .invoke(&[(&(self.0)).into(), method.into(), url.into()]);
     }
 
     pub fn send(&self) {
-        let send = js!("
+        js!("
             function(request) {
                 request.send();
             }
-            ");
-        send.invoke(&[(&(self.0)).into()]);
+            ")
+        .invoke(&[(&(self.0)).into()]);
     }
 
     pub fn send_with_body(&self, body: &str) {
-        let send_with_body = js!("
+        js!("
             function(request, body) {
                 request.send(body);
             }
-            ");
-        send_with_body.invoke(&[body.into(), (&(self.0)).into()]);
+            ")
+        .invoke(&[(&(self.0)).into(), body.into()]);
     }
 
     pub fn set_request_header(&self, key: &str, value: &str) {
-        let set_request_header = js!("
+        js!("
             function(request, key, value) {
                 request.setRequestHeader(key, value);
             }
-            ");
-        set_request_header.invoke(&[key.into(), value.into(), (&(self.0)).into()]);
+            ")
+        .invoke(&[(&(self.0)).into(), key.into(), value.into()]);
     }
 
     pub fn response_status(&self) -> u16 {
-        let response_status = js!("
+        js!("
             function(request) {
                 return request.status;
             }
-            ");
-        response_status.invoke_and_return_number(&[(&(self.0)).into()]) as u16
+            ")
+        .invoke(&[(&(self.0)).into()]) as u16
     }
 
     pub fn response_text(&self) -> String {
-        let response_text = js!("
+        js!("
             function(request) {
                 return request.responseText;
             }
-            ");
-        let text_allocation_id = response_text.invoke(&[(&(self.0)).into()]);
-        let text = extract_string_from_memory(text_allocation_id as usize);
-        text
+            ")
+        .invoke_and_return_string(&[(&(self.0)).into()])
+    }
+
+    pub fn response_header(&self, key: &str) -> String {
+        js!("
+            function(request, key) {
+                return request.getResponseHeader(key);
+            }
+            ")
+        .invoke_and_return_string(&[(&(self.0)).into(), key.into()])
+    }
+
+    pub fn set_on_load(&self, callback: impl FnMut() + Send + 'static) {
+        let function_ref = js!(r#"
+            function(request){
+                const handler = () => {
+                    this.module.instance.exports.web_handle_http_load_event_handler(id);
+                    this.releaseObject(id);
+                };
+                const id = this.storeObject(handler);
+                request.onload = handler;
+                return id;
+            }"#)
+        .invoke_and_return_bigint(&[(&(self.0)).into()]);
+        add_http_load_event_handler(function_ref, Box::new(callback));
+    }
+
+    pub fn set_response_type(&self, response_type: &str) {
+        js!("
+            function(request, response_type) {
+                request.responseType = response_type;
+            }
+            ")
+        .invoke(&[(&(self.0)).into(), response_type.into()]);
     }
 }
