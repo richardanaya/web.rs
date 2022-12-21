@@ -116,13 +116,18 @@ impl Hash for FunctionHandle {
     }
 }
 
+pub struct MouseEvent {
+    pub offset_x: f64,
+    pub offset_y: f64,
+}
+
 static MOUSE_EVENT_HANDLERS: Mutex<
-    Option<HashMap<Arc<FunctionHandle>, Box<dyn FnMut(f64, f64) + Send + 'static>>>,
+    Option<HashMap<Arc<FunctionHandle>, Box<dyn FnMut(MouseEvent) + Send + 'static>>>,
 > = Mutex::new(None);
 
 fn add_mouse_event_handler(
     id: Arc<FunctionHandle>,
-    handler: Box<dyn FnMut(f64, f64) + Send + 'static>,
+    handler: Box<dyn FnMut(MouseEvent) + Send + 'static>,
 ) {
     let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
     if let Some(h) = handlers.as_mut() {
@@ -147,7 +152,10 @@ pub extern "C" fn web_handle_mouse_event_handler(id: i64, x: f64, y: f64) {
     if let Some(h) = handlers.as_mut() {
         for (key, handler) in h.iter_mut() {
             if key.0.value == id {
-                handler(x, y);
+                handler(MouseEvent {
+                    offset_x: x,
+                    offset_y: y,
+                });
             }
         }
     }
@@ -155,7 +163,7 @@ pub extern "C" fn web_handle_mouse_event_handler(id: i64, x: f64, y: f64) {
 
 pub fn element_add_click_listener(
     element: &ExternRef,
-    handler: impl FnMut(f64, f64) + Send + 'static,
+    handler: impl FnMut(MouseEvent) + Send + 'static,
 ) -> Arc<FunctionHandle> {
     let function_ref = js!(r#"
         function(element ){
