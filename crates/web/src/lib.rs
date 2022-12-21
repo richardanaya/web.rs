@@ -913,3 +913,73 @@ pub fn local_storage_clear() {
         }"#);
     local_storage_clear.invoke(&[]);
 }
+
+pub struct XMLHttpRequest(ExternRef);
+
+impl XMLHttpRequest {
+    pub fn new() -> HttpRequest {
+        let create_new_request = js!("
+            function() {
+                return new XMLHttpRequest();
+            }
+            ");
+        let request = create_new_request.invoke_and_return_object(&[]);
+        HttpRequest(request)
+    }
+
+    pub fn open(&self, method: &str, url: &str) {
+        let open = js!("
+            function(request, method, url) {
+                request.open(method, url);
+            }
+            ");
+        open.invoke(&[method.into(), url.into(), (&(self.0)).into()]);
+    }
+
+    pub fn send(&self) {
+        let send = js!("
+            function(request) {
+                request.send();
+            }
+            ");
+        send.invoke(&[(&(self.0)).into()]);
+    }
+
+    pub fn send_with_body(&self, body: &str) {
+        let send_with_body = js!("
+            function(request, body) {
+                request.send(body);
+            }
+            ");
+        send_with_body.invoke(&[body.into(), (&(self.0)).into()]);
+    }
+
+    pub fn set_request_header(&self, key: &str, value: &str) {
+        let set_request_header = js!("
+            function(request, key, value) {
+                request.setRequestHeader(key, value);
+            }
+            ");
+        set_request_header.invoke(&[key.into(), value.into(), (&(self.0)).into()]);
+    }
+
+    pub fn response_status(&self) -> u16 {
+        let response_status = js!("
+            function(request) {
+                return request.status;
+            }
+            ");
+        response_status.invoke_and_return_number(&[(&(self.0)).into()]) as u16
+    }
+
+    pub fn response_text(&self) -> String {
+        let response_text = js!("
+            function(request) {
+                return request.responseText;
+            }
+            ");
+        let text_allocation_id = response_text.invoke(&[(&(self.0)).into()]);
+        let text = extract_string_from_memory(text_allocation_id as usize);
+        text
+    }
+}

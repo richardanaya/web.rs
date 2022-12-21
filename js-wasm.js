@@ -138,6 +138,8 @@ const $569963205592bc01$var$JsWasm = {
                 return (0, $7611355a66e759da$exports.ExternRef).load(handle);
             },
             releaseObject: function(handle) {
+                // dont release our fixed references
+                if (handle <= 4n) return;
                 (0, $7611355a66e759da$exports.ExternRef).delete(handle);
             },
             getMemory: function() {
@@ -254,12 +256,19 @@ const $569963205592bc01$var$JsWasm = {
                 js_invoke_function_and_return_object (funcHandle, parametersStart, parametersLength) {
                     const values = context.readParameters(parametersStart, parametersLength);
                     const result = context.functions[funcHandle].call(context, ...values);
+                    if (result === undefined || result === null) throw new Error("js_invoke_function_and_return_object returned undefined or null while trying to return an object");
                     return context.storeObject(result);
                 },
                 js_invoke_function_and_return_bigint (funcHandle, parametersStart, parametersLength) {
                     const values = context.readParameters(parametersStart, parametersLength);
                     const result = context.functions[funcHandle].call(context, ...values);
                     return result;
+                },
+                js_invoke_function_and_return_string (funcHandle, parametersStart, parametersLength) {
+                    const values = context.readParameters(parametersStart, parametersLength);
+                    const result = context.functions[funcHandle].call(context, ...values);
+                    if (result === undefined || result === null) throw new Error("js_invoke_function_and_return_string returned undefined or null while trying to retrieve string.");
+                    return context.writeUtf8ToMemory(result);
                 }
             },
             context

@@ -88,6 +88,10 @@ const JsWasm = {
         return ExternRef.load(handle);
       },
       releaseObject: function (handle: bigint) {
+        // dont release our fixed references
+        if(handle <= 4n) {
+          return;
+        }
         ExternRef.delete(handle);
       },
       getMemory: function () {
@@ -226,6 +230,9 @@ const JsWasm = {
           context,
           ...values 
         );
+        if(result === undefined || result === null) {
+          throw new Error("js_invoke_function_and_return_object returned undefined or null while trying to return an object");
+        }
         return context.storeObject(result);
       },
       js_invoke_function_and_return_bigint(
@@ -240,6 +247,22 @@ const JsWasm = {
         );
         return result;
       },
+      js_invoke_function_and_return_string(
+        funcHandle: number,
+        parametersStart: number,
+        parametersLength: number
+      ) {
+        const values = context.readParameters(parametersStart, parametersLength);
+        const result = context.functions[funcHandle].call(
+          context,
+          ...values 
+        );
+
+        if(result === undefined || result === null) {
+          throw new Error("js_invoke_function_and_return_string returned undefined or null while trying to retrieve string.");
+        }
+        return context.writeUtf8ToMemory(result);
+      }
     },context];
   },
 

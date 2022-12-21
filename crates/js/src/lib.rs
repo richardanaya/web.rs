@@ -30,6 +30,11 @@ extern "C" {
         parameters_start: *const u8,
         parameters_length: usize,
     ) -> i64;
+    fn js_invoke_function_and_return_string(
+        fn_handle: f64,
+        parameters_start: *const u8,
+        parameters_length: usize,
+    ) -> f64;
 }
 
 #[derive(Copy, Clone)]
@@ -200,6 +205,18 @@ where {
             capacity: _,
         } = RawParts::from_vec(param_bytes);
         unsafe { js_invoke_function_and_return_bigint(self.fn_handle, ptr, length) }
+    }
+
+    pub fn invoke_and_return_string(&self, params: &[InvokeParam]) -> String
+where {
+        let param_bytes = param_to_bytes(params);
+        let RawParts {
+            ptr,
+            length,
+            capacity: _,
+        } = RawParts::from_vec(param_bytes);
+        let allocation_id = unsafe { js_invoke_function_and_return_string(self.fn_handle, ptr, length) };
+        extract_string_from_memory(allocation_id)
     }
 }
 
