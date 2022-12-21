@@ -255,6 +255,11 @@ const $569963205592bc01$var$JsWasm = {
                     const values = context.readParameters(parametersStart, parametersLength);
                     const result = context.functions[funcHandle].call(context, ...values);
                     return context.storeObject(result);
+                },
+                js_invoke_function_and_return_bigint (funcHandle, parametersStart, parametersLength) {
+                    const values = context.readParameters(parametersStart, parametersLength);
+                    const result = context.functions[funcHandle].call(context, ...values);
+                    return result;
                 }
             },
             context
