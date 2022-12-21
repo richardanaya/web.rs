@@ -132,6 +132,12 @@ request_animation_frame(game_loop);
 
 ## events
 
+```
+element_add_key_down_listener(&body, |e| {
+    Game::instance().key_down(e.key_code as u32);
+});
+```
+
 # License
 
 This project is licensed under either of
