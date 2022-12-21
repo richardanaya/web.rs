@@ -79,6 +79,25 @@ Play demo [here](https://wasm.js.org/examples/web_snake/)
 
 ## request animation frame
 
+Let's see how to run the game loop
+
+```rust
+fn game_loop() {
+    // run game loop assuming 15 ms has passed
+    match Game::instance().run(15.0) {
+        Err(e) => console_error(&e.to_string()),
+        _ => (),
+    };
+    // request next animation frame
+    request_animation_frame(game_loop);
+}
+
+... 
+
+// start the loop
+request_animation_frame(game_loop);
+```
+
 ## events
 
 # License
