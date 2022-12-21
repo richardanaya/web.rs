@@ -46,7 +46,7 @@ vim Cargo.toml
 Remember to configure your library for WebAssembly
 
 ```toml
-# add these lines for WebAssembly to end of Cargo.toml
+# add these lines for WebAssembly to end of your Cargo.toml
 
 [lib]
 crate-type =["cdylib"]
