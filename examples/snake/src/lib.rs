@@ -1,4 +1,6 @@
 use hecs::*;
+use std::sync::Mutex;
+use std::sync::MutexGuard;
 use web::*;
 
 struct Game {
@@ -32,13 +34,22 @@ const MAP_WIDTH: i32 = 30;
 const MAP_HEIGHT: i32 = 30;
 const ITERATION_TIME: i32 = 100;
 
+
+fn game_loop() {
+    match Game::instance().run(15.0) {
+        Err(e) => console_error(&e.to_string()),
+        _ => (),
+    };
+    request_animation_frame(game_loop);
+}
+
 impl Game {
     fn new() -> Game {
         // create graphics context
-        let screen = get_element_by_id("screen");
-        let width: f64 = get_property(&screen, "width");
-        let height: f64 = get_property(&screen, "height");
-        let ctx = CanvasContext::from_canvas_element(&screen);
+        let screen = query_selector("#screen");
+        let width: f64 = get_property_f64(&screen, "width");
+        let height: f64 = get_property_f64(&screen, "height");
+        let ctx = CanvasContext::from_element(&screen);
         // create snake
         let mut world = World::new();
         let head = world.spawn((
@@ -68,25 +79,24 @@ impl Game {
                 Mutex::new(Game::new())
             };
         }
-        SINGLETON.lock()
+        SINGLETON.lock().unwrap()
     }
 
     fn start() {
-        add_event_listener(DOM_BODY, "keydown", |event| {
-            let key_down_event = KeyDownEvent::from_event(event);
-            let key_code = key_down_event.key_code();
-            Game::instance().key_down(key_code);
+        let body = query_selector("body");
+        element_add_key_down_listener(&body, |e| {
+            Game::instance().key_down(e.key_code as u32);
         });
-
-        request_animation_loop(|delta| match Game::instance().run(delta) {
-            Err(e) => console_error(&e.to_string()),
-            _ => (),
-        });
+        request_animation_frame(game_loop);
     }
 
     fn reset(&mut self) {
-        self.ctx
-            .clear_rect(0, 0, self.canvas_width, self.canvas_height);
+        self.ctx.clear_rect(
+            0.0,
+            0.0,
+            self.canvas_width as f64,
+            self.canvas_height as f64,
+        );
         self.world.clear();
         self.head = self.world.spawn((
             SnakeHead(1),
@@ -204,15 +214,19 @@ impl Game {
     }
 
     fn render_system(&self) {
-        self.ctx
-            .clear_rect(0, 0, self.canvas_width, self.canvas_height);
+        self.ctx.clear_rect(
+            0.0,
+            0.0,
+            self.canvas_width as f64,
+            self.canvas_height as f64,
+        );
         for (_id, (pos, color)) in &mut self.world.query::<(&Position, &Color)>() {
-            self.ctx.set_fill_color(&color.0);
+            self.ctx.set_fill_style(&color.0);
             self.ctx.fill_rect(
-                pos.0 * (self.canvas_width / MAP_WIDTH),
-                pos.1 * (self.canvas_height / MAP_HEIGHT),
-                self.canvas_width / MAP_WIDTH,
-                self.canvas_height / MAP_HEIGHT,
+                (pos.0 * (self.canvas_width / MAP_WIDTH)) as f64,
+                (pos.1 * (self.canvas_height / MAP_HEIGHT)) as f64,
+                (self.canvas_width / MAP_WIDTH) as f64,
+                (self.canvas_height / MAP_HEIGHT) as f64,
             );
         }
     }

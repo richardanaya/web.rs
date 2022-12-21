@@ -11,4 +11,5 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+html_color = "0.0.0"
 js = {path="../js",version="0"}
