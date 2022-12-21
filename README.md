@@ -69,7 +69,11 @@ Full example is [here](https://github.com/richardanaya/web.rs/tree/master/exampl
 
 # Something more advanced?
 
-Let's look at our `snake example` and some of it's key feature usages:
+Let's look at our [snake example](https://github.com/richardanaya/web.rs/tree/master/examples/web_snake) and some of it's key feature usages:
+
+<img width="521" alt="Screen Shot 2022-12-21 at 12 35 48 PM" src="https://user-images.githubusercontent.com/294042/208998255-3b21cd21-e96e-4671-94e1-0ef1f52b59fa.png">
+
+Play demo [here](https://wasm.js.org/examples/web_snake/)
 
 ## canvas
 
