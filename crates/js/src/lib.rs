@@ -6,12 +6,12 @@ use raw_parts::RawParts;
 use spin::Mutex;
 pub use externref_polyfill::ExternRef;
 
-pub const JS_UNDEFINED: f64 = 0.0;
-pub const JS_NULL: f64 = 1.0;
-pub const DOM_SELF: f64 = 2.0;
-pub const DOM_WINDOW: f64 = 2.0;
-pub const DOM_DOCUMENT: f64 = 3.0;
-pub const DOM_BODY: f64 = 4.0;
+pub const JS_UNDEFINED: ExternRef = ExternRef { value: 0 };
+pub const JS_NULL: ExternRef = ExternRef { value: 1 };
+pub const DOM_SELF: ExternRef = ExternRef { value: 2 };
+pub const DOM_WINDOW: ExternRef = ExternRef { value: 2 };
+pub const DOM_DOCUMENT: ExternRef = ExternRef { value: 3 };
+pub const DOM_BODY: ExternRef = ExternRef { value: 4 };
 
 extern "C" {
     fn js_register_function(start: f64, len: f64) -> f64;
@@ -21,6 +21,11 @@ extern "C" {
         parameters_length: usize,
     ) -> f64;
     fn js_invoke_function_and_return_object(
+        fn_handle: f64,
+        parameters_start: *const u8,
+        parameters_length: usize,
+    ) -> i64;
+    fn js_invoke_function_and_return_bigint(
         fn_handle: f64,
         parameters_start: *const u8,
         parameters_length: usize,
@@ -184,6 +189,17 @@ where {
         } = RawParts::from_vec(param_bytes);
         let handle = unsafe { js_invoke_function_and_return_object(self.fn_handle, ptr, length) };
         ExternRef{value: handle}
+    }
+
+    pub fn invoke_and_return_bigint(&self, params: &[InvokeParam]) -> i64
+where {
+        let param_bytes = param_to_bytes(params);
+        let RawParts {
+            ptr,
+            length,
+            capacity: _,
+        } = RawParts::from_vec(param_bytes);
+        unsafe { js_invoke_function_and_return_bigint(self.fn_handle, ptr, length) }
     }
 }
 
