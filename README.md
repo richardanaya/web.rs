@@ -1,37 +1,37 @@
-# js-wasm
-<a href="https://docs.rs/js"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
+<p align="center">
+<img src="https://user-images.githubusercontent.com/294042/208995865-88502572-76f7-4ce7-8157-9bca9f1c9444.png"/>
+</p>
 
-*JavaScript and WebAssembly should be a joy to use together.*
 
-This project aims to provide a simple, easy to learn, technology-agnostic way bridge the Rust and Javascript using an extremely minimal setup with out-of-box cargo compilation tools. My hope is almost any Rust developer familiar with JavaScript could learn how to use it in a lazy afternoon.
+<a href="https://docs.rs/web"><img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="docs.rs docs" /></a>
+
+*Make writing web applications using Rust WebAssembly easy*
+
+I wanted a library that someone could learn in an afternoon how to use and start making interactive browser experiences with.  This project doesn't support every browser function under the sun.  Though you can easily add your own using the [Javascript invoking mechanism](https://github.com/richardanaya/web.rs/tree/master/crates/js) used by this library.  Feel free to submit a PR for more functionality.
+
+* element operations
+* mouse, keyboard, and change event listeners
+* canvas2d
+* localstorage
+* fetch & XMLHttpRequest
+
+Check out the documentation [here](https://docs.rs/web/latest/web/#functions)
+
+```terminal
+cargo add web
+```
 
 # Hello World
 
 Let's just look at a basic example of how to put things in the console:
 
-```bash
-cargo new helloworld --lib
-cd helloworld
-cargo add js
-vim src/lib.rs
-```
-
 ```rust
-use js::*;
+use web::*;
 
 #[no_mangle]
 pub fn main() {
-    js!("function(str){
-        console.log(str)
-    }")
-    .invoke(&["Hello, World!".into()]);
+    console_log("Hello World!");
 }
-```
-
-Notice the basic syntax is building up a function, and then invoking it with an array of parameters.  Underneath the covers, this is an array of enums called `InvokeParameter`, i've made little converters for various types (see below) to help the data cross the barrier.  For the most part you can convert data using `.into()` for `InvokeParameter`.
-
-```bash
-vim index.html
 ```
 ```html
 <html>
@@ -45,14 +45,10 @@ vim index.html
     </body>
 </html>
 ```
+Remember to configure your library `Cargo.toml` for WebAssembly
 
-This library has a fairly simple mechanism for executing your WebAssembly during page load.
-
-```bash
-vim Cargo.toml
-```
 ```toml
-# add these lines for WebAssembly to end of Cargo.toml
+# add these lines for WebAssembly to end of your Cargo.toml
 
 [lib]
 crate-type =["cdylib"]
@@ -69,225 +65,79 @@ python3 -m http.server
 # right click, inspect, look at message in console
 ```
 
-Full example is [here](https://github.com/richardanaya/js-wasm/tree/master/examples/helloworld).
+Full example is [here](https://github.com/richardanaya/web.rs/tree/master/examples/helloworld).
 
-# How it works?
+# Something more advanced?
 
-The `js` crate makes it really easy to instantiate a javascript function and pass it parameters.  Right now this crate supports these types as parameters:
+Let's look at our [snake example](https://github.com/richardanaya/web.rs/tree/master/examples/web_snake) and some of it's key feature usages:
 
-* Undefined,
-* Float64
-* BigInt
-* String
-* Javascript Object References
-* Float32Array
-* Float64Array
-* Boolean
+<img width="521" alt="Screen Shot 2022-12-21 at 12 35 48 PM" src="https://user-images.githubusercontent.com/294042/208998255-3b21cd21-e96e-4671-94e1-0ef1f52b59fa.png">
 
-Below are several examples that show common operations one might want to do.
+Play demo [here](https://wasm.js.org/examples/web_snake/)
 
-# Interacting with DOM objects
+## canvas
 
-Here's a more complex example that invokes functions that return references to DOM objects
-
-<img width="152" alt="Screen Shot 2022-12-18 at 9 21 54 PM" src="https://user-images.githubusercontent.com/294042/208353503-00c21fcb-f45b-4612-be3c-e9624040d0e9.png">
-
+This example uses canvas
 
 ```rust
-use js::*;
+//get an element and get the 2D context for canvas
+let screen = query_selector("#screen");
+let width: f64 = get_property_f64(&screen, "width");
+let height: f64 = get_property_f64(&screen, "height");
+let ctx = CanvasContext::from_element(&screen);
 
-fn query_selector(selector: &str) -> ExternRef {
-    let query_selector = js!(r#"
-        function(selector){
-            return document.querySelector(selector);
-        }"#);
-    query_selector.invoke_and_return_object(&[selector.into()])
-}
+...
 
-fn canvas_get_context(canvas: &ExternRef) -> ExternRef {
-    let get_context = js!(r#"
-        function(canvas){
-            return canvas.getContext("2d");
-        }"#);
-    get_context.invoke_and_return_object(&[canvas.into()])
-}
+//clear screen
+self.ctx.clear_rect(
+    0.0,
+    0.0,
+    self.canvas_width as f64,
+    self.canvas_height as f64,
+);
 
-fn canvas_set_fill_style(ctx: &ExternRef, color: &str) {
-    let set_fill_style = js!(r#"
-        function(ctx, color){
-            ctx.fillStyle = color;
-        }"#);
-    set_fill_style.invoke(&[ctx.into(), color.into()]);
-}
-
-fn canvas_fill_rect(ctx: &ExternRef, x: f64, y: f64, width: f64, height: f64) {
-    let fill_rect = js!(r#"
-        function(ctx, x, y, width, height){
-            ctx.fillRect(x, y, width, height);
-        }"#);
-    fill_rect.invoke(&[ctx.into(), x.into(), y.into(), width.into(), height.into()]);
-}
-
-#[no_mangle]
-pub fn main() {
-    let screen = query_selector("#screen");
-    let ctx = canvas_get_context(&screen);
-    canvas_set_fill_style(&ctx, "red");
-    canvas_fill_rect(&ctx, 10.0, 10.0, 100.0, 100.0);
-    canvas_set_fill_style(&ctx, "green");
-    canvas_fill_rect(&ctx, 20.0, 20.0, 100.0, 100.0);
-    canvas_set_fill_style(&ctx, "blue");
-    canvas_fill_rect(&ctx, 30.0, 30.0, 100.0, 100.0);
+// iterate through all the cells of the screen and draw a rectangle
+for (_id, (pos, color)) in &mut self.world.query::<(&Position, &Color)>() {
+    self.ctx.set_fill_style(&color.0);
+    self.ctx.fill_rect(
+        (pos.0 * (self.canvas_width / MAP_WIDTH)) as f64,
+        (pos.1 * (self.canvas_height / MAP_HEIGHT)) as f64,
+        (self.canvas_width / MAP_WIDTH) as f64,
+        (self.canvas_height / MAP_HEIGHT) as f64,
+    );
 }
 ```
 
-The invocation `invoke_and_return_object` returns a structure called an `ExternRef` that is an indirect reference to something received from JavaScript. You can pass around this reference to other JavaScript invocations that will receive the option. When the structure dropped according to Rust lifetimes, it's handle is released from the JavaScript side.
 
-# Callbacks and timers
+## request animation frame
 
-This library is not opinionated about how to callback into Rust. There are several methods one can use. Here's a simple example.
-
-```rust
-use js::*;
-
-fn console_log(s: &str) {
-    let console_log = js!(r#"
-        function(s){
-            console.log(s);
-        }"#);
-    console_log.invoke(&[s.into()]);
-}
-
-fn random() -> f64 {
-    let random = js!(r#"
-        function(){
-            return Math.random();
-        }"#);
-    random.invoke(&[])
-}
-
-#[no_mangle]
-pub fn main() {
-    let start_loop = js!(r#"
-        function(){
-            window.setInterval(()=>{
-                this.module.instance.exports.run_loop();
-            }, 1000)
-        }"#);
-    start_loop.invoke(&[]);
-}
-
-#[no_mangle]
-pub fn run_loop(){
-    console_log(&format!("⏰ {}", random()));
-}
-```
-
-Notice how in the `start_loop` function, `this` actually references a context object that can be used to perform useful functions (see below) and for the importance of this demo, get ahold of the WebAssembly module so we can callback functions on it.
-
-# Getting data back into WebAssembly
-
-Let's focus on one last example.  A button that when you click it, fetches data from the public Pokemon API and put's it on the screen.
+Let's see how to run the game loop
 
 ```rust
-use js::*;
-
-fn query_selector(selector: &str) -> ExternRef {
-    let query_selector = js!(r#"
-        function(selector){
-            return document.querySelector(selector);
-        }"#);
-    query_selector.invoke_and_return_object(&[selector.into()])
+fn game_loop() {
+    // run game loop assuming 15 ms has passed
+    match Game::instance().run(15.0) {
+        Err(e) => console_error(&e.to_string()),
+        _ => (),
+    };
+    // request next animation frame
+    request_animation_frame(game_loop);
 }
 
-fn add_click_listener(element: &ExternRef, callback: &str) {
-    let add_click_listener = js!(r#"
-        function(element, callback){
-            element.addEventListener("click", ()=>{
-                this.module.instance.exports[callback]();
-            });
-        }"#);
-    add_click_listener.invoke(&[element.into(), callback.into()]);
-}
+... 
 
-fn element_set_inner_html(element: &ExternRef, html: &str) {
-    let set_inner_html = js!(r#"
-        function(element, html){
-            element.innerHTML = html;
-        }"#);
-    set_inner_html.invoke(&[element.into(), html.into()]);
-}
-
-fn fetch(url: &str, callback: &str) {
-    let fetch = js!(r#"
-        function(url, callback){
-            fetch(url).then((response)=>{
-                return response.text();
-            }).then((text)=>{
-                const allocationId = this.writeUtf8ToMemory(text);
-                this.module.instance.exports[callback](text);
-            });
-        }"#);
-    fetch.invoke(&[url.into(), callback.into()]);
-}
-
-#[no_mangle]
-pub fn main() {
-    let button = query_selector("#fetch_button");
-    add_click_listener(&button, "button_clicked");
-}
-
-#[no_mangle]
-pub fn button_clicked() {
-    // get pokemon data
-    let url = "https://pokeapi.co/api/v2/pokemon/1/";
-    fetch(url, "fetch_callback");
-}
-
-#[no_mangle]
-pub fn fetch_callback(text_allocation_id: usize) {
-    let text = extract_string_from_memory(text_allocation_id);
-    let result = query_selector("#data_output");
-    element_set_inner_html(&result, &text);
-}
+// start the loop
+request_animation_frame(game_loop);
 ```
 
-Notice in the fetch function handling, we have a function specifically for helping put strings inside of WebAssembly `writeUtf8ToMemory`.  This returns back an ID that can be used to rebuild the string on WebAssembly side `extract_string_from_memory`.
-
-# The `web` crate
-
-If you don't feel like recreating the wheel, there's an ongoing collection of commonly used functions accumulationg in `web`.
-
-```rust
-use web::*;
-
-#[no_mangle]
-fn main() {
-    console_log("Hello world!");
-    let body = query_selector("body");
-    element_add_click_listener(&body, |e| {
-        console_log(format!("Clicked at {}, {}", e.offset_x, e.offset_y).as_str());
-    });
-    element_add_mouse_move_listener(&body, |e| {
-        console_log(format!("Mouse moved to {}, {}", e.offset_x, e.offset_y).as_str());
-    });
-    element_add_mouse_down_listener(&body, |e| {
-        console_log(format!("Mouse down at {}, {}", e.offset_x, e.offset_y).as_str());
-    });
-    element_add_mouse_up_listener(&body, |e| {
-        console_log(format!("Mouse up at {}, {}", e.offset_x, e.offset_y).as_str());
-    });
-    element_add_key_down_listener(&body, |e| {
-        console_log(format!("Key down: {}", e.key_code).as_str());
-    });
-    element_add_key_up_listener(&body, |e| {
-        console_log(format!("Key up: {}", e.key_code).as_str());
-    });
-}
+## events
 
 ```
-
-Check out the documentation [here](https://docs.rs/web)
+let body = query_selector("body");
+element_add_key_down_listener(&body, |e| {
+    Game::instance().key_down(e.key_code as u32);
+});
+```
 
 # License
 
@@ -303,5 +153,5 @@ at your option.
 ### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in `js-wasm` by you, as defined in the Apache-2.0 license, shall be
+for inclusion in `web` by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
