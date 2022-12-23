@@ -1256,11 +1256,10 @@ pub extern "C" fn web_handle_history_pop_state_event(id: i64) {
 }
 
 pub fn add_history_pop_state_event_listener(
-    element: &ExternRef,
     handler: impl FnMut(PopStateEvent) + Send + 'static,
 ) -> Arc<FunctionHandle> {
     let function_ref = js!(r#"
-        function(element ){
+        function(){
             const handler = (e) => {
                 this.module.instance.exports.web_handle_history_pop_state_event(id);
             };
@@ -1268,7 +1267,7 @@ pub fn add_history_pop_state_event_listener(
             window.addEventListener("popstate",handler);
             return id;
         }"#)
-    .invoke_and_return_bigint(&[element.into()]);
+    .invoke_and_return_bigint(&[]);
     let function_handle = Arc::new(FunctionHandle(ExternRef {
         value: function_ref,
     }));
