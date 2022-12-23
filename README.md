@@ -14,6 +14,8 @@ I wanted a library that someone could learn in an afternoon how to use and start
 * canvas2d
 * localstorage
 * fetch & XMLHttpRequest
+* style & classes
+* history & location info
 
 Check out the documentation [here](https://docs.rs/web/latest/web/#functions)
 
