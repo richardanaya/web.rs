@@ -9,6 +9,7 @@
 
 I wanted a library that someone could learn in an afternoon how to use and start making interactive browser experiences with.  This project doesn't support every browser function under the sun.  Though you can easily add your own using the [Javascript invoking mechanism](https://github.com/richardanaya/web.rs/tree/master/crates/js) used by this library.  Feel free to submit a PR for more functionality.
 
+* async support
 * element operations
 * mouse, keyboard, and change event listeners
 * canvas2d
@@ -16,6 +17,7 @@ I wanted a library that someone could learn in an afternoon how to use and start
 * fetch & XMLHttpRequest
 * style & classes
 * history & location info
+* other utilities
 
 Check out the documentation [here](https://docs.rs/web/latest/web/#functions)
 
@@ -30,9 +32,14 @@ Let's just look at a basic example of how to put things in the console:
 ```rust
 use web::*;
 
-#[no_mangle]
-pub fn main() {
-    console_log("Hello World!");
+#[web::main]
+async fn main() {
+    loop {
+        console_log("⏰ tic");
+        sleep(1000).await;
+        console_log("⏰ tock");
+        sleep(1000).await;
+    }
 }
 ```
 ```html
