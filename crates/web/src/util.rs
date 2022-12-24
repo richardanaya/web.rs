@@ -74,13 +74,14 @@ pub extern "C" fn web_handle_sleep(id: i64) {
     EventHandlerFuture::<()>::wake_future_with_state_id(id, ());
 }
 
-pub fn sleep(ms: f64) -> impl Future<Output = ()> {
+pub fn sleep(ms: impl Into<f64>) -> impl Future<Output = ()> {
     let sleep = js!(r#"
         function(ms, state_id){
             window.setTimeout(()=>{
                 this.module.instance.exports.web_handle_sleep(state_id);
             }, ms);
         }"#);
+    let ms = ms.into();
     let (future, state_id) = EventHandlerFuture::<()>::create_future_with_state_id();
     sleep.invoke(&[ms.into(), state_id.into()]);
     future
