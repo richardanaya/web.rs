@@ -1,9 +1,10 @@
-use core::hash::{Hash, Hasher};
 pub use html_color::*;
 pub use js::*;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::Mutex;
+mod common;
+pub use common::*;
 
 pub fn random() -> f64 {
     let random = js!(r#"
@@ -109,22 +110,6 @@ pub fn element_remove(element: &ExternRef) {
     remove.invoke(&[element.into()]);
 }
 
-pub struct FunctionHandle(ExternRef);
-
-impl PartialEq for FunctionHandle {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.value == other.0.value
-    }
-}
-
-impl Eq for FunctionHandle {}
-
-impl Hash for FunctionHandle {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.value.hash(state);
-    }
-}
-
 // Change Events
 pub struct ChangeEvent {
     pub value: String,
@@ -206,44 +191,17 @@ pub struct MouseEvent {
     pub offset_y: f64,
 }
 
-static MOUSE_EVENT_HANDLERS: Mutex<
-    Option<HashMap<Arc<FunctionHandle>, Box<dyn FnMut(MouseEvent) + Send + 'static>>>,
-> = Mutex::new(None);
-
-fn add_mouse_event_handler(
-    id: Arc<FunctionHandle>,
-    handler: Box<dyn FnMut(MouseEvent) + Send + 'static>,
-) {
-    let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
-    if let Some(h) = handlers.as_mut() {
-        h.insert(id, handler);
-    } else {
-        let mut h = HashMap::new();
-        h.insert(id, handler);
-        *handlers = Some(h);
-    }
-}
-
-fn remove_mouse_event_handler(id: &Arc<FunctionHandle>) {
-    let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
-    if let Some(h) = handlers.as_mut() {
-        h.remove(id);
-    }
-}
+static MOUSE_EVENT_HANDLER: EventHandler<MouseEvent> = EventHandler::new();
 
 #[no_mangle]
 pub extern "C" fn web_handle_mouse_event_handler(id: i64, x: f64, y: f64) {
-    let mut handlers = MOUSE_EVENT_HANDLERS.lock().unwrap();
-    if let Some(h) = handlers.as_mut() {
-        for (key, handler) in h.iter_mut() {
-            if key.0.value == id {
-                handler(MouseEvent {
-                    offset_x: x,
-                    offset_y: y,
-                });
-            }
-        }
-    }
+    MOUSE_EVENT_HANDLER.call(
+        id,
+        MouseEvent {
+            offset_x: x,
+            offset_y: y,
+        },
+    );
 }
 
 pub fn element_add_click_listener(
@@ -262,7 +220,7 @@ pub fn element_add_click_listener(
     let function_handle = Arc::new(FunctionHandle(ExternRef {
         value: function_ref,
     }));
-    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    MOUSE_EVENT_HANDLER.add_listener(function_handle.clone(), Box::new(handler));
     function_handle
 }
 
@@ -272,7 +230,7 @@ pub fn element_remove_click_listener(element: &ExternRef, function_handle: &Arc<
             element.removeEventListener("click", f);
         }"#);
     remove_click_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
-    remove_mouse_event_handler(function_handle);
+    MOUSE_EVENT_HANDLER.remove_listener(function_handle);
 }
 
 pub fn element_add_mouse_move_listener(
@@ -291,7 +249,7 @@ pub fn element_add_mouse_move_listener(
     let function_handle = Arc::new(FunctionHandle(ExternRef {
         value: function_ref,
     }));
-    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    MOUSE_EVENT_HANDLER.add_listener(function_handle.clone(), Box::new(handler));
     function_handle
 }
 
@@ -304,7 +262,7 @@ pub fn element_remove_mouse_move_listener(
             element.removeEventListener("mousemove", f);
         }"#);
     remove_mouse_move_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
-    remove_mouse_event_handler(function_handle);
+    MOUSE_EVENT_HANDLER.remove_listener(function_handle);
 }
 
 pub fn element_add_mouse_down_listener(
@@ -323,7 +281,7 @@ pub fn element_add_mouse_down_listener(
     let function_handle = Arc::new(FunctionHandle(ExternRef {
         value: function_ref,
     }));
-    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    MOUSE_EVENT_HANDLER.add_listener(function_handle.clone(), Box::new(handler));
     function_handle
 }
 
@@ -336,7 +294,7 @@ pub fn element_remove_mouse_down_listener(
             element.removeEventListener("mousedown", f);
         }"#);
     remove_mouse_down_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
-    remove_mouse_event_handler(function_handle);
+    MOUSE_EVENT_HANDLER.remove_listener(function_handle);
 }
 
 pub fn element_add_mouse_up_listener(
@@ -355,7 +313,7 @@ pub fn element_add_mouse_up_listener(
     let function_handle = Arc::new(FunctionHandle(ExternRef {
         value: function_ref,
     }));
-    add_mouse_event_handler(function_handle.clone(), Box::new(handler));
+    MOUSE_EVENT_HANDLER.add_listener(function_handle.clone(), Box::new(handler));
     function_handle
 }
 
@@ -368,7 +326,7 @@ pub fn element_remove_mouse_up_listener(
             element.removeEventListener("mouseup", f);
         }"#);
     remove_mouse_up_listener.invoke(&[element.into(), (&(function_handle.0)).into()]);
-    remove_mouse_event_handler(function_handle);
+    MOUSE_EVENT_HANDLER.remove_listener(function_handle);
 }
 
 // Request Animation Frame
