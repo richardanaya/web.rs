@@ -12,7 +12,6 @@ pub fn main(_args: TokenStream, input: TokenStream) -> TokenStream {
     let expanded = quote! {
         #[no_mangle]
         pub fn #name() {
-            web::run_event_loop();
             executor::run(async move {
                 #block
             })

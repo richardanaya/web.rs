@@ -16,6 +16,22 @@ pub fn random_i64() -> i64 {
     (r * i64 as f64) as i64
 }
 
+pub fn get_property_i64(element: &ExternRef, property: &str) -> i64 {
+    let get_property = js!(r#"
+        function(element, property){
+            return element[property];
+        }"#);
+    get_property.invoke_and_return_bigint(&[element.into(), property.into()])
+}
+
+pub fn set_property_i64(element: &ExternRef, property: &str, value: i64) {
+    let set_property = js!(r#"
+        function(element, property, value){
+            element[property] = value;
+        }"#);
+    set_property.invoke(&[element.into(), property.into(), value.into()]);
+}
+
 pub fn get_property_f64(element: &ExternRef, property: &str) -> f64 {
     let get_property = js!(r#"
         function(element, property){
@@ -70,7 +86,7 @@ pub fn set_property_string(element: &ExternRef, property: &str, value: &str) {
 }
 
 #[no_mangle]
-pub extern "C" fn web_handle_sleep(id: i64) {
+pub extern "C" fn web_handle_empty_callback(id: i64) {
     EventHandlerFuture::<()>::wake_future_with_state_id(id, ());
 }
 
@@ -78,11 +94,23 @@ pub fn sleep(ms: impl Into<f64>) -> impl Future<Output = ()> {
     let sleep = js!(r#"
         function(ms, state_id){
             window.setTimeout(()=>{
-                this.module.instance.exports.web_handle_sleep(state_id);
+                this.module.instance.exports.web_handle_empty_callback(state_id);
             }, ms);
         }"#);
     let ms = ms.into();
     let (future, state_id) = EventHandlerFuture::<()>::create_future_with_state_id();
     sleep.invoke(&[ms.into(), state_id.into()]);
+    future
+}
+
+pub fn wait_til_animation_frame() -> impl Future<Output = ()> {
+    let wait_til_animation_frame = js!(r#"
+        function(state_id){
+            window.requestAnimationFrame(()=>{
+                this.module.instance.exports.web_handle_empty_callback(state_id);
+            });
+        }"#);
+    let (future, state_id) = EventHandlerFuture::<()>::create_future_with_state_id();
+    wait_til_animation_frame.invoke(&[state_id.into()]);
     future
 }

@@ -1,3 +1,5 @@
+use crate::set_timeout;
+
 extern crate alloc;
 use {
     alloc::{boxed::Box, collections::vec_deque::VecDeque, sync::Arc},
@@ -29,6 +31,13 @@ struct Task<T> {
 impl<T> Woke for Task<T> {
     fn wake_by_ref(_: &Arc<Self>) {
         // tell the executor to poll for new things again
+        // but not recursively
+        set_timeout(
+            || {
+                poll_tasks();
+            },
+            0,
+        );
     }
 }
 
@@ -75,6 +84,9 @@ impl Executor {
             self.tasks = Some(TasksList::new());
         }
         let tasks: &mut TasksList = self.tasks.as_mut().expect("tasks not initialized");
+        if tasks.is_empty() {
+            return;
+        }
         for _ in 0..tasks.len() {
             let task = tasks.pop_front().unwrap();
             if task.is_pending() {
