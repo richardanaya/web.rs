@@ -2,6 +2,11 @@
 name = "web_macros"
 version = "0.0.0"
 edition = "2021"
+authors = ["Richard Anaya"]
+license = "MIT OR Apache-2.0"
+description = "A library for interacting with the web browser"
+repository = "https://github.com/richardanaya/js-wasm"
+readme = "README.md"
 
 [lib]
 proc-macro = true
