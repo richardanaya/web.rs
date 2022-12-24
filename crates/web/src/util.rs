@@ -8,6 +8,12 @@ pub fn random() -> f64 {
     random.invoke(&[])
 }
 
+pub fn random_i64() -> i64 {
+    let r = random();
+    let i64 = std::i64::MAX;
+    (r * i64 as f64) as i64
+}
+
 pub fn get_property_f64(element: &ExternRef, property: &str) -> f64 {
     let get_property = js!(r#"
         function(element, property){

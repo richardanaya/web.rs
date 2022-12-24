@@ -141,7 +141,9 @@ pub struct MouseEvent {
     pub offset_y: f64,
 }
 
-static MOUSE_EVENT_HANDLER: EventHandler<MouseEvent> = EventHandler::new();
+static MOUSE_EVENT_HANDLER: EventHandler<MouseEvent> = EventHandler {
+    listeners: Mutex::new(None),
+};
 
 #[no_mangle]
 pub extern "C" fn web_handle_mouse_event_handler(id: i64, x: f64, y: f64) {
