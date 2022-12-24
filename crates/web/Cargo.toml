@@ -14,3 +14,6 @@ readme = "README.md"
 globals = "1.0.5"
 html_color = "0.0.0"
 js = {path="../js",version="0"}
+spin = "0.9.4"
+web_macro = "0.0.1"
+woke = "0.0.4"

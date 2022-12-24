@@ -118,14 +118,18 @@ impl<T> SharedStateMap<T> {
         map.insert(id, state);
     }
     pub fn wake_future(&self, id: i64, result: T) {
-        let map = self.map.lock().unwrap();
-        if let Some(state) = map.get(&id) {
-            let mut shared_state = state.lock().unwrap();
-            shared_state.completed = true;
-            shared_state.result = Some(result);
-            if let Some(waker) = shared_state.waker.take() {
-                waker.wake();
+        let mut waker = None;
+        {
+            let mut map = self.map.lock().unwrap();
+            if let Some(state) = map.remove(&id) {
+                let mut shared_state = state.lock().unwrap();
+                shared_state.completed = true;
+                shared_state.result = Some(result);
+                waker = shared_state.waker.take();
             }
+        }
+        if let Some(waker) = waker {
+            waker.wake();
         }
     }
 }
@@ -153,5 +157,10 @@ where
             },
             id,
         )
+    }
+
+    pub fn wake_future_with_state_id(id: StateId, result: T) {
+        let state_storage = globals::get::<SharedStateMap<T>>();
+        state_storage.wake_future(id, result);
     }
 }

@@ -1,3 +1,5 @@
+use crate::EventHandlerFuture;
+use core::future::Future;
 use js::*;
 
 pub fn random() -> f64 {
@@ -65,4 +67,21 @@ pub fn set_property_string(element: &ExternRef, property: &str, value: &str) {
             element[property] = value;
         }"#);
     set_property.invoke(&[element.into(), property.into(), value.into()]);
+}
+
+#[no_mangle]
+pub extern "C" fn web_handle_sleep(id: i64) {
+    EventHandlerFuture::<()>::wake_future_with_state_id(id, ());
+}
+
+pub fn sleep(ms: f64) -> impl Future<Output = ()> {
+    let sleep = js!(r#"
+        function(ms, state_id){
+            window.setTimeout(()=>{
+                this.module.instance.exports.web_handle_sleep(state_id);
+            }, ms);
+        }"#);
+    let (future, state_id) = EventHandlerFuture::<()>::create_future_with_state_id();
+    sleep.invoke(&[ms.into(), state_id.into()]);
+    future
 }
