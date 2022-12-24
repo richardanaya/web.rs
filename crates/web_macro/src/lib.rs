@@ -10,7 +10,7 @@ pub fn main(_args: TokenStream, input: TokenStream) -> TokenStream {
     let block = input.block;
 
     let expanded = quote! {
-        pub fn #name() -> Result<(), JsValue> {
+        pub fn #name() {
             web::run_event_loop();
             executor::run(async move {
                 #block
