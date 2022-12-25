@@ -161,7 +161,7 @@ async fn main() {
     let ctx = CanvasContext::from_element(&canvas);
 
     // we can spawn concurrent
-    coroutine(async move {
+    coroutine(async {
         loop {
             console_log("tik");
             sleep(1000).await;
