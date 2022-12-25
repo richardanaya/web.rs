@@ -148,7 +148,7 @@ element_add_key_down_listener(&body, |e| {
 });
 ```
 
-# Async 
+# Async & Coroutines
 
 This library has support for async and spawning coroutines. Consider this program that starts a looping console log and also draws random squares on a screen.
 
