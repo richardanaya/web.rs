@@ -155,15 +155,17 @@ This library has support for async and spawning coroutines. Consider this progra
 ```rust
 use web::*;
 
+// easily make your first function async
 #[web::main]
 async fn main() {
     let canvas = query_selector("#canvas");
     let ctx = CanvasContext::from_element(&canvas);
 
-    // we can spawn concurrent
+    // we can spawn concurrent operations
     coroutine(async {
         loop {
             console_log("tik");
+            // hand async set_timeout
             sleep(1000).await;
             console_log("tok");
             sleep(1000).await;
@@ -171,7 +173,7 @@ async fn main() {
     });
 
     loop {
-        // Draw a random color rect
+        // draw a random color rect
         ctx.set_fill_style(&format!(
             "rgb({}, {}, {})",
             random() * 255.0,
@@ -184,6 +186,7 @@ async fn main() {
             random() * 500.0,
             random() * 500.0,
         );
+        // a more async way to write graphics code
         wait_til_animation_frame().await;
     }
 }
