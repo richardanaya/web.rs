@@ -9,7 +9,7 @@
 
 I wanted a library that someone could learn in an afternoon how to use and start making interactive browser experiences with.  This project doesn't support every browser function under the sun.  Though you can easily add your own using the [Javascript invoking mechanism](https://github.com/richardanaya/web.rs/tree/master/crates/js) used by this library.  Feel free to submit a PR for more functionality.
 
-* async support
+* async & coroutine support
 * element operations
 * mouse, keyboard, and change event listeners
 * canvas2d
@@ -146,6 +146,47 @@ let body = query_selector("body");
 element_add_key_down_listener(&body, |e| {
     Game::instance().key_down(e.key_code as u32);
 });
+```
+
+# Async 
+
+This library has support for async and spawning coroutines. Consider this program that starts a looping console log and also draws random squares on a screen.
+
+```rust
+use web::*;
+
+#[web::main]
+async fn main() {
+    let canvas = query_selector("#canvas");
+    let ctx = CanvasContext::from_element(&canvas);
+
+    // we can spawn concurrent
+    coroutine(async move {
+        loop {
+            console_log("tik");
+            sleep(1000).await;
+            console_log("tok");
+            sleep(1000).await;
+        }
+    });
+
+    loop {
+        // Draw a random color rect
+        ctx.set_fill_style(&format!(
+            "rgb({}, {}, {})",
+            random() * 255.0,
+            random() * 255.0,
+            random() * 255.0
+        ));
+        ctx.fill_rect(
+            random() * 500.0,
+            random() * 500.0,
+            random() * 500.0,
+            random() * 500.0,
+        );
+        wait_til_animation_frame().await;
+    }
+}
 ```
 
 # License
