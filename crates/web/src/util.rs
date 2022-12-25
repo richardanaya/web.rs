@@ -114,3 +114,4 @@ pub fn wait_til_animation_frame() -> impl Future<Output = ()> {
     wait_til_animation_frame.invoke(&[state_id.into()]);
     future
 }
+

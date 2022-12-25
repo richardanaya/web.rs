@@ -20,3 +20,4 @@ pub mod executor;
 mod window;
 pub use web_macro::main;
 pub use window::*;
+pub use executor::coroutine;    

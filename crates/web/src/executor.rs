@@ -54,18 +54,18 @@ impl<T> Pendable for Arc<Task<T>> {
 
 impl Executor {
     // Run async task
-    pub fn run<T>(&mut self, future: Pin<Box<dyn Future<Output = T> + 'static + Send>>)
+    pub fn run<T>(&mut self, future: Pin<Box<dyn Future<Output = T> + 'static + Send + Sync>>)
     where
-        T: Send + 'static,
+        T: Send + Sync + 'static,
     {
         self.add_task(future);
         self.poll_tasks();
     }
 
     /// Add task for a future to the list of tasks
-    fn add_task<T>(&mut self, future: Pin<Box<dyn Future<Output = T> + 'static + Send>>)
+    fn add_task<T>(&mut self, future: Pin<Box<dyn Future<Output = T> + 'static + Send + Sync>>)
     where
-        T: Send + 'static,
+        T: Send + Sync + 'static,
     {
         // store our task
         let task = Arc::new(Task {
@@ -98,13 +98,26 @@ impl Executor {
 
 static DEFAULT_EXECUTOR: Mutex<Executor> = Mutex::new(Executor { tasks: None });
 
-pub fn run<T>(future: impl Future<Output = T> + 'static + Send)
+pub fn run<T>(future: impl Future<Output = T> + 'static + Send + Sync)
 where
-    T: Send + 'static,
+    T: Send + Sync + 'static,
 {
     DEFAULT_EXECUTOR.lock().run(Box::pin(future))
 }
 
 pub fn poll_tasks() {
     DEFAULT_EXECUTOR.lock().poll_tasks()
+}
+
+pub fn coroutine<T>(future: impl Future<Output = T> + 'static + Send + Sync )
+where
+    T: Send + Sync + 'static,
+{
+    let mut a = Some(Box::pin(future));
+    set_timeout( move ||{
+        let b = a.take();
+        if let Some(b) = b {
+            DEFAULT_EXECUTOR.lock().run(b);
+        }
+    }, 0);
 }
