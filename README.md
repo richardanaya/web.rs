@@ -32,14 +32,8 @@ Let's just look at a basic example of how to put things in the console:
 ```rust
 use web::*;
 
-#[web::main]
-async fn main() {
-    loop {
-        console_log("⏰ tic");
-        sleep(1000).await;
-        console_log("⏰ tock");
-        sleep(1000).await;
-    }
+fn main() {
+    console_log("Hello, world!");
 }
 ```
 ```html
@@ -164,10 +158,10 @@ async fn main() {
     // we can spawn concurrent operations
     coroutine(async {
         loop {
-            console_log("tik");
+            console_log("⏰ tik");
             // hand async set_timeout
             sleep(1000).await;
-            console_log("tok");
+            console_log("⏰ tok");
             sleep(1000).await;
         }
     });
