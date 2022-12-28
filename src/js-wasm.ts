@@ -181,6 +181,17 @@ const JsWasm = {
               values.push(array);
               break;
             }
+            case 10: {
+              const start = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              const len = new DataView(parameters.buffer).getInt32(i, true);
+              i += 4;
+              const memory = context.getMemory();
+              const slice = memory.buffer.slice(start, start + len * 4);
+              const array = new Uint32Array(slice);
+              values.push(array);
+              break;
+            }
             default:
               throw new Error("unknown parameter type");
           }

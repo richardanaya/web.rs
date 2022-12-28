@@ -226,6 +226,18 @@ const $569963205592bc01$var$JsWasm = {
                                 values.push(array1);
                                 break;
                             }
+                        case 10:
+                            {
+                                const start4 = new DataView(parameters.buffer).getInt32(i, true);
+                                i += 4;
+                                const len3 = new DataView(parameters.buffer).getInt32(i, true);
+                                i += 4;
+                                const memory2 = context.getMemory();
+                                const slice2 = memory2.buffer.slice(start4, start4 + len3 * 4);
+                                const array2 = new Uint32Array(slice2);
+                                values.push(array2);
+                                break;
+                            }
                         default:
                             throw new Error("unknown parameter type");
                     }
