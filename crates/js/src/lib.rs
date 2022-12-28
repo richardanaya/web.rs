@@ -225,7 +225,7 @@ where {
         extract_string_from_memory(allocation_id)
     }
 
-    pub fn invoke_and_return_bool(&self, params: &[InvokeParam]) -> bool { 
+    pub fn invoke_and_return_bool(&self, params: &[InvokeParam]) -> bool {
         let param_bytes = param_to_bytes(params);
         let RawParts {
             ptr,
@@ -233,7 +233,7 @@ where {
             capacity: _,
         } = RawParts::from_vec(param_bytes);
         let ret = unsafe { js_invoke_function_and_return_bool(self.fn_handle, ptr, length) };
-        ret != 0
+        ret != 0.0
     }
 }
 
