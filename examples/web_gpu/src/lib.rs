@@ -103,6 +103,9 @@ async fn main() {
 
     let queue = device.get_queue();
 
+    let canvas_width = get_property_f64(&canvas, "width");
+    let canvas_height = get_property_f64(&canvas, "height");
+
     loop {
         let command_encoder = device.create_command_encoder();
 
@@ -119,8 +122,18 @@ async fn main() {
                 },
                 load_op: GPULoadOp::Clear,
                 store_op: GPUStoreOp::Store,
-            }]
+            }],
         });
+        render_pass.set_pipeline(&pipeline);
+        render_pass.set_viewport(0.0, 0.0, canvas_width, canvas_height, 0.0, 1.0);
+        render_pass.set_scissor_rect(0.0, 0.0, canvas_width, canvas_height);
+        render_pass.set_vertex_buffer(0, &position_buffer);
+        render_pass.set_vertex_buffer(1, &color_buffer);
+        render_pass.set_index_buffer(&index_buffer, "uint32");
+        render_pass.draw_indexed(3);
+        render_pass.end();
+
+        queue.submit(&[command_encoder.finish()]);
 
         wait_til_animation_frame().await;
     }

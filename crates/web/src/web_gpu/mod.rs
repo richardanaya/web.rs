@@ -64,6 +64,20 @@ pub struct GPUQueue(ExternRef);
 pub struct GPUCommandEncoder(ExternRef);
 pub struct GPURenderPipeline(ExternRef);
 
+impl GPUQueue {
+    pub fn submit(&self, command_buffers: &[GPUCommandBuffer]) {
+        let command_buffers_ref = create_array();
+        command_buffers.iter().for_each(|command_buffer| {
+            add_to_array(&command_buffers_ref, &command_buffer.0);
+        });
+        let submit = js!(r#"
+            function(queue, commandBuffers){
+                queue.submit(commandBuffers);
+            }"#);
+        submit.invoke(&[(&(self.0)).into(), (&command_buffers_ref).into()]);
+    }
+}
+
 impl GPUDevice {
     pub fn create_buffer(&self, descriptor: &GPUBufferDescriptor) -> GPUBuffer {
         let create_buffer = js!(r#"
@@ -681,5 +695,105 @@ impl GPUCommandEncoder {
         "#)
         .invoke_and_return_object(&[(&self.0).into(), (&color_attachments_ref).into()]);
         GPURenderPass(render_pass_ref)
+    }
+
+    pub fn finish(&self) -> GPUCommandBuffer {
+        let command_buffer_ref = js!(r#"
+        function(encoder){
+            return encoder.finish();
+        }
+        "#)
+        .invoke_and_return_object(&[(&self.0).into()])
+        .into();
+        GPUCommandBuffer(command_buffer_ref)
+    }
+}
+
+pub struct GPUCommandBuffer(ExternRef);
+
+impl GPURenderPass {
+    pub fn set_pipeline(&self, pipeline: &GPURenderPipeline) {
+        js!(r#"
+        function(encoder, pipeline){
+            encoder.setPipeline(pipeline);
+        }
+        "#)
+        .invoke(&[(&self.0).into(), (&pipeline.0).into()]);
+    }
+
+    pub fn set_viewport(
+        &self,
+        x: f64,
+        y: f64,
+        width: f64,
+        height: f64,
+        min_depth: f64,
+        max_depth: f64,
+    ) {
+        js!(r#"
+        function(encoder, x, y, width, height, minDepth, maxDepth){
+            encoder.setViewport(x, y, width, height, minDepth, maxDepth);
+        }
+        "#)
+        .invoke(&[
+            (&self.0).into(),
+            x.into(),
+            y.into(),
+            width.into(),
+            height.into(),
+            min_depth.into(),
+            max_depth.into(),
+        ]);
+    }
+
+    pub fn set_scissor_rect(&self, x: f64, y: f64, width: f64, height: f64) {
+        js!(r#"
+        function(encoder, x, y, width, height){
+            encoder.setScissorRect(x, y, width, height);
+        }
+        "#)
+        .invoke(&[
+            (&self.0).into(),
+            x.into(),
+            y.into(),
+            width.into(),
+            height.into(),
+        ]);
+    }
+
+    pub fn set_vertex_buffer(&self, slot: usize, buffer: &GPUBuffer) {
+        js!(r#"
+        function(encoder, slot, buffer){
+            encoder.setVertexBuffer(slot, buffer);
+        }
+        "#)
+        .invoke(&[(&self.0).into(), slot.into(), (&buffer.0).into()]);
+    }
+
+    pub fn set_index_buffer(&self, buffer: &GPUBuffer, index_format: &str) {
+        js!(r#"
+        function(encoder, buffer, indexFormat){
+            encoder.setIndexBuffer(buffer, indexFormat);
+        }
+        "#)
+        .invoke(&[(&self.0).into(), (&buffer.0).into(), index_format.into()]);
+    }
+
+    pub fn draw_indexed(&self, index_count: usize) {
+        js!(r#"
+        function(encoder, indexCount){
+            encoder.drawIndexed(indexCount);
+        }
+        "#)
+        .invoke(&[(&self.0).into(), index_count.into()]);
+    }
+
+    pub fn end(&self) {
+        js!(r#"
+        function(encoder){
+            encoder.end();
+        }
+        "#)
+        .invoke(&[(&self.0).into()]);
     }
 }
