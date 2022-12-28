@@ -66,6 +66,7 @@ pub enum InvokeParam<'a> {
     Float32Array(&'a [f32]),
     Float64Array(&'a [f64]),
     Bool(bool),
+    Uint32Array(&'a [u32]),
 }
 
 impl From<f64> for InvokeParam<'_> {
@@ -122,6 +123,12 @@ impl From<bool> for InvokeParam<'_> {
     }
 }
 
+impl<'a> From<&'a [u32]> for InvokeParam<'a> {
+    fn from(a: &'a [u32]) -> Self {
+        InvokeParam::Uint32Array(a)
+    }
+}
+
 fn param_to_bytes(params: &[InvokeParam]) -> Vec<u8> {
     let mut param_bytes = Vec::new();
     for param in params {
@@ -167,6 +174,13 @@ fn param_to_bytes(params: &[InvokeParam]) -> Vec<u8> {
             }
             InvokeParam::Float64Array(a) => {
                 param_bytes.push(9);
+                let start = a.as_ptr() as usize;
+                let len = a.len();
+                param_bytes.extend_from_slice(&start.to_le_bytes());
+                param_bytes.extend_from_slice(&len.to_le_bytes());
+            }
+            InvokeParam::Uint32Array(a) => {
+                param_bytes.push(10);
                 let start = a.as_ptr() as usize;
                 let len = a.len();
                 param_bytes.extend_from_slice(&start.to_le_bytes());

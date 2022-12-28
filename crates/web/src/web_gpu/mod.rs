@@ -59,6 +59,17 @@ impl GPUAdapter {
 
 pub struct GPUDevice(ExternRef);
 
+impl GPUDevice {
+    pub fn create_buffer(&self, descriptor: &GPUBufferDescriptor) -> GPUBuffer {
+        let create_buffer = js!(r#"
+            function(device, descriptor){
+                return device.createBuffer(descriptor);
+            }"#);
+        let buffer_ref = create_buffer.invoke_and_return_object(&[(&(self.0)).into(), (&(descriptor.0)).into()]);
+        GPUBuffer(buffer_ref)
+    }
+}
+
 pub struct GpuCanvasContext(ExternRef);
 
 impl GpuCanvasContext {
@@ -124,5 +135,71 @@ impl GPUCanvasAlphaMode {
             GPUCanvasAlphaMode::Premultiplied => "premultiplied",
             GPUCanvasAlphaMode::Opaque => "opaque",
         }
+    }
+}
+
+pub struct GPUBufferDescriptor(ExternRef);
+
+impl GPUBufferDescriptor {
+    pub fn new() -> Self {
+        let descriptor_ref = create_object();
+        GPUBufferDescriptor(descriptor_ref)
+    }
+
+    pub fn set_size(&self, size: usize) {
+        js!(r#"
+            function(descriptor, size){
+                descriptor.size = size;
+            }"#)
+        .invoke(&[(&(self.0)).into(), size.into()]);
+    }
+
+    pub fn set_usage(&self, usage: u32) {
+        js!(r#"
+            function(descriptor, usage){
+                descriptor.usage = usage;
+            }"#)
+        .invoke(&[(&(self.0)).into(), (usage as f64).into()]);
+    }
+
+    pub fn set_mapped_at_creation(&self, mapped_at_creation: bool) {
+        js!(r#"
+            function(descriptor, mapped_at_creation){
+                descriptor.mappedAtCreation = mapped_at_creation;
+            }"#)
+        .invoke(&[(&(self.0)).into(), mapped_at_creation.into()]);
+    }
+}
+
+pub const GPU_BUFFER_USAGE_MAP_READ: u32 = 0x0001;
+pub const GPU_BUFFER_USAGE_MAP_WRITE: u32 = 0x0002;
+pub const GPU_BUFFER_USAGE_COPY_SRC: u32 = 0x0004;
+pub const GPU_BUFFER_USAGE_COPY_DST: u32 = 0x0008;
+pub const GPU_BUFFER_USAGE_INDEX: u32 = 0x0010;
+pub const GPU_BUFFER_USAGE_VERTEX: u32 = 0x0020;
+pub const GPU_BUFFER_USAGE_UNIFORM: u32 = 0x0040;
+pub const GPU_BUFFER_USAGE_STORAGE: u32 = 0x0080;
+pub const GPU_BUFFER_USAGE_INDIRECT: u32 = 0x0100;
+pub const GPU_BUFFER_USAGE_QUERY_RESOLVE: u32 = 0x0200;
+
+pub struct GPUBuffer(ExternRef);
+
+impl GPUBuffer {
+    pub fn set_from_f32_array(&self, data: &[f32]) {
+        js!(r#"
+            function(buffer, data){
+                new Float32Array(buffer.getMappedRange()).set(data);
+                positionBuffer.unmap();
+            }"#)
+        .invoke(&[(&(self.0)).into(), data.into()]);
+    }
+
+    pub fn set_from_u32_array(&self, data: &[u32]) {
+        js!(r#"
+            function(buffer, data){
+                new Uint32Array(buffer.getMappedRange()).set(data);
+                positionBuffer.unmap();
+            }"#)
+        .invoke(&[(&(self.0)).into(), data.into()]);
     }
 }
