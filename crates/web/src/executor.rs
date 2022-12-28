@@ -109,15 +109,18 @@ pub fn poll_tasks() {
     DEFAULT_EXECUTOR.lock().poll_tasks()
 }
 
-pub fn coroutine<T>(future: impl Future<Output = T> + 'static + Send + Sync )
+pub fn coroutine<T>(future: impl Future<Output = T> + 'static + Send + Sync)
 where
     T: Send + Sync + 'static,
 {
     let mut a = Some(Box::pin(future));
-    set_timeout( move ||{
-        let b = a.take();
-        if let Some(b) = b {
-            DEFAULT_EXECUTOR.lock().run(b);
-        }
-    }, 0);
+    set_timeout(
+        move || {
+            let b = a.take();
+            if let Some(b) = b {
+                DEFAULT_EXECUTOR.lock().run(b);
+            }
+        },
+        0,
+    );
 }

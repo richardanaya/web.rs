@@ -1,9 +1,0 @@
-use web::*;
-
-#[web::main]
-async fn main() {
-    if !WebGPU::is_available() {
-        console_error("WebGPU is not available");
-        return;
-    }
-}
