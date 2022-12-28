@@ -123,3 +123,20 @@ pub fn create_object() -> ExternRef {
     .invoke_and_return_object(&[]);
     config_ref
 }
+
+pub fn create_array() -> ExternRef {
+    let config_ref = js!(r#"
+        function(){
+            return [];
+        }"#)
+    .invoke_and_return_object(&[]);
+    config_ref
+}
+
+pub fn add_to_array(array: &ExternRef, value: &ExternRef) {
+    let add_to_array = js!(r#"
+        function(array, value){
+            array.push(value);
+        }"#);
+    add_to_array.invoke(&[(array).into(), (value).into()]);
+}

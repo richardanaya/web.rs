@@ -10,7 +10,7 @@ async fn main() {
     let device = adapter.request_device().await;
     let canvas = query_selector("canvas");
     let preferred_canvas_texture_format = WebGPU::get_preferred_canvas_format();
-    let context = GpuCanvasContext::from_element(&canvas);
+    let context = GPUCanvasContext::from_element(&canvas);
     context.configure(&GpuCanvasConfiguration {
         device: &device,
         format: preferred_canvas_texture_format,
@@ -105,6 +105,22 @@ async fn main() {
 
     loop {
         let command_encoder = device.create_command_encoder();
+
+        let current_view = context.get_current_texture().create_view();
+
+        let render_pass = command_encoder.begin_render_pass(&GPURenderPassDescriptor {
+            color_attachments: vec![GPURenderPassColorAttachment {
+                view: &current_view,
+                clear_value: GPUColor {
+                    r: 0.0,
+                    g: 0.0,
+                    b: 0.0,
+                    a: 1.0,
+                },
+                load_op: GPULoadOp::Clear,
+                store_op: GPUStoreOp::Store,
+            }]
+        });
 
         wait_til_animation_frame().await;
     }

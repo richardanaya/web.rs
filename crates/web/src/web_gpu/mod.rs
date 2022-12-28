@@ -1,6 +1,4 @@
-use crate::console_error;
-use crate::create_object;
-use crate::EventHandlerFuture;
+use crate::{add_to_array, console_error, create_array, EventHandlerFuture};
 use js::*;
 
 pub struct WebGPU;
@@ -137,27 +135,144 @@ impl GPUDevice {
         &self,
         descriptor: &GPURenderPipelineDescriptor,
     ) -> GPURenderPipeline {
-        let pipeline_descriptor_ref = create_object();
+        let fragment_state_ref = {
+            let fragment_state = &descriptor.fragment;
+            let targets_ref = create_array();
+            descriptor.fragment.targets.iter().for_each(|target| {
+                let format = target.format;
+                let target_ref = js!(r#"
+                function(format){
+                    return {
+                        format
+                    };
+                }"#)
+                .invoke_and_return_object(&[format.as_str().into()]);
+                add_to_array(&targets_ref, &target_ref);
+            });
+
+            js!(r#"
+                function(module, entryPoint, targets){
+                    return {
+                        module,
+                        entryPoint,
+                        targets
+                    };
+                }"#)
+            .invoke_and_return_object(&[
+                (&(fragment_state.module.0)).into(),
+                fragment_state.entry_point.into(),
+                (&targets_ref).into(),
+            ])
+        };
+        let vertex_state_ref = {
+            let vertex_state = &descriptor.vertex;
+            let vertex_buffers_ref = create_array();
+            vertex_state.buffers.iter().for_each(|buffer| {
+                let attributes_ref = create_array();
+                buffer.attributes.iter().for_each(|attribute| {
+                    let attribute_ref = js!(r#"
+                    function(shaderLocation, offset, format){
+                        return {
+                            shaderLocation,
+                            offset,
+                            format
+                        };
+                    }"#)
+                    .invoke_and_return_object(&[
+                        attribute.shader_location.into(),
+                        attribute.offset.into(),
+                        attribute.format.as_str().into(),
+                    ]);
+                    add_to_array(&attributes_ref, &attribute_ref);
+                });
+                let buffer_ref = js!(r#"
+                    function(arrayStride, stepMode, attributes){
+                        return {
+                            arrayStride,
+                            stepMode,
+                            attributes
+                        };
+                    }"#)
+                .invoke_and_return_object(&[
+                    buffer.array_stride.into(),
+                    buffer.step_mode.as_str().into(),
+                    (&attributes_ref).into(),
+                ]);
+                add_to_array(&vertex_buffers_ref, &buffer_ref);
+            });
+            js!(r#"
+                function(module, entryPoint, buffers){
+                    return {
+                        module,
+                        entryPoint,
+                        buffers
+                    };
+                }"#)
+            .invoke_and_return_object(&[
+                (&(vertex_state.module.0)).into(),
+                vertex_state.entry_point.into(),
+                (&vertex_buffers_ref).into(),
+            ])
+        };
+        let primitive_state_ref = js!(r#"
+            function(topology, cullMode, frontFace){
+                return {
+                    topology,
+                    cullMode,
+                    frontFace
+                };
+            }"#)
+        .invoke_and_return_object(&[
+            descriptor.primitive.topology.as_str().into(),
+            descriptor.primitive.cull_mode.as_str().into(),
+            descriptor.primitive.front_face.as_str().into(),
+        ]);
 
         let pipeline_ref = js!(r#"
-            function(device, descriptor){
-                return device.createRenderPipeline(descriptor);
+            function(device, layout, fragment, vertex, primitive){
+                let config = {
+                    layout,
+                    fragment,
+                    vertex,
+                    primitive
+                };
+                return device.createRenderPipeline(config);
             }"#)
-        .invoke_and_return_object(&[(&(self.0)).into(), (&(pipeline_descriptor_ref)).into()]);
+        .invoke_and_return_object(&[
+            (&(self.0)).into(),
+            (&(descriptor.layout.0)).into(),
+            (&fragment_state_ref).into(),
+            (&vertex_state_ref).into(),
+            (&primitive_state_ref).into(),
+        ]);
         GPURenderPipeline(pipeline_ref)
     }
 }
 
-pub struct GpuCanvasContext(ExternRef);
+pub struct GPUCanvasContext(ExternRef);
+pub struct GPUTexture(ExternRef);
 
-impl GpuCanvasContext {
+impl GPUTexture {
+    pub fn create_view(&self) -> GPUTextureView {
+        let create_view = js!(r#"
+            function(texture){
+                return texture.createView();
+            }"#);
+        let view_ref = create_view.invoke_and_return_object(&[(&(self.0)).into()]);
+        GPUTextureView(view_ref)
+    }
+}
+
+pub struct GPUTextureView(ExternRef);
+
+impl GPUCanvasContext {
     pub fn from_element(element: &ExternRef) -> Self {
         let get_context = js!(r#"
             function(element){
                 return element.getContext("webgpu");
             }"#);
         let ctx_ref = get_context.invoke_and_return_object(&[element.into()]);
-        GpuCanvasContext(ctx_ref)
+        GPUCanvasContext(ctx_ref)
     }
 
     pub fn configure(&self, config: &GpuCanvasConfiguration) {
@@ -175,6 +290,15 @@ impl GpuCanvasContext {
             config.format.as_str().into(),
             config.alpha_mode.as_str().into(),
         ]);
+    }
+
+    pub fn get_current_texture(&self) -> GPUTexture {
+        let texture_ref = js!(r#"
+            function(ctx){
+                return ctx.getCurrentTexture();
+            }"#)
+        .invoke_and_return_object(&[(&(self.0)).into()]);
+        GPUTexture(texture_ref)
     }
 }
 
@@ -347,8 +471,8 @@ pub struct GPURenderPipelineDescriptor<'a> {
 
 pub struct GPUVertexAttribute {
     pub format: GPUVertexFormat,
-    pub offset: u32,
-    pub shader_location: u32,
+    pub offset: usize,
+    pub shader_location: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -461,5 +585,101 @@ impl GPUInputStepMode {
             GPUInputStepMode::Vertex => "vertex",
             GPUInputStepMode::Instance => "instance",
         }
+    }
+}
+
+pub struct GPURenderPassDescriptor<'a> {
+    pub color_attachments: Vec<GPURenderPassColorAttachment<'a>>,
+}
+
+pub struct GPUColor {
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
+    pub a: f64,
+}
+
+#[derive(Clone, Copy)]
+pub enum GPULoadOp {
+    Load,
+    Clear,
+}
+
+impl GPULoadOp {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            GPULoadOp::Load => "load",
+            GPULoadOp::Clear => "clear",
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub enum GPUStoreOp {
+    Store,
+    Discard,
+}
+
+impl GPUStoreOp {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            GPUStoreOp::Store => "store",
+            GPUStoreOp::Discard => "discard",
+        }
+    }
+}
+
+pub struct GPURenderPassColorAttachment<'a> {
+    pub view: &'a GPUTextureView,
+    pub load_op: GPULoadOp,
+    pub store_op: GPUStoreOp,
+    pub clear_value: GPUColor,
+}
+
+pub struct GPURenderPass(ExternRef);
+
+impl GPUCommandEncoder {
+    pub fn begin_render_pass(&self, descriptor: &GPURenderPassDescriptor) -> GPURenderPass {
+        let color_attachments_ref = create_array();
+        for attachment in &descriptor.color_attachments {
+            let clear_value = js!(r#"
+            function(r, g, b, a){
+                return {r, g, b, a};
+            }
+            "#)
+            .invoke_and_return_object(&[
+                attachment.clear_value.r.into(),
+                attachment.clear_value.g.into(),
+                attachment.clear_value.b.into(),
+                attachment.clear_value.a.into(),
+            ]);
+            let attachment_ref = js!(r#"
+                function(view, loadOp, storeOp, clearValue){
+                    return {
+                        view,
+                        loadOp,
+                        storeOp,
+                        clearValue
+                    };
+                }
+                "#)
+            .invoke_and_return_object(&[
+                (&attachment.view.0).into(),
+                attachment.load_op.as_str().into(),
+                attachment.store_op.as_str().into(),
+                (&clear_value).into(),
+            ]);
+            add_to_array(&color_attachments_ref, &attachment_ref);
+        }
+
+        let render_pass_ref = js!(r#"
+        function(encoder, colorAttachments){
+            return encoder.beginRenderPass({
+                colorAttachments
+            });
+        }
+        "#)
+        .invoke_and_return_object(&[(&self.0).into(), (&color_attachments_ref).into()]);
+        GPURenderPass(render_pass_ref)
     }
 }
