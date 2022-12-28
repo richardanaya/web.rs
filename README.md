@@ -17,6 +17,7 @@ I wanted a library that someone could learn in an afternoon how to use and start
 * fetch & XMLHttpRequest
 * style & classes
 * history & location info
+* WebGPU
 * other utilities
 
 Check out the documentation [here](https://docs.rs/web/latest/web/#functions)
