@@ -114,3 +114,12 @@ pub fn wait_til_animation_frame() -> impl Future<Output = ()> {
     wait_til_animation_frame.invoke(&[state_id.into()]);
     future
 }
+
+pub fn create_object() -> ExternRef {
+    let config_ref = js!(r#"
+        function(){
+            return {};
+        }"#)
+    .invoke_and_return_object(&[]);
+    config_ref
+}

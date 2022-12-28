@@ -1,3 +1,4 @@
+use crate::create_object;
 use crate::EventHandlerFuture;
 use js::*;
 
@@ -17,7 +18,7 @@ impl WebGPU {
         .invoke_and_return_bool(&[])
     }
 
-    pub async fn request_adapter() -> WebGPUAdapter {
+    pub async fn request_adapter() -> GPUAdapter {
         let (future, state_id) = EventHandlerFuture::<ExternRef>::create_future_with_state_id();
         js!(r#"
             async function(state_id){
@@ -27,7 +28,7 @@ impl WebGPU {
             }"#)
         .invoke(&[state_id.into()]);
         let adapter_ref = future.await;
-        WebGPUAdapter(adapter_ref)
+        GPUAdapter(adapter_ref)
     }
 
     pub fn get_preferred_canvas_format() -> String {
@@ -39,10 +40,10 @@ impl WebGPU {
     }
 }
 
-pub struct WebGPUAdapter(ExternRef);
+pub struct GPUAdapter(ExternRef);
 
-impl WebGPUAdapter {
-    pub async fn request_device(&self) -> WebGPUDevice {
+impl GPUAdapter {
+    pub async fn request_device(&self) -> GPUDevice {
         let (future, state_id) = EventHandlerFuture::<ExternRef>::create_future_with_state_id();
         js!(r#"
             async function(adapter, state_id){
@@ -52,11 +53,11 @@ impl WebGPUAdapter {
             }"#)
         .invoke(&[(&(self.0)).into(), state_id.into()]);
         let device_ref = future.await;
-        WebGPUDevice(device_ref)
+        GPUDevice(device_ref)
     }
 }
 
-pub struct WebGPUDevice(ExternRef);
+pub struct GPUDevice(ExternRef);
 
 pub struct GpuCanvasContext(ExternRef);
 
@@ -68,5 +69,60 @@ impl GpuCanvasContext {
             }"#);
         let ctx_ref = get_context.invoke_and_return_object(&[element.into()]);
         GpuCanvasContext(ctx_ref)
+    }
+
+    pub fn configure(&self, config: &GpuCanvasConfiguration) {
+        js!(r#"
+            function(ctx, config){
+                ctx.configure(config);
+            }"#)
+        .invoke(&[(&(self.0)).into(), (&(config.0)).into()]);
+    }
+}
+
+pub struct GpuCanvasConfiguration(ExternRef);
+
+impl GpuCanvasConfiguration {
+    pub fn new() -> Self {
+        let config_ref = create_object();
+        GpuCanvasConfiguration(config_ref)
+    }
+
+    pub fn set_device(&self, device: &GPUDevice) {
+        js!(r#"
+            function(config, device){
+                config.device = device;
+            }"#)
+        .invoke(&[(&(self.0)).into(), (&(device.0)).into()]);
+    }
+
+    pub fn set_format(&self, format: &str) {
+        js!(r#"
+            function(config, format){
+                config.format = format;
+            }"#)
+        .invoke(&[(&(self.0)).into(), format.into()]);
+    }
+
+    pub fn set_alpha_mode(&self, alpha_mode: GPUCanvasAlphaMode) {
+        js!(r#"
+            function(config, alpha_mode){
+                config.alphaMode = alpha_mode;
+            }"#)
+        .invoke(&[(&(self.0)).into(), alpha_mode.as_str().into()]);
+    }
+}
+
+pub enum GPUCanvasAlphaMode {
+    Premultiplied,
+    Opaque,
+}
+
+impl GPUCanvasAlphaMode {
+    fn as_str(&self) -> &'static str {
+        match self {
+            GPUCanvasAlphaMode::Premultiplied => "premultiplied",
+            GPUCanvasAlphaMode::Opaque => "opaque",
+        }
     }
 }
