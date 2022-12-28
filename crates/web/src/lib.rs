@@ -21,3 +21,5 @@ mod window;
 pub use web_macro::main;
 pub use window::*;
 pub use executor::coroutine;    
+mod web_gpu;
+pub use web_gpu::*;

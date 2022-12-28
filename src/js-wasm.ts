@@ -235,6 +235,18 @@ const JsWasm = {
         }
         return context.storeObject(result);
       },
+      js_invoke_function_and_return_bool(
+        funcHandle: number,
+        parametersStart: number,
+        parametersLength: number
+      ) {
+        const values = context.readParameters(parametersStart, parametersLength);
+        const result = context.functions[funcHandle].call(
+          context,
+          ...values
+        );
+        return result ? 1 : 0;
+      },
       js_invoke_function_and_return_bigint(
         funcHandle: number,
         parametersStart: number,

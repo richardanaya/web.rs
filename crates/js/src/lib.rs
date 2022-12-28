@@ -35,6 +35,11 @@ extern "C" {
         parameters_start: *const u8,
         parameters_length: usize,
     ) -> usize;
+    fn js_invoke_function_and_return_bool(
+        fn_handle: f64,
+        parameters_start: *const u8,
+        parameters_length: usize,
+    ) -> f64;
 }
 
 #[derive(Copy, Clone)]
@@ -218,6 +223,17 @@ where {
         let allocation_id =
             unsafe { js_invoke_function_and_return_string(self.fn_handle, ptr, length) };
         extract_string_from_memory(allocation_id)
+    }
+
+    pub fn invoke_and_return_bool(&self, params: &[InvokeParam]) -> bool { 
+        let param_bytes = param_to_bytes(params);
+        let RawParts {
+            ptr,
+            length,
+            capacity: _,
+        } = RawParts::from_vec(param_bytes);
+        let ret = unsafe { js_invoke_function_and_return_bool(self.fn_handle, ptr, length) };
+        ret != 0
     }
 }
 
