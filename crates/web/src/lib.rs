@@ -23,3 +23,5 @@ pub use web_macro::main;
 pub use window::*;
 mod web_gpu;
 pub use web_gpu::*;
+mod web_component;
+pub use web_component::*;
