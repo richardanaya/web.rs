@@ -122,6 +122,12 @@ const $569963205592bc01$var$JsWasm = {
                 this.getMemory().set(bytes, start);
                 return id;
             },
+            writeArrayBufferToMemory: function(ab) {
+                const len = ab.byteLength;
+                const [id, start] = this.createAllocation(len);
+                this.getMemory().set(ab, start);
+                return id;
+            },
             readUtf16FromMemory: function(start, len) {
                 const text = this.utf16dec.decode(this.getMemory().subarray(start, start + len));
                 return text;

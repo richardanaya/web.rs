@@ -1,16 +1,16 @@
 use web::*;
 
-#[no_mangle]
-pub fn main() {
+#[web::main]
+pub async fn main() {
     let body = query_selector("body");
 
-    fetch(
-        "https://pokeapi.co/api/v2/pokemon/1/",
-        HTTPMethod::GET,
-        None,
-        None,
-        move |_status, text| {
-            element_set_inner_html(&body, &text);
-        },
-    );
+    let result = fetch(FetchOptions {
+        url: "https://pokeapi.co/api/v2/pokemon/1/",
+        response_type: FetchResponseType::ArrayBuffer,
+        ..Default::default()
+    })
+    .await;
+    if let FetchResponse::ArrayBuffer(_, text) = result {
+        element_set_inner_html(&body, "got em all2");
+    }
 }

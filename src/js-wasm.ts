@@ -13,6 +13,7 @@ interface JSWasmHandlerContext {
   getMemory: () => Uint8Array;
   createAllocation: (size: number) => [number,number] ;
   writeUtf8ToMemory: (txt: string) => number;
+  writeArrayBufferToMemory: (ab: ArrayBuffer) => number;
   readUint8ArrayFromMemory: (start: number, length: number) => Uint8Array;
   getObject: (handle: bigint) => unknown;
   readParameters: (start: number, length: number) => unknown[];
@@ -66,6 +67,12 @@ const JsWasm = {
         const len = bytes.length;
         const [id,start] = this.createAllocation(len);
         this.getMemory().set(bytes, start);
+        return id;
+      },
+      writeArrayBufferToMemory: function (ab: ArrayBuffer) {
+        const len = ab.byteLength;
+        const [id,start] = this.createAllocation(len);
+        this.getMemory().set(ab, start);
         return id;
       },
       readUtf16FromMemory: function (start: number, len: number) {

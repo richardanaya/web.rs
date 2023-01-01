@@ -1,3 +1,5 @@
+use crate::EventHandlerFuture;
+use core::future::Future;
 use js::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -98,6 +100,17 @@ impl XMLHttpRequest {
         .invoke_and_return_string(&[(&(self.0)).into()])
     }
 
+    pub fn response_array_buffer(&self) -> Vec<u8> {
+        let allocation_id = js!("
+            function(request) {
+                debugger;
+                return request.responseText;
+            }
+            ")
+        .invoke(&[(&(self.0)).into()]);
+        vec![11]
+    }
+
     pub fn response_header(&self, key: &str) -> String {
         js!("
             function(request, key) {
@@ -142,13 +155,42 @@ pub enum HTTPMethod {
     PATCH,
 }
 
-pub fn fetch(
-    url: &str,
-    action: HTTPMethod,
-    body: Option<&str>,
-    headers: Option<HashMap<String, String>>,
-    mut callback: impl FnMut(usize, String) + Send + 'static,
-) {
+pub enum FetchResponse {
+    Text(usize, String),
+    ArrayBuffer(usize, Vec<u8>),
+}
+
+pub struct FetchOptions<'a> {
+    pub url: &'a str,
+    pub action: HTTPMethod,
+    pub body: Option<&'a str>,
+    pub headers: Option<HashMap<String, String>>,
+    pub response_type: FetchResponseType,
+}
+
+pub enum FetchResponseType {
+    Text,
+    ArrayBuffer,
+}
+
+impl Default for FetchOptions<'_> {
+    fn default() -> Self {
+        FetchOptions {
+            url: "",
+            action: HTTPMethod::GET,
+            body: None,
+            headers: None,
+            response_type: FetchResponseType::Text,
+        }
+    }
+}
+
+pub fn fetch(options: FetchOptions) -> impl Future<Output = FetchResponse> {
+    let url = options.url;
+    let body = options.body;
+    let headers = options.headers;
+    let response_type = options.response_type;
+    let action = options.action;
     let request = Arc::new(XMLHttpRequest::new());
     let r2 = request.clone();
     let method_str = match action {
@@ -160,9 +202,9 @@ pub fn fetch(
         HTTPMethod::OPTIONS => "OPTIONS",
         HTTPMethod::PATCH => "PATCH",
     };
-    request.open(method_str, url);
+    request.open(method_str, &url);
     if let Some(body) = body {
-        request.send_with_body(body);
+        request.send_with_body(&body);
     } else {
         request.send();
     }
@@ -171,9 +213,33 @@ pub fn fetch(
             request.set_request_header(&key, &value);
         }
     }
-    request.set_on_load(move || {
-        let status = r2.response_status();
-        let text = r2.response_text();
-        callback(status, text);
+    match response_type {
+        FetchResponseType::Text => {
+            request.set_response_type("text");
+        }
+        FetchResponseType::ArrayBuffer => {
+            request.set_response_type("arraybuffer");
+        }
+    }
+
+    let (future, state_id) = EventHandlerFuture::<FetchResponse>::create_future_with_state_id();
+    request.set_on_load(move || match response_type {
+        FetchResponseType::Text => {
+            let status = r2.response_status();
+            let text = r2.response_text();
+            EventHandlerFuture::<FetchResponse>::wake_future_with_state_id(
+                state_id,
+                FetchResponse::Text(status, text),
+            );
+        }
+        FetchResponseType::ArrayBuffer => {
+            let status = r2.response_status();
+            let ab = r2.response_array_buffer();
+            EventHandlerFuture::<FetchResponse>::wake_future_with_state_id(
+                state_id,
+                FetchResponse::ArrayBuffer(status, ab),
+            );
+        }
     });
+    return future;
 }
