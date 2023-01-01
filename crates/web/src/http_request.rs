@@ -101,14 +101,12 @@ impl XMLHttpRequest {
     }
 
     pub fn response_array_buffer(&self) -> Vec<u8> {
-        let allocation_id = js!("
+        js!("
             function(request) {
-                debugger;
-                return request.responseText;
+                return request.response;
             }
             ")
-        .invoke(&[(&(self.0)).into()]);
-        vec![11]
+        .invoke_and_return_array_buffer(&[(&(self.0)).into()])
     }
 
     pub fn response_header(&self, key: &str) -> String {

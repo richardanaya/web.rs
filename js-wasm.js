@@ -123,9 +123,10 @@ const $569963205592bc01$var$JsWasm = {
                 return id;
             },
             writeArrayBufferToMemory: function(ab) {
-                const len = ab.byteLength;
+                const bytes = new Uint8Array(ab);
+                const len = bytes.length;
                 const [id, start] = this.createAllocation(len);
-                this.getMemory().set(ab, start);
+                this.getMemory().set(bytes, start);
                 return id;
             },
             readUtf16FromMemory: function(start, len) {
@@ -292,6 +293,12 @@ const $569963205592bc01$var$JsWasm = {
                     const result = context.functions[funcHandle].call(context, ...values);
                     if (result === undefined || result === null) throw new Error("js_invoke_function_and_return_string returned undefined or null while trying to retrieve string.");
                     return context.writeUtf8ToMemory(result);
+                },
+                js_invoke_function_and_return_array_buffer (funcHandle, parametersStart, parametersLength) {
+                    const values = context.readParameters(parametersStart, parametersLength);
+                    const result = context.functions[funcHandle].call(context, ...values);
+                    if (result === undefined || result === null) throw new Error("js_invoke_function_and_return_array_buffer returned undefined or null while trying to retrieve arraybuffer.");
+                    return context.writeArrayBufferToMemory(result);
                 }
             },
             context

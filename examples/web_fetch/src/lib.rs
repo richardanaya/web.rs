@@ -10,7 +10,7 @@ pub async fn main() {
         ..Default::default()
     })
     .await;
-    if let FetchResponse::ArrayBuffer(_, text) = result {
-        element_set_inner_html(&body, "got em all2");
+    if let FetchResponse::ArrayBuffer(_, ab) = result {
+        element_set_inner_html(&body, &format!("Got response: {:?}", ab));
     }
 }

@@ -35,6 +35,11 @@ extern "C" {
         parameters_start: *const u8,
         parameters_length: usize,
     ) -> usize;
+    fn js_invoke_function_and_return_array_buffer(
+        fn_handle: f64,
+        parameters_start: *const u8,
+        parameters_length: usize,
+    ) -> usize;
     fn js_invoke_function_and_return_bool(
         fn_handle: f64,
         parameters_start: *const u8,
@@ -239,6 +244,20 @@ where {
         extract_string_from_memory(allocation_id)
     }
 
+    pub fn invoke_and_return_array_buffer(&self, params: &[InvokeParam]) -> Vec<u8>
+where {
+        let param_bytes = param_to_bytes(params);
+        let RawParts {
+            ptr,
+            length,
+            capacity: _,
+        } = RawParts::from_vec(param_bytes);
+        let allocation_id =
+            unsafe { js_invoke_function_and_return_array_buffer(self.fn_handle, ptr, length) };
+        extract_vec_from_memory(allocation_id)
+    }
+
+
     pub fn invoke_and_return_bool(&self, params: &[InvokeParam]) -> bool {
         let param_bytes = param_to_bytes(params);
         let RawParts {
@@ -269,6 +288,13 @@ pub fn extract_string_from_memory(allocation_id: usize) -> String {
     let vec = allocation.as_ref().unwrap();
     let s = String::from_utf8(vec.clone()).unwrap();
     s
+}
+
+pub fn extract_vec_from_memory(allocation_id: usize) -> Vec<u8> {
+    let allocations = ALLOCATIONS.lock();
+    let allocation = allocations.get(allocation_id).unwrap();
+    let vec = allocation.as_ref().unwrap();
+    vec.clone()
 }
 
 #[no_mangle]

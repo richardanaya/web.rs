@@ -1,6 +1,6 @@
 {
   "name": "js-wasm",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Call JavaScript from WebAssembly ",
   "directories": {
     "example": "examples"
