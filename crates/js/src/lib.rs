@@ -257,7 +257,6 @@ where {
         extract_vec_from_memory(allocation_id)
     }
 
-
     pub fn invoke_and_return_bool(&self, params: &[InvokeParam]) -> bool {
         let param_bytes = param_to_bytes(params);
         let RawParts {
