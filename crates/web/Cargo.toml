@@ -1,6 +1,6 @@
 [package]
 name = "web"
-version = "0.2.10"
+version = "0.2.11"
 authors = ["Richard Anaya"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
