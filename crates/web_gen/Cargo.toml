@@ -2,6 +2,11 @@
 name = "web_gen"
 version = "0.0.0"
 edition = "2021"
+authors = ["Richard Anaya"]
+license = "MIT OR Apache-2.0"
+description = "A tool for generating binding for web"
+repository = "https://github.com/richardanaya/js-wasm"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
