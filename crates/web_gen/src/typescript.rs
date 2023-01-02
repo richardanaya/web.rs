@@ -10,7 +10,7 @@ use nom::{
     IResult,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ValueType {
     Void,
     Interface(String),
@@ -19,47 +19,47 @@ pub enum ValueType {
     Boolean,
 }
 
-#[derive(Debug)]
-pub struct Argument {
+#[derive(Debug, Clone)]
+pub struct Parameter {
     pub name: String,
-    pub value_type: String,
+    pub value_type: ValueType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Function {
     pub name: String,
-    pub arguments: Vec<Argument>,
+    pub parameters: Vec<Parameter>,
     pub return_type: ValueType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Declaration {
     pub name: String,
     pub value_type: ValueType,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Comment(pub String);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum InterfaceMember {
     Function(Function),
     Field(Declaration),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Interface {
     pub name: String,
     pub members: Vec<InterfaceMember>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Namespace {
     pub name: String,
     pub parts: Vec<TypescriptDefinitionFilePart>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TypescriptDefinitionFilePart {
     Comment(Comment),
     Interface(Interface),
@@ -67,7 +67,7 @@ pub enum TypescriptDefinitionFilePart {
     NameSpace(Namespace),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TypescriptDefinitionFile {
     pub parts: Vec<TypescriptDefinitionFilePart>,
 }
@@ -125,7 +125,7 @@ fn parse_interface(input: &str) -> IResult<&str, TypescriptDefinitionFilePart> {
     ))
 }
 
-fn parse_argument(input: &str) -> IResult<&str, Argument> {
+fn parse_parameter(input: &str) -> IResult<&str, Parameter> {
     let (input, _) = multispace0(input)?;
     let (input, name) = alpha1(input)?;
     let (input, _) = multispace0(input)?;
@@ -135,15 +135,21 @@ fn parse_argument(input: &str) -> IResult<&str, Argument> {
     let (input, _) = multispace0(input)?;
     Ok((
         input,
-        Argument {
+        Parameter {
             name: String::from(name),
-            value_type: String::from(value_type),
+            value_type: match value_type {
+                "void" => panic!("void is not a valid parameter type"),
+                "string" => ValueType::String,
+                "number" => ValueType::Number,
+                "boolean" => ValueType::Boolean,
+                _ => ValueType::Interface(String::from(value_type)),
+            },
         },
     ))
 }
 
-fn parse_arguments(input: &str) -> IResult<&str, Vec<Argument>> {
-    separated_list0(char(','), parse_argument)(input)
+fn parse_parameters(input: &str) -> IResult<&str, Vec<Parameter>> {
+    separated_list0(char(','), parse_parameter)(input)
 }
 
 fn parse_function(input: &str) -> IResult<&str, InterfaceMember> {
@@ -152,7 +158,7 @@ fn parse_function(input: &str) -> IResult<&str, InterfaceMember> {
     let (input, _) = multispace0(input)?;
     let (input, _) = char('(')(input)?;
     let (input, _) = multispace0(input)?;
-    let (input, arguments) = map(opt(parse_arguments), |args| args.unwrap_or(vec![]))(input)?;
+    let (input, parameters) = map(opt(parse_parameters), |args| args.unwrap_or(vec![]))(input)?;
     let (input, _) = multispace0(input)?;
     let (input, _) = char(')')(input)?;
     let (input, _) = multispace0(input)?;
@@ -165,7 +171,7 @@ fn parse_function(input: &str) -> IResult<&str, InterfaceMember> {
         input,
         InterfaceMember::Function(Function {
             name: String::from(name),
-            arguments: arguments,
+            parameters: parameters,
             return_type: match return_type {
                 "void" => ValueType::Void,
                 "string" => ValueType::String,
